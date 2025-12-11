@@ -11,6 +11,7 @@ export interface UserProfile {
   name: string;
   username: string;
   email: string;
+  emailVerified: boolean;
   bio: string;
   avatarUrl?: string;
   twoFactorEnabled: boolean;
@@ -24,6 +25,8 @@ export interface ApiKey {
   provider: 'huggingface' | 'openai' | 'custom';
   permissions: string[];
   created: number;
+  lastUsed?: number;
+  usageCount: number;
 }
 
 export interface ExchangeConnection {
@@ -31,6 +34,7 @@ export interface ExchangeConnection {
   exchange: string;
   apiKey: string;
   apiSecret: string;
+  passphrase?: string;
   permissions: ('read' | 'trade' | 'withdraw')[];
   status: 'connected' | 'disconnected' | 'error';
   lastChecked: number;
@@ -50,15 +54,26 @@ export interface TelegramConfig {
 }
 
 export interface UserPreferences {
-  theme: 'dark' | 'light';
+  theme: 'purple' | 'cyan' | 'green';
   currency: string;
   language: string;
   dateFormat: string;
+  timeFormat: '12h' | '24h';
+  decimalPlaces: number;
+  chartPreferences: {
+    defaultTimeframe: string;
+    chartType: 'candlestick' | 'line' | 'area';
+    showVolume: boolean;
+  };
   notifications: {
     email: boolean;
     push: boolean;
+    telegram: boolean;
     priceAlerts: boolean;
     tradeExecutions: boolean;
+    signalGeneration: boolean;
+    newsUpdates: boolean;
+    portfolioUpdates: boolean;
   };
   quietHours: {
     enabled: boolean;
@@ -66,11 +81,15 @@ export interface UserPreferences {
     end: string;
   };
   soundEnabled: boolean;
+  notificationSound: string;
   dataSource: {
     refreshRateMarket: number;
     refreshRateNews: number;
     refreshRateSentiment: number;
+    cacheEnabled: boolean;
+    cacheTTL: number;
     hfToken?: string;
+    hfBaseUrl: string;
   };
 }
 
@@ -79,6 +98,7 @@ const DEFAULT_SETTINGS = {
     name: 'Admin User',
     username: 'cryptotrader',
     email: 'admin@crypto.one',
+    emailVerified: true,
     bio: 'Professional crypto trader and analyst.',
     twoFactorEnabled: false,
     // Default hash for 'password'
@@ -95,18 +115,38 @@ const DEFAULT_SETTINGS = {
     minConfidence: 75
   },
   preferences: {
-    theme: 'dark',
+    theme: 'purple',
     currency: 'USD',
     language: 'en',
     dateFormat: 'MM/DD/YYYY',
-    notifications: { email: true, push: true, priceAlerts: true, tradeExecutions: true },
+    timeFormat: '12h',
+    decimalPlaces: 2,
+    chartPreferences: {
+      defaultTimeframe: '1h',
+      chartType: 'candlestick',
+      showVolume: true
+    },
+    notifications: { 
+      email: true, 
+      push: true, 
+      telegram: false,
+      priceAlerts: true, 
+      tradeExecutions: true,
+      signalGeneration: true,
+      newsUpdates: true,
+      portfolioUpdates: true
+    },
     quietHours: { enabled: false, start: '22:00', end: '07:00' },
     soundEnabled: true,
+    notificationSound: 'default',
     dataSource: { 
       refreshRateMarket: 30, 
       refreshRateNews: 300, 
       refreshRateSentiment: 3600,
-      hfToken: '' 
+      cacheEnabled: true,
+      cacheTTL: 300,
+      hfToken: '',
+      hfBaseUrl: 'https://really-amin-datasourceforcryptocurrency-2.hf.space'
     }
   }
 };
@@ -184,11 +224,21 @@ class SettingsService {
       key: encrypt(key),
       provider,
       permissions: ['read'],
-      created: Date.now()
+      created: Date.now(),
+      usageCount: 0
     };
     this.state.apiKeys.push(newKey);
     this.save();
     return newKey;
+  }
+
+  public async updateApiKeyUsage(id: string) {
+    const key = this.state.apiKeys.find((k: ApiKey) => k.id === id);
+    if (key) {
+      key.lastUsed = Date.now();
+      key.usageCount = (key.usageCount || 0) + 1;
+      this.save();
+    }
   }
 
   public async deleteApiKey(id: string) {
@@ -233,7 +283,7 @@ class SettingsService {
     return [...this.state.exchanges];
   }
 
-  public async connectExchange(exchange: string, apiKey: string, apiSecret: string): Promise<ExchangeConnection> {
+  public async connectExchange(exchange: string, apiKey: string, apiSecret: string, passphrase?: string, permissions: ('read' | 'trade' | 'withdraw')[] = ['read', 'trade']): Promise<ExchangeConnection> {
     await new Promise(r => setTimeout(r, 1200));
     
     // Validate credentials
@@ -268,7 +318,8 @@ class SettingsService {
       exchange,
       apiKey: encrypt(apiKey),
       apiSecret: encrypt(apiSecret),
-      permissions: ['read', 'trade'],
+      passphrase: passphrase ? encrypt(passphrase) : undefined,
+      permissions,
       status: 'connected',
       lastChecked: Date.now()
     };
