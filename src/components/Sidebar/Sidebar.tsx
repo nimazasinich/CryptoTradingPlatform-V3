@@ -47,12 +47,7 @@ const MENU_ITEMS: MenuItem[] = [
     id: 'trading', 
     label: 'Trading Hub', 
     icon: CandlestickChart,
-    subItems: [
-      { id: 'trade-spot', label: 'Spot Trading', path: '/trade/spot' },
-      { id: 'trade-margin', label: 'Margin', path: '/trade/margin' },
-      { id: 'trade-futures', label: 'Futures', path: '/trade/futures' },
-      { id: 'trade-swap', label: 'Quick Swap', path: '/trade/swap' },
-    ]
+    path: '/trade/spot'
   },
   { 
     id: 'ai', 
@@ -65,18 +60,8 @@ const MENU_ITEMS: MenuItem[] = [
       { id: 'ai-strategy', label: 'Strategy Builder', path: '/ai/strategy' },
     ]
   },
-  { 
-    id: 'strategy', 
-    label: 'Strategies', 
-    icon: Target,
-    subItems: [
-      { id: 'strategy-manager', label: 'Strategy Manager', path: '/strategy' },
-      { id: 'strategy-dreammaker', label: 'DreamMaker Engine', path: '/strategy/dreammaker' },
-      { id: 'strategy-advanced', label: 'Advanced 5-Layer', path: '/strategy/advanced' },
-      { id: 'strategy-settings', label: 'Strategy Settings', path: '/strategy/settings' },
-    ]
-  },
   { id: 'risk', label: 'Risk Management', icon: ShieldAlert, path: '/risk' },
+  { id: 'strategy', label: 'Strategy Manager', icon: Target, path: '/strategy' },
   { 
     id: 'settings', 
     label: 'Settings', 

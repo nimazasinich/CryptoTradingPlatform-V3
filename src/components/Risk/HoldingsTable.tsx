@@ -1,8 +1,10 @@
 
 import React, { useEffect, useState } from 'react';
+import { Download } from 'lucide-react';
 import { CoinIcon } from '../Common/CoinIcon';
 import { formatPrice } from '../../utils/format';
 import { riskService, Holding } from '../../services/riskService';
+import { exportTable } from '../../utils/exportTable';
 
 export const HoldingsTable = () => {
   const [holdings, setHoldings] = useState<Holding[]>([]);
@@ -17,10 +19,31 @@ export const HoldingsTable = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const handleExport = () => {
+    const exportData = holdings.map(h => ({
+      Asset: h.name,
+      Symbol: h.symbol,
+      Balance: h.amount,
+      Price: h.price,
+      Value: h.value,
+      Allocation: `${h.allocation.toFixed(2)}%`
+    }));
+    exportTable(exportData, { filename: `holdings_${new Date().toISOString().split('T')[0]}` });
+  };
+
   return (
     <div className="glass-card flex flex-col">
-      <div className="p-6 border-b border-white/5">
+      <div className="p-6 border-b border-white/5 flex items-center justify-between">
         <h3 className="font-bold text-white text-lg">Current Holdings</h3>
+        <button
+          onClick={handleExport}
+          disabled={holdings.length === 0}
+          className="flex items-center gap-2 px-3 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm font-medium text-white transition-colors"
+          title="Export to CSV"
+        >
+          <Download size={16} />
+          Export
+        </button>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full">

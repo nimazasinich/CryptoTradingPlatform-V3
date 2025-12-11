@@ -4,6 +4,7 @@ import { ShieldCheck, Activity, Terminal, Monitor } from 'lucide-react';
 import { SystemHealth } from '../components/Admin/SystemHealth';
 import { LogViewer } from '../components/Admin/LogViewer';
 import { SystemMonitoring } from '../components/Admin/SystemMonitoring';
+import { PerformanceCharts } from '../components/Admin/PerformanceCharts';
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState('health');
@@ -68,7 +69,10 @@ export default function Admin() {
 
        {activeTab === 'monitoring' && (
          <div className="animate-fade-in">
-           <SystemMonitoring />
+           <PerformanceCharts />
+           <div className="mt-6">
+             <SystemMonitoring />
+           </div>
          </div>
        )}
 

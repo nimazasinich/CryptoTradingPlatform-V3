@@ -1,11 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, ArrowUp, ArrowDown, Star, LayoutGrid, Gauge, RefreshCcw } from 'lucide-react';
+import { Search, Filter, ArrowUp, ArrowDown, Star, LayoutGrid, Gauge, RefreshCcw, Download, Copy } from 'lucide-react';
 import { marketService } from '../services/marketService';
 import { CryptoPrice } from '../types';
 import { CoinIcon } from '../components/Common/CoinIcon';
 import { formatPrice, formatCompactNumber } from '../utils/format';
 import { calculateRSI, calculateSMA, calculateMACD } from '../utils/indicators';
+import { exportTable, copyToClipboard } from '../utils/exportTable';
+import { useApp } from '../context/AppContext';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -44,6 +46,7 @@ const TechnicalIndicatorCard = ({ title, value, status, description, color }: an
 };
 
 export default function MarketAnalysis() {
+  const { addToast } = useApp();
   const [activeTab, setActiveTab] = useState('market');
   const [searchQuery, setSearchQuery] = useState('');
   const [coins, setCoins] = useState<CryptoPrice[]>([]);
@@ -255,6 +258,37 @@ export default function MarketAnalysis() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="input-glass w-full pl-10"
               />
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={async () => {
+                  try {
+                    await copyToClipboard(coins);
+                    addToast('Copied to clipboard!', 'success');
+                  } catch (e) {
+                    addToast('Failed to copy', 'error');
+                  }
+                }}
+                className="px-3 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm font-medium text-slate-300 flex items-center gap-2 transition-colors"
+                title="Copy to clipboard"
+              >
+                <Copy size={16} />
+                Copy
+              </button>
+              <button
+                onClick={() => {
+                  exportTable(coins, {
+                    filename: `market_${activeTab}_${new Date().toISOString().split('T')[0]}`,
+                    format: 'csv'
+                  });
+                  addToast('Exported to CSV!', 'success');
+                }}
+                className="px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium text-white flex items-center gap-2 transition-colors"
+                title="Export to CSV"
+              >
+                <Download size={16} />
+                Export
+              </button>
             </div>
           </div>
 
