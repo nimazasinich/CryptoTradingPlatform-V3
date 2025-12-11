@@ -38,44 +38,54 @@ const PagePlaceholder = ({ title }: { title: string }) => (
 
 function AppContent() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [currentPath, setCurrentPath] = useState('/');
+  const [currentPath, setCurrentPath] = useState(window.location.pathname + window.location.search);
+
+  // Handle navigation and update browser URL
+  const handleNavigate = (path: string) => {
+    setCurrentPath(path);
+    window.history.pushState({ path }, '', path);
+  };
+
+  // Listen for browser back/forward navigation
+  React.useEffect(() => {
+    const handlePopState = () => {
+      setCurrentPath(window.location.pathname + window.location.search);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const renderContent = () => {
-    switch (currentPath) {
-      case '/': return <Dashboard />;
-      
-      // Market
-      case '/market/overview': return <MarketAnalysis />;
-      case '/market/trending': return <MarketAnalysis />; 
-      case '/market/technical': return <PagePlaceholder title="Technical Analysis" />;
-      
-      // Trading
-      case '/trade/spot': return <TradingHub />;
-      case '/trade/margin': return <PagePlaceholder title="Margin Trading" />;
-      case '/trade/futures': return <PagePlaceholder title="Futures Trading" />;
-      case '/trade/swap': return <PagePlaceholder title="Quick Swap" />;
-      
-      // AI Lab
-      case '/ai/signals': return <AILab />;
-      case '/ai/scanner': return <AILab />;
-      case '/ai/backtest': return <AILab />;
-      case '/ai/strategy': return <AILab />;
-      
-      // Risk
-      case '/risk': return <RiskManagement />;
-      
-      // Settings
-      case '/settings': return <Settings />;
-      case '/profile': return <Settings />;
-      case '/notifications': return <Settings />; 
-      
-      // Admin
-      case '/admin/health': return <Admin />;
-      case '/admin/monitoring': return <Admin />;
-      case '/admin/logs': return <Admin />;
-      
-      default: return <PagePlaceholder title={currentPath.split('/').pop()?.replace('-', ' ').toUpperCase() || 'Page'} />;
+    // Extract base path and query params
+    const [basePath] = currentPath.split('?');
+    const params = new URLSearchParams(currentPath.split('?')[1] || '');
+    const tab = params.get('tab');
+
+    // Dashboard
+    if (basePath === '/') return <Dashboard />;
+    
+    // Market Analysis - all tabs handled within component
+    if (basePath === '/market-analysis') return <MarketAnalysis />;
+    
+    // Trading Hub - all tabs handled within component
+    if (basePath === '/trading-hub') return <TradingHub />;
+    
+    // AI Lab - all tabs handled within component
+    if (basePath === '/ai-lab') return <AILab />;
+    
+    // Risk Management
+    if (basePath === '/risk') return <RiskManagement />;
+    
+    // Settings - pass tab as prop
+    if (basePath === '/settings') {
+      const defaultTab = tab || 'profile';
+      return <Settings defaultTab={defaultTab} />;
     }
+    
+    // Admin - all tabs handled within component
+    if (basePath === '/admin') return <Admin />;
+    
+    return <PagePlaceholder title="Not Found" />;
   };
 
   return (
@@ -84,7 +94,7 @@ function AppContent() {
         isMobileOpen={isMobileOpen}
         setIsMobileOpen={setIsMobileOpen}
         currentPath={currentPath}
-        onNavigate={setCurrentPath}
+        onNavigate={handleNavigate}
       />
 
       <div className="flex-1 flex flex-col min-h-screen relative overflow-hidden transition-all duration-300">

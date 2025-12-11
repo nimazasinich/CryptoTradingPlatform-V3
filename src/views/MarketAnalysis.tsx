@@ -44,12 +44,35 @@ const TechnicalIndicatorCard = ({ title, value, status, description, color }: an
 };
 
 export default function MarketAnalysis() {
-  const [activeTab, setActiveTab] = useState('market');
+  // Read tab from URL query params
+  const getTabFromUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    return tab && ['market', 'trending', 'categories', 'technical'].includes(tab) ? tab : 'market';
+  };
+
+  const [activeTab, setActiveTab] = useState(getTabFromUrl());
   const [searchQuery, setSearchQuery] = useState('');
   const [coins, setCoins] = useState<CryptoPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [taData, setTaData] = useState<any>(null);
   const [selectedTaSymbol, setSelectedTaSymbol] = useState('BTC');
+
+  // Update URL when tab changes
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId);
+    const newUrl = `/market-analysis?tab=${tabId}`;
+    window.history.pushState({ path: newUrl }, '', newUrl);
+  };
+
+  // Listen for browser back/forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      setActiveTab(getTabFromUrl());
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const fetchTA = async (symbol: string) => {
     setLoading(true);
@@ -153,7 +176,7 @@ export default function MarketAnalysis() {
           {TABS.map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => handleTabChange(tab.id)}
               className={cn(
                 "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                 activeTab === tab.id 

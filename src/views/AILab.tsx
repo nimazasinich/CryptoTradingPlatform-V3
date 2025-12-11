@@ -16,9 +16,32 @@ const TABS = [
 ];
 
 export default function AILab() {
-  const [activeTab, setActiveTab] = useState('signals');
+  // Read tab from URL query params
+  const getTabFromUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    return tab && ['signals', 'scanner', 'backtest', 'strategy'].includes(tab) ? tab : 'signals';
+  };
+
+  const [activeTab, setActiveTab] = useState(getTabFromUrl());
   const [signals, setSignals] = useState<AISignal[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // Update URL when tab changes
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId);
+    const newUrl = `/ai-lab?tab=${tabId}`;
+    window.history.pushState({ path: newUrl }, '', newUrl);
+  };
+
+  // Listen for browser back/forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      setActiveTab(getTabFromUrl());
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   useEffect(() => {
     if (activeTab === 'signals') {
@@ -93,7 +116,7 @@ export default function AILab() {
         {TABS.map(tab => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() => handleTabChange(tab.id)}
             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold whitespace-nowrap transition-all ${
               activeTab === tab.id 
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/20' 

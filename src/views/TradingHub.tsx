@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Bot, LayoutTemplate, Briefcase } from 'lucide-react';
+import { ChevronDown, Bot, LayoutTemplate, Briefcase, TrendingUp } from 'lucide-react';
 import { PriceChart } from '../components/Trading/PriceChart';
 import { OrderBook } from '../components/Trading/OrderBook';
 import { OrderForm } from '../components/Trading/OrderForm';
@@ -10,8 +10,29 @@ import { AutoTradingPanel } from '../components/Trading/AutoTradingPanel';
 import { CoinIcon } from '../components/Common/CoinIcon';
 import { tradingService, Position } from '../services/tradingService';
 import { marketService } from '../services/marketService';
+import { clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+function cn(...inputs: (string | undefined | null | false)[]) {
+  return twMerge(clsx(inputs));
+}
 
 const AVAILABLE_PAIRS = ['BTC', 'ETH', 'SOL', 'BNB', 'ADA', 'XRP', 'DOGE'];
+
+const TRADING_TABS = [
+  { id: 'spot', label: 'Spot Trading' },
+  { id: 'margin', label: 'Margin' },
+  { id: 'futures', label: 'Futures' },
+  { id: 'swap', label: 'Quick Swap' },
+];
+
+const PlaceholderTab = ({ title, description }: { title: string; description: string }) => (
+  <div className="glass-card p-12 text-center animate-fade-in">
+    <TrendingUp className="w-16 h-16 mx-auto mb-4 text-purple-400" />
+    <h2 className="text-2xl font-bold text-white mb-2">{title}</h2>
+    <p className="text-slate-400">{description}</p>
+  </div>
+);
 
 const PositionRow = ({ pos, closePos }: { pos: Position, closePos: (s:string)=>void }) => (
   <tr className="hover:bg-white/5 border-b border-white/5 last:border-0 text-sm">
@@ -39,10 +60,34 @@ const PositionRow = ({ pos, closePos }: { pos: Position, closePos: (s:string)=>v
 );
 
 export default function TradingHub() {
+  // Read tab from URL query params
+  const getTabFromUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    return tab && ['spot', 'margin', 'futures', 'swap'].includes(tab) ? tab : 'spot';
+  };
+
+  const [activeTab, setActiveTab] = useState(getTabFromUrl());
   const [activeSymbol, setActiveSymbol] = useState('BTC');
   const [currentPrice, setCurrentPrice] = useState(65000);
   const [showBot, setShowBot] = useState(false);
   const [positions, setPositions] = useState<Position[]>([]);
+
+  // Update URL when tab changes
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId);
+    const newUrl = `/trading-hub?tab=${tabId}`;
+    window.history.pushState({ path: newUrl }, '', newUrl);
+  };
+
+  // Listen for browser back/forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      setActiveTab(getTabFromUrl());
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // Fetch real price
   useEffect(() => {
@@ -88,9 +133,38 @@ export default function TradingHub() {
   };
 
   return (
-    <div className="h-[calc(100vh-6rem)] pb-4 animate-fade-in flex flex-col gap-3 max-w-[1920px] mx-auto">
-      {/* Header */}
-      <div className="glass-card p-2 px-4 flex items-center justify-between shrink-0">
+    <div className="pb-4 animate-fade-in flex flex-col gap-3 max-w-[1920px] mx-auto">
+      {/* Tabs */}
+      <div className="flex items-center gap-4 mb-2">
+        <h1 className="text-3xl font-bold text-white">Trading Hub</h1>
+        <div className="flex bg-slate-900/50 p-1 rounded-xl border border-white/5">
+          {TRADING_TABS.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => handleTabChange(tab.id)}
+              className={cn(
+                "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                activeTab === tab.id 
+                  ? "bg-purple-600 text-white shadow-lg shadow-purple-900/20" 
+                  : "text-slate-400 hover:text-white hover:bg-white/5"
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Tab Content */}
+      {activeTab !== 'spot' ? (
+        <PlaceholderTab 
+          title={TRADING_TABS.find(t => t.id === activeTab)?.label || ''} 
+          description="This trading mode is scheduled for implementation in upcoming phases." 
+        />
+      ) : (
+        <div className="flex flex-col gap-3">
+          {/* Header */}
+          <div className="glass-card p-2 px-4 flex items-center justify-between shrink-0">
          <div className="flex items-center gap-6">
             <div className="group relative">
                <button className="flex items-center gap-2 hover:bg-white/5 p-2 rounded-lg transition-colors">
@@ -201,6 +275,8 @@ export default function TradingHub() {
              )}
          </div>
       </div>
+        </div>
+      )}
     </div>
   );
 }

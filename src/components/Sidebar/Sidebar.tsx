@@ -36,32 +36,36 @@ const MENU_ITEMS: MenuItem[] = [
     id: 'market', 
     label: 'Market Analysis', 
     icon: LineChart,
+    path: '/market-analysis',
     subItems: [
-      { id: 'market-overview', label: 'Overview', path: '/market/overview' },
-      { id: 'market-trending', label: 'Trending', path: '/market/trending' },
-      { id: 'market-technical', label: 'Technical Analysis', path: '/market/technical' },
+      { id: 'market-overview', label: 'Overview', path: '/market-analysis?tab=market' },
+      { id: 'market-trending', label: 'Trending', path: '/market-analysis?tab=trending' },
+      { id: 'market-categories', label: 'Categories', path: '/market-analysis?tab=categories' },
+      { id: 'market-technical', label: 'Technical', path: '/market-analysis?tab=technical' },
     ]
   },
   { 
     id: 'trading', 
     label: 'Trading Hub', 
     icon: CandlestickChart,
+    path: '/trading-hub',
     subItems: [
-      { id: 'trade-spot', label: 'Spot Trading', path: '/trade/spot' },
-      { id: 'trade-margin', label: 'Margin', path: '/trade/margin' },
-      { id: 'trade-futures', label: 'Futures', path: '/trade/futures' },
-      { id: 'trade-swap', label: 'Quick Swap', path: '/trade/swap' },
+      { id: 'trade-spot', label: 'Spot Trading', path: '/trading-hub?tab=spot' },
+      { id: 'trade-margin', label: 'Margin', path: '/trading-hub?tab=margin' },
+      { id: 'trade-futures', label: 'Futures', path: '/trading-hub?tab=futures' },
+      { id: 'trade-swap', label: 'Quick Swap', path: '/trading-hub?tab=swap' },
     ]
   },
   { 
     id: 'ai', 
     label: 'AI Lab', 
     icon: Bot,
+    path: '/ai-lab',
     subItems: [
-      { id: 'ai-signals', label: 'Trading Signals', path: '/ai/signals' },
-      { id: 'ai-scanner', label: 'Market Scanner', path: '/ai/scanner' },
-      { id: 'ai-backtest', label: 'Backtesting', path: '/ai/backtest' },
-      { id: 'ai-strategy', label: 'Strategy Builder', path: '/ai/strategy' },
+      { id: 'ai-signals', label: 'Trading Signals', path: '/ai-lab?tab=signals' },
+      { id: 'ai-scanner', label: 'Market Scanner', path: '/ai-lab?tab=scanner' },
+      { id: 'ai-backtest', label: 'Backtesting', path: '/ai-lab?tab=backtest' },
+      { id: 'ai-strategy', label: 'Strategy Builder', path: '/ai-lab?tab=strategy' },
     ]
   },
   { id: 'risk', label: 'Risk Management', icon: ShieldAlert, path: '/risk' },
@@ -71,23 +75,24 @@ const MENU_ITEMS: MenuItem[] = [
     icon: Settings, 
     path: '/settings',
     subItems: [
-      { id: 'settings-profile', label: 'Profile', path: '/settings/profile' },
-      { id: 'settings-api', label: 'API Keys', path: '/settings/api' },
-      { id: 'settings-exchanges', label: 'Exchanges', path: '/settings/exchanges' },
-      { id: 'settings-telegram', label: 'Telegram Bot', path: '/settings/telegram' },
-      { id: 'settings-personalization', label: 'Personalization', path: '/settings/personalization' },
-      { id: 'settings-notifications', label: 'Notifications', path: '/settings/notifications' },
-      { id: 'settings-data', label: 'Data Sources', path: '/settings/data' },
+      { id: 'settings-profile', label: 'Profile', path: '/settings?tab=profile' },
+      { id: 'settings-api', label: 'API Keys', path: '/settings?tab=api' },
+      { id: 'settings-exchanges', label: 'Exchanges', path: '/settings?tab=exchanges' },
+      { id: 'settings-telegram', label: 'Telegram Bot', path: '/settings?tab=telegram' },
+      { id: 'settings-personalization', label: 'Personalization', path: '/settings?tab=personalization' },
+      { id: 'settings-notifications', label: 'Notifications', path: '/settings?tab=notifications' },
+      { id: 'settings-data', label: 'Data Sources', path: '/settings?tab=data' },
     ]
   },
   { 
     id: 'admin', 
     label: 'Admin', 
     icon: ShieldCheck,
+    path: '/admin',
     subItems: [
-      { id: 'admin-health', label: 'System Health', path: '/admin/health' },
-      { id: 'admin-monitoring', label: 'Monitoring', path: '/admin/monitoring' },
-      { id: 'admin-logs', label: 'System Logs', path: '/admin/logs' },
+      { id: 'admin-health', label: 'System Health', path: '/admin?tab=health' },
+      { id: 'admin-monitoring', label: 'Monitoring', path: '/admin?tab=monitoring' },
+      { id: 'admin-logs', label: 'System Logs', path: '/admin?tab=logs' },
     ]
   },
 ];
@@ -107,6 +112,14 @@ export function Sidebar({ isMobileOpen, setIsMobileOpen, currentPath, onNavigate
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [expandedMenus, setExpandedMenus] = useState<string[]>(['settings']);
   const [isWalletConnected, setIsWalletConnected] = useState(false);
+
+  // Helper to check if current path matches (handles query params)
+  const isPathActive = (itemPath: string) => {
+    if (!itemPath) return false;
+    const [pathWithoutQuery] = currentPath.split('?');
+    const [itemPathWithoutQuery] = itemPath.split('?');
+    return pathWithoutQuery === itemPathWithoutQuery;
+  };
 
   const toggleSubmenu = (menuId: string) => {
     if (isCollapsed) setIsCollapsed(false);
@@ -189,7 +202,7 @@ export function Sidebar({ isMobileOpen, setIsMobileOpen, currentPath, onNavigate
         {/* Menu Items */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden py-6 px-3 space-y-1.5 custom-scrollbar">
           {MENU_ITEMS.map((item) => {
-            const isActive = currentPath === item.path || item.subItems?.some(sub => sub.path === currentPath);
+            const isActive = isPathActive(item.path || '') || item.subItems?.some(sub => currentPath === sub.path);
             const isExpanded = expandedMenus.includes(item.id);
 
             return (

@@ -6,14 +6,29 @@ import { LogViewer } from '../components/Admin/LogViewer';
 import { SystemMonitoring } from '../components/Admin/SystemMonitoring';
 
 export default function Admin() {
-  const [activeTab, setActiveTab] = useState('health');
+  // Read tab from URL query params
+  const getTabFromUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    return tab && ['health', 'monitoring', 'logs'].includes(tab) ? tab : 'health';
+  };
 
-  // Sync with URL if needed, similar to Settings
+  const [activeTab, setActiveTab] = useState(getTabFromUrl());
+
+  // Update URL when tab changes
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId);
+    const newUrl = `/admin?tab=${tabId}`;
+    window.history.pushState({ path: newUrl }, '', newUrl);
+  };
+
+  // Listen for browser back/forward navigation
   useEffect(() => {
-    const path = window.location.pathname.split('/').pop();
-    if (path && ['health', 'monitoring', 'logs'].includes(path)) {
-      setActiveTab(path);
-    }
+    const handlePopState = () => {
+      setActiveTab(getTabFromUrl());
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   return (
@@ -29,19 +44,19 @@ export default function Admin() {
          
          <div className="flex bg-white/5 p-1 rounded-xl">
            <button 
-             onClick={() => setActiveTab('health')}
+             onClick={() => handleTabChange('health')}
              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'health' ? 'bg-purple-600 text-white' : 'text-slate-400'}`}
            >
              Health
            </button>
            <button 
-             onClick={() => setActiveTab('monitoring')}
+             onClick={() => handleTabChange('monitoring')}
              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'monitoring' ? 'bg-purple-600 text-white' : 'text-slate-400'}`}
            >
              Monitoring
            </button>
            <button 
-             onClick={() => setActiveTab('logs')}
+             onClick={() => handleTabChange('logs')}
              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'logs' ? 'bg-purple-600 text-white' : 'text-slate-400'}`}
            >
              Logs
