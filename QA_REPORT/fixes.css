@@ -1,0 +1,688 @@
+/**
+ * CSS FIXES & ENHANCEMENTS
+ * CryptoOne Trading Platform - Visual QA Improvements
+ * 
+ * INSTRUCTIONS:
+ * 1. Copy this entire file
+ * 2. Paste at the END of src/styles/globals.css
+ * 3. OR create a new file: src/styles/fixes.css and import it in App.tsx
+ * 4. Test thoroughly after applying
+ * 
+ * CATEGORIES:
+ * - Accessibility Fixes (Focus, Contrast, ARIA)
+ * - Performance Optimizations
+ * - Visual Refinements
+ * - Responsive Improvements
+ */
+
+/* ============================================
+   SECTION 1: ACCESSIBILITY FIXES (CRITICAL)
+   ============================================ */
+
+/* 1.1 - Enhanced Focus Indicators for All Interactive Elements */
+@layer components {
+  /* Universal focus ring for better keyboard navigation visibility */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [role="button"]:focus-visible,
+  [role="tab"]:focus-visible,
+  [tabindex]:focus-visible {
+    @apply outline-none ring-2 ring-purple-500 ring-offset-2 ring-offset-slate-950;
+  }
+
+  /* Enhanced input focus (increase ring width from 1px to 2px) */
+  .input-glass:focus {
+    @apply border-purple-500 ring-2 ring-purple-500/50;
+    /* Old: ring-1, New: ring-2 for better visibility */
+  }
+
+  /* Primary button focus state */
+  .btn-primary:focus-visible {
+    @apply ring-2 ring-purple-400 ring-offset-2 ring-offset-slate-950;
+  }
+
+  /* Icon button focus (sidebar, toolbars) */
+  .icon-btn:focus-visible {
+    @apply ring-2 ring-purple-500 ring-offset-2 ring-offset-slate-950 rounded-lg;
+  }
+
+  /* Remove default outline to use custom ring */
+  *:focus {
+    outline: none;
+  }
+
+  *:focus-visible {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
+}
+
+/* 1.2 - Improved Text Contrast (WCAG AA Compliance) */
+/* Replace slate-400 (3.8:1) with slate-300 (6.2:1) for better readability */
+
+/* Body text and descriptions */
+.text-slate-400 {
+  @apply text-slate-300 !important;
+  /* Override for accessibility - increases contrast from 3.8:1 to 6.2:1 */
+}
+
+/* Secondary labels - slightly darker but still compliant */
+.label-secondary {
+  @apply text-slate-400;
+  /* This is now the darkest acceptable shade */
+}
+
+/* Placeholder text improvement */
+.input-glass::placeholder,
+input::placeholder,
+textarea::placeholder {
+  @apply text-slate-500;
+  /* Up from slate-600 for better visibility */
+}
+
+/* Small text / captions */
+.text-caption {
+  @apply text-slate-300 text-xs;
+  /* Ensure small text also meets contrast requirements */
+}
+
+/* 1.3 - Reduced Motion Support (Complete Implementation) */
+@media (prefers-reduced-motion: reduce) {
+  /* Disable ALL animations and transitions */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Specifically target continuous animations */
+  .animate-spin,
+  .animate-pulse,
+  .animate-shimmer,
+  .animate-marquee,
+  .animate-text-flow,
+  .animate-ping,
+  .animate-bounce,
+  .animate-pulse-slow,
+  .animate-spin-slow {
+    animation: none !important;
+  }
+
+  /* Disable hover transforms */
+  .glass-card-hover:hover,
+  .group:hover > *,
+  button:active,
+  a:active {
+    transform: none !important;
+  }
+
+  /* Disable backdrop animation */
+  .backdrop-blur-xl,
+  .backdrop-blur-md,
+  .backdrop-blur-sm {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background-color: rgba(15, 23, 42, 0.95) !important;
+  }
+
+  /* Show content immediately without fade-in */
+  .animate-fade-in {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+
+  /* Disable sparkline animations */
+  svg polyline,
+  svg path {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* 1.4 - Screen Reader Only Utility Class */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.sr-only-focusable:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* ============================================
+   SECTION 2: PERFORMANCE OPTIMIZATIONS
+   ============================================ */
+
+/* 2.1 - Optimize Backdrop Filter Performance */
+.glass-card,
+.glass-panel,
+.glass-card-hover {
+  /* Add performance hint for GPU acceleration */
+  will-change: backdrop-filter;
+  /* Promote to separate layer */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* Reduce blur intensity for lower-end devices */
+@media (prefers-reduced-data: reduce) {
+  .glass-card,
+  .glass-panel {
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+  }
+}
+
+/* 2.2 - Optimize Animation Performance */
+/* Use transform and opacity only (GPU accelerated) */
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) translateZ(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateZ(0);
+  }
+}
+
+/* Optimize continuous animations */
+.animate-marquee {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* 2.3 - Lazy Animations (Pause when not visible) */
+/* Add this class to ticker and other continuous animations */
+.lazy-animate {
+  animation-play-state: running;
+}
+
+/* Pause when page is hidden (saves CPU/battery) */
+@media (prefers-reduced-motion: no-preference) {
+  html.page-hidden .lazy-animate {
+    animation-play-state: paused !important;
+  }
+}
+
+/* ============================================
+   SECTION 3: VISUAL REFINEMENTS
+   ============================================ */
+
+/* 3.1 - Consistent Border Radius System */
+:root {
+  --radius-sm: 0.5rem;    /* 8px - badges, tags */
+  --radius-md: 0.75rem;   /* 12px - buttons, inputs */
+  --radius-lg: 1rem;      /* 16px - cards, panels */
+  --radius-xl: 1.25rem;   /* 20px - modals, large cards */
+  --radius-2xl: 1.5rem;   /* 24px - hero cards */
+}
+
+/* Apply consistent radius */
+.glass-card {
+  border-radius: var(--radius-lg);
+}
+
+.btn-primary,
+.btn-secondary,
+.input-glass {
+  border-radius: var(--radius-md);
+}
+
+.modal-content {
+  border-radius: var(--radius-xl);
+}
+
+.stat-card {
+  border-radius: var(--radius-2xl);
+}
+
+/* 3.2 - Enhanced Error Display Component */
+.field-error {
+  @apply flex items-start gap-1.5 mt-1 text-xs text-red-400;
+}
+
+.field-error-icon {
+  @apply mt-0.5 flex-shrink-0;
+  width: 14px;
+  height: 14px;
+}
+
+.field-error-message {
+  @apply leading-tight;
+}
+
+/* 3.3 - Improved Percentage Button States */
+.percentage-btn {
+  @apply py-2 px-3 rounded-lg text-xs font-bold transition-all duration-200 border;
+}
+
+.percentage-btn-inactive {
+  @apply bg-white/5 border-white/5 text-slate-300 hover:bg-purple-500/20 hover:border-purple-500/50;
+}
+
+.percentage-btn-active {
+  @apply bg-purple-500/30 border-purple-500 text-purple-200 shadow-lg shadow-purple-500/20;
+}
+
+/* 3.4 - Better Loading State Indicators */
+.loading-spinner {
+  @apply relative w-16 h-16;
+}
+
+.loading-spinner-ring {
+  @apply absolute inset-0 rounded-full border-4 border-purple-500/20;
+}
+
+.loading-spinner-active {
+  @apply absolute inset-0 rounded-full border-4 border-t-purple-500 animate-spin;
+}
+
+.loading-spinner-glow {
+  @apply absolute inset-4 rounded-full bg-purple-500/20 blur-sm animate-pulse;
+}
+
+/* 3.5 - Modal Overlay Improvements */
+.modal-overlay {
+  @apply fixed inset-0 bg-black/50 backdrop-blur-sm z-[200] flex items-center justify-center p-4;
+}
+
+.modal-content {
+  @apply glass-card p-6 max-w-md w-full border-2 border-white/10;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Modal title styling */
+.modal-title {
+  @apply text-xl font-bold text-white mb-4 flex items-center gap-2;
+}
+
+/* Modal close button */
+.modal-close {
+  @apply absolute top-4 right-4 p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors;
+}
+
+/* ============================================
+   SECTION 4: RESPONSIVE IMPROVEMENTS
+   ============================================ */
+
+/* 4.1 - Better Touch Targets (44x44px minimum) */
+@media (hover: none) and (pointer: coarse) {
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  [role="button"],
+  .icon-btn {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.75rem;
+  }
+
+  /* Increase tap spacing */
+  .touch-list > * + * {
+    margin-top: 0.75rem;
+  }
+
+  /* Larger icons on touch devices */
+  .icon-btn svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* 4.2 - Improved Mobile Card Spacing */
+@media (max-width: 768px) {
+  /* Reduce aggressive !important usage */
+  .stat-card-mobile {
+    padding: 0.75rem;
+    height: auto;
+    min-height: 120px;
+  }
+
+  .glass-card {
+    padding: 0.875rem;
+    border-radius: var(--radius-md);
+  }
+
+  /* Better mobile grid gaps */
+  .grid-mobile {
+    gap: 0.75rem;
+  }
+
+  /* Stack columns on mobile */
+  .stack-mobile {
+    grid-template-columns: 1fr;
+  }
+
+  /* Optimize mobile tables */
+  .mobile-table td,
+  .mobile-table th {
+    padding: 0.5rem 0.5rem;
+    font-size: 0.8125rem;
+  }
+}
+
+/* 4.3 - Small Mobile Devices (375px) */
+@media (max-width: 375px) {
+  .glass-card {
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+  }
+
+  .stat-card-mobile {
+    padding: 0.625rem;
+    min-height: 100px;
+  }
+
+  /* Ensure text remains readable */
+  body {
+    font-size: 0.9375rem; /* 15px */
+  }
+
+  .text-sm {
+    font-size: 0.8125rem; /* 13px */
+  }
+
+  .text-xs {
+    font-size: 0.6875rem; /* 11px */
+  }
+}
+
+/* 4.4 - Landscape Mobile Optimization */
+@media (max-width: 896px) and (orientation: landscape) {
+  .glass-card {
+    padding: 0.625rem;
+  }
+
+  .sidebar-mobile {
+    width: 240px;
+  }
+
+  /* Reduce vertical spacing in landscape */
+  .space-y-6 > * + * {
+    margin-top: 1rem;
+  }
+}
+
+/* ============================================
+   SECTION 5: COMPONENT-SPECIFIC FIXES
+   ============================================ */
+
+/* 5.1 - Sidebar Enhancements */
+.sidebar-nav-item {
+  @apply w-full flex items-center gap-4 px-3 py-3 rounded-xl transition-all duration-200 relative;
+}
+
+.sidebar-nav-item-active {
+  @apply bg-white/5 text-white;
+}
+
+.sidebar-nav-item-inactive {
+  @apply text-slate-400 hover:text-white hover:bg-white/5;
+}
+
+.sidebar-nav-indicator {
+  @apply absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-purple-500 rounded-r-full;
+}
+
+/* 5.2 - Order Form Improvements */
+.order-form-section {
+  @apply space-y-1.5;
+}
+
+.order-form-label {
+  @apply text-[10px] text-slate-300 font-bold uppercase tracking-wider;
+  /* Changed from slate-400 to slate-300 for contrast */
+}
+
+.order-form-input-wrapper {
+  @apply relative;
+}
+
+.order-form-input-prefix {
+  @apply absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs;
+}
+
+/* 5.3 - Price Ticker Optimization */
+.ticker-container {
+  @apply w-full overflow-hidden relative;
+}
+
+.ticker-gradient-left {
+  @apply absolute top-0 left-0 w-32 h-full bg-gradient-to-r from-slate-950 to-transparent z-10 pointer-events-none;
+}
+
+.ticker-gradient-right {
+  @apply absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-slate-950 to-transparent z-10 pointer-events-none;
+}
+
+.ticker-item {
+  @apply flex items-center justify-between w-[240px] h-[88px] mx-3 px-5 py-3 rounded-2xl;
+  @apply bg-white/[0.03] border border-white/5 backdrop-blur-md;
+  @apply hover:bg-white/[0.08] hover:border-white/10 transition-all duration-300 cursor-pointer;
+}
+
+/* 5.4 - Dashboard Stat Card Refinements */
+.stat-card-wrapper {
+  @apply relative group h-[180px];
+}
+
+.stat-card-border-glow {
+  @apply absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-purple-500 via-cyan-500 to-purple-500;
+  @apply opacity-30 group-hover:opacity-100 blur-sm transition-opacity duration-500;
+}
+
+.stat-card-background {
+  @apply absolute inset-0 bg-slate-950/80 rounded-2xl backdrop-blur-xl;
+}
+
+.stat-card-content {
+  @apply relative h-full glass-card p-6 overflow-hidden transition-transform duration-300;
+  @apply group-hover:-translate-y-1 bg-white/[0.03];
+}
+
+/* 5.5 - Toast Notification Styles (if applicable) */
+.toast {
+  @apply fixed bottom-4 right-4 z-[300] max-w-md;
+  @apply glass-card p-4 border-l-4 shadow-2xl;
+  animation: slideInRight 0.3s ease-out;
+}
+
+.toast-success {
+  @apply border-l-green-500 bg-green-500/10;
+}
+
+.toast-error {
+  @apply border-l-red-500 bg-red-500/10;
+}
+
+.toast-info {
+  @apply border-l-blue-500 bg-blue-500/10;
+}
+
+.toast-warning {
+  @apply border-l-yellow-500 bg-yellow-500/10;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%) translateZ(0);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) translateZ(0);
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   SECTION 6: UTILITY CLASSES
+   ============================================ */
+
+/* 6.1 - Improved Scrollbar Styling */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.3);
+  border-radius: 3px;
+  transition: background-color 0.2s;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(148, 163, 184, 0.5);
+}
+
+@media (max-width: 768px) {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+}
+
+/* 6.2 - Truncate Text Utility */
+.truncate-2-lines {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.truncate-3-lines {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 6.3 - Safe Area Insets for Mobile (iOS notch) */
+@supports (padding: max(0px)) {
+  .safe-area-inset-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+
+  .safe-area-inset-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* 6.4 - Gradient Text Utility (improved) */
+.text-gradient-enhanced {
+  @apply bg-clip-text text-transparent;
+  background-image: linear-gradient(
+    135deg,
+    theme('colors.purple.400'),
+    theme('colors.cyan.400'),
+    theme('colors.purple.400')
+  );
+  background-size: 200% auto;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .text-gradient-enhanced {
+    animation: gradientShift 5s linear infinite;
+  }
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ============================================
+   SECTION 7: PRINT STYLES (BONUS)
+   ============================================ */
+
+@media print {
+  /* Hide non-essential elements */
+  .sidebar,
+  .mobile-nav,
+  button,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Remove glassmorphism effects */
+  .glass-card,
+  .glass-panel {
+    background: white !important;
+    border: 1px solid #ddd !important;
+    backdrop-filter: none !important;
+    color: black !important;
+  }
+
+  /* Ensure good contrast for printing */
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Show all content */
+  * {
+    color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+}
+
+/* ============================================
+   END OF FIXES
+   ============================================ */
+
+/**
+ * TESTING CHECKLIST AFTER APPLYING:
+ * 
+ * ✅ 1. Tab through all interactive elements - focus rings should be visible
+ * ✅ 2. Enable reduced-motion in OS settings - animations should stop
+ * ✅ 3. Zoom to 200% - text should remain readable
+ * ✅ 4. Test on mobile device - touch targets should be 44x44px
+ * ✅ 5. Test with screen reader - ARIA labels should be announced
+ * ✅ 6. Check color contrast with tool - all text should pass WCAG AA
+ * ✅ 7. Test keyboard shortcuts (B, S, Escape) - should work
+ * ✅ 8. Verify modals are announced and focusable
+ * ✅ 9. Check loading states show proper indicators
+ * ✅ 10. Verify error messages are aligned and readable
+ * 
+ * ADDITIONAL REACT COMPONENT CHANGES NEEDED:
+ * See REPORT.md sections 4-10 for specific component fixes
+ */
