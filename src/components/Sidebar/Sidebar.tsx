@@ -16,7 +16,8 @@ import {
   Menu,
   X,
   Zap,
-  Wallet
+  Wallet,
+  Target
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
@@ -62,6 +63,17 @@ const MENU_ITEMS: MenuItem[] = [
       { id: 'ai-scanner', label: 'Market Scanner', path: '/ai/scanner' },
       { id: 'ai-backtest', label: 'Backtesting', path: '/ai/backtest' },
       { id: 'ai-strategy', label: 'Strategy Builder', path: '/ai/strategy' },
+    ]
+  },
+  { 
+    id: 'strategy', 
+    label: 'Strategies', 
+    icon: Target,
+    subItems: [
+      { id: 'strategy-manager', label: 'Strategy Manager', path: '/strategy' },
+      { id: 'strategy-dreammaker', label: 'DreamMaker Engine', path: '/strategy/dreammaker' },
+      { id: 'strategy-advanced', label: 'Advanced 5-Layer', path: '/strategy/advanced' },
+      { id: 'strategy-settings', label: 'Strategy Settings', path: '/strategy/settings' },
     ]
   },
   { id: 'risk', label: 'Risk Management', icon: ShieldAlert, path: '/risk' },

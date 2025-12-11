@@ -13,6 +13,7 @@ const AILab = lazy(() => import('./src/views/AILab'));
 const RiskManagement = lazy(() => import('./src/views/RiskManagement'));
 const Settings = lazy(() => import('./src/views/Settings'));
 const Admin = lazy(() => import('./src/views/Admin'));
+const StrategyManager = lazy(() => import('./src/views/StrategyManager'));
 
 // Loading Fallback Component
 const PageLoader = () => (
@@ -60,6 +61,12 @@ function AppContent() {
       case '/ai/scanner': return <AILab />;
       case '/ai/backtest': return <AILab />;
       case '/ai/strategy': return <AILab />;
+      
+      // Strategy Manager
+      case '/strategy': return <StrategyManager />;
+      case '/strategy/dreammaker': return <StrategyManager />;
+      case '/strategy/advanced': return <StrategyManager />;
+      case '/strategy/settings': return <StrategyManager />;
       
       // Risk
       case '/risk': return <RiskManagement />;

@@ -1,0 +1,28 @@
+{
+  "spot": {
+    "maxPositionSize": 500,
+    "maxDailyLoss": 150,
+    "maxOpenPositions": 5,
+    "maxRiskPerTrade": 2.5
+  },
+  "futures": {
+    "maxPositionSize": 300,
+    "maxDailyLoss": 100,
+    "maxOpenPositions": 3,
+    "maxRiskPerTrade": 2.0,
+    "minLeverage": 2,
+    "maxLeverage": 10,
+    "liquidationBuffer": 0.35,
+    "volatilityGate": {
+      "enabled": true,
+      "atrZScoreMax": 3.0,
+      "leverageReduction": 0.30
+    }
+  },
+  "cooldown": {
+    "enabled": true,
+    "afterConsecutiveSL": 2,
+    "bars": 20,
+    "barDurationMs": 900000
+  }
+}
