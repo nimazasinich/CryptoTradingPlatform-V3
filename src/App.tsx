@@ -67,7 +67,11 @@ function AppContent() {
       return <PagePlaceholder title="Advanced Trading" />;
     }
     
-    if (currentPath.startsWith('/ai')) return <AILab />;
+    if (currentPath.startsWith('/ai')) {
+      const parts = currentPath.split('/');
+      const tab = parts[2] || 'signals';
+      return <AILab defaultTab={tab} />;
+    }
     
     if (currentPath === '/risk') return <RiskManagement />;
     

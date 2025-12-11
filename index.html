@@ -103,6 +103,9 @@
       }
     </style>
     
+    <!-- SQL.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    
     <script type="importmap">
 {
   "imports": {
@@ -114,13 +117,13 @@
     "framer-motion": "https://esm.sh/framer-motion@10.18.0?deps=react@18.2.0,react-dom@18.2.0",
     "clsx": "https://esm.sh/clsx@2.1.0",
     "tailwind-merge": "https://esm.sh/tailwind-merge@2.2.1",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.1/",
-    "sql.js": "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"
+    "react-dom/": "https://esm.sh/react-dom@^19.2.1/"
   }
 }
 </script>
 </head>
   <body>
     <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
   </body>
 </html>
