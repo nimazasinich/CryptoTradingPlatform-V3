@@ -1,0 +1,43 @@
+{
+  "multiTimeframe": {
+    "anyThreshold": 0.65,
+    "majorityThreshold": 0.60
+  },
+  "confluence": {
+    "required": true,
+    "threshold": 0.60,
+    "weights": {
+      "ai": 0.5,
+      "tech": 0.35,
+      "context": 0.15
+    }
+  },
+  "counterTrend": {
+    "enabled": true,
+    "requireAdjTFConfirm": true,
+    "minConfluence": 0.70
+  },
+  "contextGating": {
+    "badNewsHold": {
+      "enabled": true,
+      "newsThreshold": -0.35,
+      "sentimentThreshold": -0.25
+    },
+    "shockReduction": {
+      "enabled": true,
+      "confluenceThreshold": 0.45,
+      "leverageReduction": 0.30
+    }
+  },
+  "futures": {
+    "entryMode": "ATR",
+    "atrMultiplier": 1.2,
+    "riskRewardRatio": 2.0,
+    "positionLadder": [0.4, 0.35, 0.25],
+    "trailingStop": {
+      "enabled": true,
+      "startAt": "TP1",
+      "atrMultiplier": 1.0
+    }
+  }
+}
