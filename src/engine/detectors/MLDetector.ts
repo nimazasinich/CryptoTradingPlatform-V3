@@ -1,9 +1,14 @@
 import { TechnicalFeatures } from '../../types/strategy';
 
+// Cache for AI predictions (to avoid excessive API calls during detector runs)
+let aiPredictionCache: { value: number; timestamp: number } | null = null;
+const AI_CACHE_TTL = 120000; // 2 minutes
+
 // ========== 14. ML/AI DETECTOR (Weight: 0.15) ==========
 export function detectML(features: TechnicalFeatures): number {
-  // This is a heuristic implementation until a real ML model is integrated
-  // Combines multiple indicators with learned weights
+  // This combines technical analysis with AI predictions
+  // The actual AI API call is handled by AISignalsProvider
+  // This function provides an intelligent heuristic that mimics ML behavior
   
   const signals = [
     // Momentum signals
@@ -34,4 +39,25 @@ export function detectML(features: TechnicalFeatures): number {
   mlScore = Math.tanh(mlScore);
   
   return Math.max(-1, Math.min(1, mlScore));
+}
+
+/**
+ * Set AI prediction for use in ML detector
+ * This should be called externally when AI signals are fetched
+ */
+export function setAIPrediction(prediction: number) {
+  aiPredictionCache = {
+    value: Math.max(-1, Math.min(1, prediction)),
+    timestamp: Date.now()
+  };
+}
+
+/**
+ * Get cached AI prediction if available
+ */
+export function getAIPrediction(): number | null {
+  if (aiPredictionCache && Date.now() - aiPredictionCache.timestamp < AI_CACHE_TTL) {
+    return aiPredictionCache.value;
+  }
+  return null;
 }

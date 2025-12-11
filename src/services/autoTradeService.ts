@@ -2,6 +2,7 @@ import { SignalAggregator } from './strategy/SignalAggregator';
 import { RiskManager } from './strategy/RiskManager';
 import { AutoTradeState, Signal, Position, TradeResult, PerformanceMetrics, Candle } from '../types/strategy';
 import { configManager } from '../engine/ConfigManager';
+import { marketDataProvider } from './strategy/MarketDataProvider';
 
 export class AutoTradeService {
   private static instance: AutoTradeService;
@@ -78,12 +79,27 @@ export class AutoTradeService {
   
   private async monitorSymbol(symbol: string) {
     try {
-      // Generate mock candle data (in production, fetch from marketDataService)
-      const candles15m = this.generateMockCandles(200, 15);
-      const candles1h = this.generateMockCandles(200, 60);
-      const candles4h = this.generateMockCandles(200, 240);
+      // Extract base symbol (remove /USDT if present)
+      const baseSymbol = symbol.split('/')[0];
       
-      // Generate signal
+      console.log(`🔍 Monitoring ${symbol}...`);
+      
+      // Fetch real market data from API
+      const [candles15m, candles1h, candles4h] = await Promise.all([
+        marketDataProvider.getCandles(baseSymbol, '15m', 200),
+        marketDataProvider.getCandles(baseSymbol, '1h', 200),
+        marketDataProvider.getCandles(baseSymbol, '4h', 200)
+      ]);
+      
+      // Validate we have enough data
+      if (candles15m.length < 50 || candles1h.length < 50 || candles4h.length < 50) {
+        console.warn(`⚠️ Insufficient candle data for ${symbol}, skipping...`);
+        return;
+      }
+      
+      console.log(`📊 Analyzing ${symbol} with ${candles1h.length} 1h candles...`);
+      
+      // Generate signal using real data
       const result = await this.signalAggregator.generateCombinedSignal(
         symbol,
         candles15m,
@@ -92,7 +108,7 @@ export class AutoTradeService {
       );
       
       if (result.signal) {
-        console.log(`📊 Signal generated for ${symbol}:`, result.signal.type);
+        console.log(`✅ Signal generated for ${symbol}:`, result.signal.type, `(${(result.signal.confidence * 100).toFixed(0)}%)`);
         
         // Add to active signals
         this.state.activeSignals.push(result.signal);
@@ -104,6 +120,8 @@ export class AutoTradeService {
         
         // Execute trade (simulated or real)
         await this.executeSignal(result.signal);
+      } else {
+        console.log(`⏸️ No signal generated for ${symbol}`);
       }
     } catch (error) {
       console.error(`❌ Error monitoring ${symbol}:`, error);
@@ -136,9 +154,9 @@ export class AutoTradeService {
   private async updateOpenPositions() {
     for (const position of [...this.state.openPositions]) {
       try {
-        // Simulate price movement (in production, fetch real price)
-        const priceChange = (Math.random() - 0.5) * 0.02; // ±1% movement
-        const currentPrice = position.entryPrice * (1 + priceChange);
+        // Fetch real current price
+        const baseSymbol = position.symbol.split('/')[0];
+        const currentPrice = await marketDataProvider.getCurrentPrice(baseSymbol);
         
         // Calculate P&L
         const pnl = this.calculatePnl(position, currentPrice);
@@ -282,26 +300,7 @@ export class AutoTradeService {
     };
   }
   
-  private generateMockCandles(count: number, intervalMinutes: number): Candle[] {
-    const candles: Candle[] = [];
-    let price = 50000 + Math.random() * 10000;
-    const now = Date.now();
-    
-    for (let i = 0; i < count; i++) {
-      const timestamp = now - (count - i) * intervalMinutes * 60 * 1000;
-      const change = (Math.random() - 0.5) * 0.02;
-      const open = price;
-      const close = price * (1 + change);
-      const high = Math.max(open, close) * (1 + Math.random() * 0.01);
-      const low = Math.min(open, close) * (1 - Math.random() * 0.01);
-      const volume = 1000000 + Math.random() * 5000000;
-      
-      candles.push({ timestamp, open, high, low, close, volume });
-      price = close;
-    }
-    
-    return candles;
-  }
+  // Mock candle generation removed - now using real API data via marketDataProvider
   
   getState(): AutoTradeState {
     return { ...this.state };

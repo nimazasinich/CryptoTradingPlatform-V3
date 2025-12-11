@@ -14,6 +14,7 @@ import {
 import { FeatureExtractor } from './FeatureExtractor';
 import { DetectorRegistry } from './DetectorRegistry';
 import { ScoreAggregator } from '../../engine/ScoreAggregator';
+import { sentimentDataProvider } from './SentimentDataProvider';
 
 export class StrategyEngine {
   private detectorRegistry: DetectorRegistry;
@@ -226,13 +227,27 @@ export class StrategyEngine {
   }
   
   private async getMarketContext(symbol: string): Promise<MarketContext> {
-    // This would integrate with external APIs for real data
-    // For now, return neutral values
-    return {
-      sentiment01: 0,
-      news01: 0,
-      whales01: 0
-    };
+    // Fetch real market context from sentiment data provider
+    try {
+      const baseSymbol = symbol.split('/')[0]; // Extract base symbol (e.g., 'BTC' from 'BTC/USDT')
+      const context = await sentimentDataProvider.getMarketContext(baseSymbol);
+      
+      console.log(`📊 Market context for ${baseSymbol}:`, {
+        sentiment: context.sentiment01.toFixed(2),
+        news: context.news01.toFixed(2),
+        whales: context.whales01.toFixed(2)
+      });
+      
+      return context;
+    } catch (error) {
+      console.error('❌ Error fetching market context:', error);
+      // Return neutral values on error
+      return {
+        sentiment01: 0,
+        news01: 0,
+        whales01: 0
+      };
+    }
   }
   
   private applyContextGating(
