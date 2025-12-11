@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
   User, Key, Bell, Monitor, Database, Send,
-  Trash2, Lock, Volume2, Moon, Clock, Server, Download, Upload, CheckCircle, Link as LinkIcon
+  Trash2, Lock, Volume2, Moon, Clock, Server, Download, Upload, CheckCircle, Link as LinkIcon,
+  Shield, Mail, Globe, TrendingUp, BarChart3, Activity
 } from 'lucide-react';
 import { settingsService, UserProfile, ApiKey, ExchangeConnection, TelegramConfig, UserPreferences } from '../services/settingsService';
 import { useApp } from '../context/AppContext';
@@ -43,7 +44,6 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
 
   // Form State
   const [passwordForm, setPasswordForm] = useState({ current: '', new: '', confirm: '' });
-  const [keyForm, setKeyForm] = useState({ name: '', key: '', show: false });
 
   useEffect(() => {
     if (defaultTab) setActiveTab(defaultTab);
@@ -52,6 +52,10 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
   const loadAllSettings = async () => {
     try {
       setIsLoading(true);
+      
+      // Initialize database if needed
+      await databaseService.initDatabase();
+      
       const [p, k, e, t, pr, d] = await Promise.all([
         settingsService.getProfile(),
         settingsService.getApiKeys(),
@@ -60,14 +64,16 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
         settingsService.getPreferences(),
         Promise.resolve(databaseService.getStats())
       ]);
+      
       setProfile(p);
       setApiKeys(k);
       setExchanges(e);
       setTelegram(t);
       setPrefs(pr);
       setDbStats(d);
-    } catch (err) {
-      addToast("Failed to load settings", "error");
+    } catch (err: any) {
+      console.error("Failed to load settings:", err);
+      addToast(err.message || "Failed to load settings", "error");
     } finally {
       setIsLoading(false);
     }
@@ -82,52 +88,114 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile) return;
+    
+    // Validation
+    if (!profile.name || profile.name.trim().length < 2) {
+      addToast("Name must be at least 2 characters", "error");
+      return;
+    }
+    if (!profile.username || profile.username.trim().length < 3) {
+      addToast("Username must be at least 3 characters", "error");
+      return;
+    }
+    if (!profile.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profile.email)) {
+      addToast("Please enter a valid email address", "error");
+      return;
+    }
+    
     setIsSaving(true);
     try {
       await settingsService.saveProfile(profile);
-      addToast("Profile updated", "success");
-    } catch (error) { addToast("Update failed", "error"); }
-    setIsSaving(false);
+      addToast("Profile updated successfully", "success");
+    } catch (error: any) { 
+      addToast(error.message || "Failed to update profile", "error"); 
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
-      try {
-        const base64 = await settingsService.uploadAvatar(e.target.files[0]);
-        setProfile(prev => prev ? ({ ...prev, avatarUrl: base64 }) : null);
-        await settingsService.saveProfile({ avatarUrl: base64 });
-        addToast("Avatar updated", "success");
-      } catch (err: any) { addToast(err.message, "error"); }
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      addToast("Please select an image file", "error");
+      return;
+    }
+    
+    try {
+      const base64 = await settingsService.uploadAvatar(file);
+      setProfile(prev => prev ? ({ ...prev, avatarUrl: base64 }) : null);
+      await settingsService.saveProfile({ avatarUrl: base64 });
+      addToast("Avatar updated successfully", "success");
+    } catch (err: any) { 
+      addToast(err.message || "Failed to upload avatar", "error"); 
     }
   };
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (passwordForm.new !== passwordForm.confirm) return addToast("New passwords do not match", "error");
+    
+    // Validation
+    if (!passwordForm.current) {
+      addToast("Current password is required", "error");
+      return;
+    }
+    if (!passwordForm.new || passwordForm.new.length < 8) {
+      addToast("New password must be at least 8 characters", "error");
+      return;
+    }
+    if (passwordForm.new !== passwordForm.confirm) {
+      addToast("New passwords do not match", "error");
+      return;
+    }
+    if (passwordForm.new === passwordForm.current) {
+      addToast("New password must be different from current password", "error");
+      return;
+    }
+    
     try {
       await settingsService.changePassword(passwordForm.current, passwordForm.new);
       addToast("Password changed successfully", "success");
       setPasswordForm({ current: '', new: '', confirm: '' });
-    } catch (err: any) { addToast(err.message, "error"); }
-  };
-
-  const handleAddKey = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const newKey = await settingsService.saveApiKey(keyForm.name, keyForm.key);
-      setApiKeys(prev => [...prev, newKey]);
-      setKeyForm({ name: '', key: '', show: false });
-      addToast("API Key added", "success");
-    } catch (err) { addToast("Failed to add key", "error"); }
+    } catch (err: any) { 
+      addToast(err.message || "Failed to change password", "error"); 
+    }
   };
 
   const handleSavePrefs = async () => {
     if (!prefs) return;
+    
+    // Validate refresh rates
+    if (prefs.dataSource.refreshRateMarket < 10) {
+      addToast("Market refresh rate must be at least 10 seconds", "error");
+      return;
+    }
+    if (prefs.dataSource.refreshRateNews < 10) {
+      addToast("News refresh rate must be at least 10 seconds", "error");
+      return;
+    }
+    if (prefs.dataSource.refreshRateSentiment < 10) {
+      addToast("Sentiment refresh rate must be at least 10 seconds", "error");
+      return;
+    }
+    
+    // Validate quiet hours if enabled
+    if (prefs.quietHours.enabled) {
+      if (!prefs.quietHours.start || !prefs.quietHours.end) {
+        addToast("Please set both start and end times for quiet hours", "error");
+        return;
+      }
+    }
+    
     try {
       await settingsService.savePreferences(prefs);
       setTheme(prefs.theme);
-      addToast("Preferences updated", "success");
-    } catch (err) { addToast("Update failed", "error"); }
+      addToast("Preferences saved successfully", "success");
+    } catch (err: any) { 
+      addToast(err.message || "Failed to save preferences", "error"); 
+    }
   };
 
   if (isLoading || !profile) return <div className="flex h-screen items-center justify-center"><div className="animate-spin w-8 h-8 border-4 border-purple-500 rounded-full border-t-transparent" /></div>;
@@ -179,8 +247,19 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                     </label>
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-white">{profile.name}</h2>
+                    <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                      {profile.name}
+                      {profile.emailVerified && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-500/10 border border-green-500/20 rounded-full text-xs font-semibold text-green-400">
+                          <CheckCircle size={12} /> Verified
+                        </span>
+                      )}
+                    </h2>
                     <div className="text-slate-400">@{profile.username}</div>
+                    <div className="flex items-center gap-1 text-sm text-slate-500 mt-1">
+                      <Mail size={14} />
+                      {profile.email}
+                    </div>
                   </div>
                 </div>
                 
@@ -247,7 +326,7 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-lg font-bold text-white">Primary Data Source</h3>
-                    <p className="text-sm text-slate-400">HuggingFace Inference Token</p>
+                    <p className="text-sm text-slate-400">HuggingFace Inference Token (Optional)</p>
                   </div>
                   <div className="p-2 bg-purple-500/10 rounded-lg text-purple-400"><Server size={24} /></div>
                 </div>
@@ -266,59 +345,8 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                 </div>
               </div>
 
-              {/* Custom Keys */}
-              <div className="glass-card p-8">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-lg font-bold text-white">Custom API Keys</h3>
-                  <button onClick={() => setKeyForm({...keyForm, show: !keyForm.show})} className="text-xs bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg text-white transition-colors">
-                    {keyForm.show ? 'Cancel' : '+ New Key'}
-                  </button>
-                </div>
-
-                {keyForm.show && (
-                  <form onSubmit={handleAddKey} className="bg-slate-900/50 p-4 rounded-xl border border-white/5 mb-6 animate-fade-in">
-                    <div className="flex gap-4">
-                      <input 
-                        placeholder="Key Name (e.g. Trading Bot)" 
-                        value={keyForm.name}
-                        onChange={e => setKeyForm({...keyForm, name: e.target.value})}
-                        className="input-glass flex-1" 
-                        required 
-                      />
-                      <input 
-                        placeholder="Secret Key" 
-                        value={keyForm.key}
-                        onChange={e => setKeyForm({...keyForm, key: e.target.value})}
-                        className="input-glass flex-1" 
-                        required 
-                      />
-                      <button type="submit" className="btn-primary">Save</button>
-                    </div>
-                  </form>
-                )}
-
-                <div className="space-y-3">
-                  {apiKeys.map(key => (
-                    <div key={key.id} className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5">
-                      <div className="flex items-center gap-4">
-                        <div className="p-2 bg-slate-800 rounded-lg text-slate-400"><Key size={20} /></div>
-                        <div>
-                          <div className="font-bold text-white">{key.name}</div>
-                          <div className="text-xs text-slate-500 font-mono">ID: {key.id} • Created: {new Date(key.created).toLocaleDateString()}</div>
-                        </div>
-                      </div>
-                      <button onClick={async () => {
-                        await settingsService.deleteApiKey(key.id);
-                        setApiKeys(prev => prev.filter(k => k.id !== key.id));
-                        addToast("Key deleted", "success");
-                      }} className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  ))}
-                  {apiKeys.length === 0 && <div className="text-center text-slate-500 py-4 italic">No custom keys generated</div>}
-                </div>
-              </div>
+              {/* Custom Keys Manager */}
+              <ApiKeysManager apiKeys={apiKeys} onUpdate={setApiKeys} />
             </div>
           )}
 
@@ -334,53 +362,174 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
 
           {/* --- PERSONALIZATION TAB --- */}
           {activeTab === 'personalization' && prefs && (
-            <div className="glass-card p-8 animate-fade-in">
-              <h2 className="text-xl font-bold text-white mb-8">Interface Personalization</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-4">
-                  <label className="text-xs font-bold text-slate-400 uppercase">Theme Accent</label>
-                  <div className="flex gap-4">
-                    {['dark', 'light'].map(t => (
-                      <button 
-                        key={t}
-                        onClick={() => setPrefs({...prefs, theme: t as any})}
-                        className={`px-6 py-3 rounded-xl border transition-all ${prefs.theme === t ? 'border-purple-500 bg-purple-500/10 text-white' : 'border-white/10 text-slate-400 hover:bg-white/5'}`}
-                      >
-                        {t.charAt(0).toUpperCase() + t.slice(1)} Mode
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <label className="text-xs font-bold text-slate-400 uppercase">Base Currency</label>
-                  <select 
-                    value={prefs.currency} 
-                    onChange={e => setPrefs({...prefs, currency: e.target.value})}
-                    className="input-glass w-full"
-                  >
-                    <option value="USD">USD ($)</option>
-                    <option value="EUR">EUR (€)</option>
-                    <option value="GBP">GBP (£)</option>
-                    <option value="JPY">JPY (¥)</option>
-                  </select>
-                </div>
-
-                <div className="space-y-4">
-                  <label className="text-xs font-bold text-slate-400 uppercase">Date Format</label>
-                  <select 
-                    value={prefs.dateFormat} 
-                    onChange={e => setPrefs({...prefs, dateFormat: e.target.value})}
-                    className="input-glass w-full"
-                  >
-                    <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-                    <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-                    <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-                  </select>
+            <div className="space-y-6 animate-fade-in">
+              {/* Theme Selection */}
+              <div className="glass-card p-8">
+                <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                  <Monitor size={20} className="text-purple-400" /> Theme & Appearance
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  {[
+                    { value: 'purple', label: 'Purple Dream', gradient: 'from-purple-500 to-pink-500' },
+                    { value: 'cyan', label: 'Cyber Blue', gradient: 'from-cyan-500 to-blue-500' },
+                    { value: 'green', label: 'Matrix Green', gradient: 'from-green-500 to-emerald-500' }
+                  ].map(theme => (
+                    <button
+                      key={theme.value}
+                      onClick={() => setPrefs({...prefs, theme: theme.value as any})}
+                      className={cn(
+                        "p-6 rounded-xl border-2 transition-all group relative overflow-hidden",
+                        prefs.theme === theme.value 
+                          ? 'border-white/20 bg-white/5' 
+                          : 'border-white/5 hover:border-white/10'
+                      )}
+                    >
+                      <div className={`absolute inset-0 bg-gradient-to-br ${theme.gradient} opacity-10 group-hover:opacity-20 transition-opacity`} />
+                      <div className="relative">
+                        <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${theme.gradient} mb-3 mx-auto`} />
+                        <div className="text-white font-bold mb-1">{theme.label}</div>
+                        {prefs.theme === theme.value && (
+                          <div className="text-xs text-purple-400 font-semibold">✓ Active</div>
+                        )}
+                      </div>
+                    </button>
+                  ))}
                 </div>
               </div>
-              <div className="flex justify-end mt-8">
-                <button onClick={handleSavePrefs} className="btn-primary">Apply Changes</button>
+
+              {/* Localization */}
+              <div className="glass-card p-8">
+                <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                  <Globe size={18} className="text-cyan-400" /> Localization
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-400 uppercase">Language</label>
+                    <select 
+                      value={prefs.language} 
+                      onChange={e => setPrefs({...prefs, language: e.target.value})}
+                      className="input-glass w-full"
+                    >
+                      <option value="en">English</option>
+                      <option value="es">Español</option>
+                      <option value="fr">Français</option>
+                      <option value="de">Deutsch</option>
+                      <option value="zh">中文</option>
+                      <option value="ja">日本語</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-400 uppercase">Base Currency</label>
+                    <select 
+                      value={prefs.currency} 
+                      onChange={e => setPrefs({...prefs, currency: e.target.value})}
+                      className="input-glass w-full"
+                    >
+                      <option value="USD">USD ($)</option>
+                      <option value="EUR">EUR (€)</option>
+                      <option value="GBP">GBP (£)</option>
+                      <option value="JPY">JPY (¥)</option>
+                      <option value="BTC">BTC (₿)</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-400 uppercase">Date Format</label>
+                    <select 
+                      value={prefs.dateFormat} 
+                      onChange={e => setPrefs({...prefs, dateFormat: e.target.value})}
+                      className="input-glass w-full"
+                    >
+                      <option value="MM/DD/YYYY">MM/DD/YYYY (US)</option>
+                      <option value="DD/MM/YYYY">DD/MM/YYYY (EU)</option>
+                      <option value="YYYY-MM-DD">YYYY-MM-DD (ISO)</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-400 uppercase">Time Format</label>
+                    <select 
+                      value={prefs.timeFormat} 
+                      onChange={e => setPrefs({...prefs, timeFormat: e.target.value as any})}
+                      className="input-glass w-full"
+                    >
+                      <option value="12h">12 Hour (AM/PM)</option>
+                      <option value="24h">24 Hour</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-400 uppercase">Decimal Places</label>
+                    <select 
+                      value={prefs.decimalPlaces} 
+                      onChange={e => setPrefs({...prefs, decimalPlaces: parseInt(e.target.value)})}
+                      className="input-glass w-full"
+                    >
+                      <option value={2}>2 decimals</option>
+                      <option value={4}>4 decimals</option>
+                      <option value={6}>6 decimals</option>
+                      <option value={8}>8 decimals</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Chart Preferences */}
+              <div className="glass-card p-8">
+                <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                  <TrendingUp size={18} className="text-green-400" /> Chart Preferences
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-400 uppercase">Default Timeframe</label>
+                    <select 
+                      value={prefs.chartPreferences.defaultTimeframe} 
+                      onChange={e => setPrefs({...prefs, chartPreferences: {...prefs.chartPreferences, defaultTimeframe: e.target.value}})}
+                      className="input-glass w-full"
+                    >
+                      <option value="1m">1 Minute</option>
+                      <option value="5m">5 Minutes</option>
+                      <option value="15m">15 Minutes</option>
+                      <option value="1h">1 Hour</option>
+                      <option value="4h">4 Hours</option>
+                      <option value="1d">1 Day</option>
+                      <option value="1w">1 Week</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-400 uppercase">Chart Type</label>
+                    <select 
+                      value={prefs.chartPreferences.chartType} 
+                      onChange={e => setPrefs({...prefs, chartPreferences: {...prefs.chartPreferences, chartType: e.target.value as any}})}
+                      className="input-glass w-full"
+                    >
+                      <option value="candlestick">Candlestick</option>
+                      <option value="line">Line</option>
+                      <option value="area">Area</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-400 uppercase flex items-center justify-between">
+                      Show Volume Bars
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          className="sr-only peer" 
+                          checked={prefs.chartPreferences.showVolume} 
+                          onChange={e => setPrefs({...prefs, chartPreferences: {...prefs.chartPreferences, showVolume: e.target.checked}})} 
+                        />
+                        <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:bg-purple-600 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                      </label>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <button onClick={handleSavePrefs} className="btn-primary">Save All Preferences</button>
               </div>
             </div>
           )}
@@ -421,15 +570,34 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                 )}
               </div>
 
-              <div className="flex items-center justify-between p-6 bg-white/5 rounded-xl border border-white/5">
-                <div className="flex items-center gap-3">
-                  <Volume2 className="text-purple-400" size={20} />
-                  <span className="font-bold text-white">Sound Effects</span>
+              <div className="bg-white/5 p-6 rounded-xl border border-white/5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Volume2 className="text-purple-400" size={20} />
+                    <span className="font-bold text-white">Sound Effects</span>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className="sr-only peer" checked={prefs.soundEnabled} onChange={e => setPrefs({...prefs, soundEnabled: e.target.checked})} />
+                    <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:bg-purple-600 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                  </label>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" className="sr-only peer" checked={prefs.soundEnabled} onChange={e => setPrefs({...prefs, soundEnabled: e.target.checked})} />
-                  <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:bg-purple-600 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
-                </label>
+                
+                {prefs.soundEnabled && (
+                  <div className="animate-fade-in">
+                    <label className="text-xs font-bold text-slate-400 uppercase block mb-2">Notification Sound</label>
+                    <select 
+                      value={prefs.notificationSound} 
+                      onChange={e => setPrefs({...prefs, notificationSound: e.target.value})}
+                      className="input-glass w-full"
+                    >
+                      <option value="default">Default (Ding)</option>
+                      <option value="chime">Chime</option>
+                      <option value="bell">Bell</option>
+                      <option value="pop">Pop</option>
+                      <option value="swoosh">Swoosh</option>
+                    </select>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-4 pt-4">
@@ -453,39 +621,114 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
 
           {/* --- DATA SOURCES TAB --- */}
           {activeTab === 'data' && prefs && (
-            <div className="glass-card p-8 animate-fade-in space-y-8">
-              <div className="text-center pb-8 border-b border-white/5">
-                <Database size={48} className="mx-auto text-purple-500 mb-4" />
-                <h2 className="text-xl font-bold text-white">Data Connection Status</h2>
-                <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full text-green-400 text-sm font-bold">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                  Systems Operational
+            <div className="space-y-6 animate-fade-in">
+              {/* HuggingFace Connection */}
+              <div className="glass-card p-8">
+                <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                      <Server size={20} className="text-purple-400" /> HuggingFace Space
+                    </h2>
+                    <p className="text-sm text-slate-400 mt-1">Primary data source connection</p>
+                  </div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-500/10 border border-green-500/20 rounded-full text-green-400 text-xs font-bold">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                    Connected
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-xs font-bold text-slate-400 uppercase block mb-2">Base URL</label>
+                    <div className="input-glass w-full bg-white/[0.02] text-slate-300 font-mono text-sm p-3 rounded-lg">
+                      {prefs.dataSource.hfBaseUrl}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="text-xs font-bold text-slate-400 uppercase block mb-2">API Token (Optional)</label>
+                    <div className="text-xs text-slate-500 mb-2">Configure in API Keys tab</div>
+                    <div className="input-glass w-full bg-white/[0.02] text-slate-500 font-mono text-sm p-3 rounded-lg">
+                      {prefs.dataSource.hfToken ? '••••••••••••••••' : 'Not configured'}
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[
-                  { label: 'Market Data', key: 'refreshRateMarket', val: prefs.dataSource.refreshRateMarket },
-                  { label: 'News Feed', key: 'refreshRateNews', val: prefs.dataSource.refreshRateNews },
-                  { label: 'Sentiment', key: 'refreshRateSentiment', val: prefs.dataSource.refreshRateSentiment },
-                ].map((item) => (
-                  <div key={item.key} className="bg-white/5 p-4 rounded-xl border border-white/5">
-                    <label className="text-xs font-bold text-slate-400 uppercase block mb-3">{item.label} Refresh</label>
-                    <select 
-                      value={item.val} 
-                      onChange={e => setPrefs({...prefs, dataSource: {...prefs.dataSource, [item.key]: parseInt(e.target.value)}})}
-                      className="input-glass w-full text-sm"
-                    >
-                      <option value={10}>10 Seconds</option>
-                      <option value={30}>30 Seconds</option>
-                      <option value={60}>1 Minute</option>
-                      <option value={300}>5 Minutes</option>
-                      <option value={3600}>1 Hour</option>
-                    </select>
-                  </div>
-                ))}
+              {/* Refresh Intervals */}
+              <div className="glass-card p-8">
+                <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                  <Activity size={18} className="text-cyan-400" /> Refresh Intervals
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {[
+                    { label: 'Market Data', key: 'refreshRateMarket', val: prefs.dataSource.refreshRateMarket },
+                    { label: 'News Feed', key: 'refreshRateNews', val: prefs.dataSource.refreshRateNews },
+                    { label: 'Sentiment', key: 'refreshRateSentiment', val: prefs.dataSource.refreshRateSentiment },
+                  ].map((item) => (
+                    <div key={item.key} className="bg-white/5 p-4 rounded-xl border border-white/5">
+                      <label className="text-xs font-bold text-slate-400 uppercase block mb-3">{item.label}</label>
+                      <select 
+                        value={item.val} 
+                        onChange={e => setPrefs({...prefs, dataSource: {...prefs.dataSource, [item.key]: parseInt(e.target.value)}})}
+                        className="input-glass w-full text-sm"
+                      >
+                        <option value={10}>10 Seconds</option>
+                        <option value={30}>30 Seconds</option>
+                        <option value={60}>1 Minute</option>
+                        <option value={300}>5 Minutes</option>
+                        <option value={3600}>1 Hour</option>
+                      </select>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="flex justify-end"><button onClick={handleSavePrefs} className="btn-primary">Update Intervals</button></div>
+
+              {/* Cache Settings */}
+              <div className="glass-card p-8">
+                <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                  <Database size={18} className="text-green-400" /> Cache Settings
+                </h3>
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5">
+                    <div>
+                      <div className="font-bold text-white">Enable Response Caching</div>
+                      <div className="text-sm text-slate-400 mt-1">Cache API responses to reduce load times</div>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        className="sr-only peer" 
+                        checked={prefs.dataSource.cacheEnabled} 
+                        onChange={e => setPrefs({...prefs, dataSource: {...prefs.dataSource, cacheEnabled: e.target.checked}})} 
+                      />
+                      <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:bg-purple-600 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                    </label>
+                  </div>
+
+                  {prefs.dataSource.cacheEnabled && (
+                    <div className="animate-fade-in">
+                      <label className="text-xs font-bold text-slate-400 uppercase block mb-2">Cache TTL (Time To Live)</label>
+                      <select 
+                        value={prefs.dataSource.cacheTTL} 
+                        onChange={e => setPrefs({...prefs, dataSource: {...prefs.dataSource, cacheTTL: parseInt(e.target.value)}})}
+                        className="input-glass w-full"
+                      >
+                        <option value={60}>1 Minute</option>
+                        <option value={300}>5 Minutes</option>
+                        <option value={600}>10 Minutes</option>
+                        <option value={1800}>30 Minutes</option>
+                        <option value={3600}>1 Hour</option>
+                      </select>
+                      <p className="text-xs text-slate-500 mt-2">Cached data will be refreshed after this duration</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <button onClick={handleSavePrefs} className="btn-primary">Save Data Source Settings</button>
+              </div>
 
               <div className="pt-6">
                 <h3 className="font-bold text-lg text-white mb-6 flex items-center gap-2">
@@ -524,23 +767,39 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
 
                 <div className="flex gap-4 justify-end">
                   <button onClick={() => {
-                    const data = localStorage.getItem('crypto_platform.db');
-                    if (data) {
-                      const blob = new Blob([data], {type: "text/plain"});
+                    try {
+                      const data = localStorage.getItem('crypto_platform.db');
+                      if (!data) {
+                        addToast("No database data to backup", "warning");
+                        return;
+                      }
+                      const blob = new Blob([data], {type: "application/octet-stream"});
                       const url = URL.createObjectURL(blob);
                       const a = document.createElement('a');
                       a.href = url;
-                      a.download = "backup.db";
+                      a.download = `crypto_backup_${new Date().toISOString().split('T')[0]}.db`;
+                      document.body.appendChild(a);
                       a.click();
+                      document.body.removeChild(a);
+                      URL.revokeObjectURL(url);
+                      addToast("Database backup downloaded", "success");
+                    } catch (err) {
+                      addToast("Failed to backup database", "error");
                     }
                   }} className="flex items-center gap-2 px-4 py-2 border border-white/10 rounded-lg text-slate-300 hover:bg-white/5 text-sm transition-colors">
                     <Download size={16} /> Backup
                   </button>
-                  <button onClick={() => {
-                    if (confirm("Clear all local data? This cannot be undone.")) {
+                  <button onClick={async () => {
+                    if (!confirm("⚠️ WARNING: This will permanently delete ALL local data including:\n\n• Trading positions\n• Trade history\n• Cached market data\n• Price alerts\n• AI signals\n\nThis action CANNOT be undone!\n\nAre you absolutely sure?")) {
+                      return;
+                    }
+                    try {
+                      await databaseService.initDatabase();
                       databaseService.clearAllData();
                       setDbStats({ size: 0, tables: [] });
-                      addToast("Database cleared", "success");
+                      addToast("Database cleared successfully", "success");
+                    } catch (err) {
+                      addToast("Failed to clear database", "error");
                     }
                   }} className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg hover:bg-red-500/20 text-sm transition-colors">
                     <Trash2 size={16} /> Clear Data

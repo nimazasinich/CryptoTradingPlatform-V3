@@ -12,25 +12,46 @@ interface Props {
 export const ExchangeConnectionsManager = ({ exchanges, onUpdate }: Props) => {
   const { addToast } = useApp();
   const [isSaving, setIsSaving] = useState(false);
-  const [exchangeForm, setExchangeForm] = useState({ exchange: 'binance', apiKey: '', apiSecret: '' });
+  const [exchangeForm, setExchangeForm] = useState({ 
+    exchange: 'binance', 
+    apiKey: '', 
+    apiSecret: '', 
+    passphrase: '',
+    permissions: ['read', 'trade'] as ('read' | 'trade' | 'withdraw')[]
+  });
 
   const handleConnectExchange = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
     try {
-      const conn = await settingsService.connectExchange(exchangeForm.exchange, exchangeForm.apiKey, exchangeForm.apiSecret);
+      const conn = await settingsService.connectExchange(
+        exchangeForm.exchange, 
+        exchangeForm.apiKey, 
+        exchangeForm.apiSecret,
+        exchangeForm.passphrase || undefined,
+        exchangeForm.permissions
+      );
       const updatedList = exchanges.some(ex => ex.id === conn.id) 
         ? exchanges.map(ex => ex.id === conn.id ? conn : ex)
         : [...exchanges, conn];
       
       onUpdate(updatedList);
-      setExchangeForm({ exchange: 'binance', apiKey: '', apiSecret: '' });
+      setExchangeForm({ exchange: 'binance', apiKey: '', apiSecret: '', passphrase: '', permissions: ['read', 'trade'] });
       addToast("Exchange connected successfully", "success");
     } catch (err: any) { 
       addToast(err.message || "Failed to connect exchange", "error"); 
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const togglePermission = (permission: 'read' | 'trade' | 'withdraw') => {
+    setExchangeForm(prev => ({
+      ...prev,
+      permissions: prev.permissions.includes(permission)
+        ? prev.permissions.filter(p => p !== permission)
+        : [...prev.permissions, permission]
+    }));
   };
 
   const handleDisconnect = async (id: string) => {
@@ -110,6 +131,44 @@ export const ExchangeConnectionsManager = ({ exchanges, onUpdate }: Props) => {
               placeholder="Enter your API Secret"
               required 
             />
+          </div>
+          {['kucoin', 'okx'].includes(exchangeForm.exchange) && (
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-400 uppercase">
+                Passphrase {exchangeForm.exchange === 'kucoin' ? '(Required)' : '(Optional)'}
+              </label>
+              <input 
+                type="password"
+                value={exchangeForm.passphrase}
+                onChange={e => setExchangeForm({...exchangeForm, passphrase: e.target.value})}
+                className="input-glass w-full" 
+                placeholder="Enter passphrase"
+                required={exchangeForm.exchange === 'kucoin'}
+              />
+            </div>
+          )}
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-slate-400 uppercase block">Permissions</label>
+            <div className="flex gap-3">
+              {[
+                { id: 'read', label: 'Read', desc: 'View account data' },
+                { id: 'trade', label: 'Trade', desc: 'Execute trades' },
+                { id: 'withdraw', label: 'Withdraw', desc: 'Withdraw funds' }
+              ].map(perm => (
+                <label key={perm.id} className="flex items-center gap-2 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={exchangeForm.permissions.includes(perm.id as any)}
+                    onChange={() => togglePermission(perm.id as any)}
+                    className="w-4 h-4 accent-purple-500 rounded border-gray-600 bg-gray-700"
+                  />
+                  <div>
+                    <div className="text-sm text-white font-medium group-hover:text-purple-400 transition-colors">{perm.label}</div>
+                    <div className="text-xs text-slate-500">{perm.desc}</div>
+                  </div>
+                </label>
+              ))}
+            </div>
           </div>
           <div className="pt-4">
             <button type="submit" disabled={isSaving} className="btn-primary w-full">
