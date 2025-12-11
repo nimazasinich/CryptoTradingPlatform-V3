@@ -297,7 +297,7 @@ export const AutoTradingPanel = ({ symbol }: { symbol: string }) => {
           animate={{ scale: isRunning ? [1, 1.1, 1] : 1 }}
           transition={{ repeat: isRunning ? Infinity : 0, duration: 2 }}
           className={`px-3 py-1 rounded-lg text-xs font-bold uppercase flex items-center gap-1.5 ${
-            isRunning ? 'bg-green-500/20 text-green-400' : 'bg-slate-500/20 text-slate-400'
+            isRunning ? 'bg-green-500/20 text-green-400' : 'bg-slate-500/20 text-slate-300'
           }`}
         >
           <div className={`w-2 h-2 rounded-full ${isRunning ? 'bg-green-400 animate-pulse' : 'bg-slate-400'}`} />
@@ -308,7 +308,7 @@ export const AutoTradingPanel = ({ symbol }: { symbol: string }) => {
       <div className="p-4 space-y-4 flex-1 overflow-y-auto custom-scrollbar">
         {/* Strategy Selector */}
         <div className="space-y-2">
-          <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Strategy</label>
+          <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">Strategy</label>
           <div className="relative">
             <select 
               value={activeStrategyId}
@@ -326,7 +326,7 @@ export const AutoTradingPanel = ({ symbol }: { symbol: string }) => {
           
           {activeStrategy && (
             <div className="bg-slate-900/30 rounded-lg p-3 text-xs space-y-1">
-              <p className="text-slate-400">{activeStrategy.description}</p>
+              <p className="text-slate-300">{activeStrategy.description}</p>
               <div className="flex flex-wrap gap-2 pt-2">
                 <span className="bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded text-[10px]">
                   Risk: {activeStrategy.params.stopLossPercent}%
@@ -342,7 +342,7 @@ export const AutoTradingPanel = ({ symbol }: { symbol: string }) => {
         {/* Performance Metrics */}
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Performance</label>
+            <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">Performance</label>
             <button
               onClick={resetMetrics}
               className="text-[10px] text-slate-500 hover:text-white transition-colors"
@@ -400,10 +400,10 @@ export const AutoTradingPanel = ({ symbol }: { symbol: string }) => {
             }`}
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] text-slate-400 uppercase font-bold">Last Signal</span>
+              <span className="text-[10px] text-slate-300 uppercase font-bold">Last Signal</span>
               <span className={`text-xs font-bold ${
                 lastSignal.action === 'BUY' ? 'text-green-400' : 
-                lastSignal.action === 'SELL' ? 'text-red-400' : 'text-slate-400'
+                lastSignal.action === 'SELL' ? 'text-red-400' : 'text-slate-300'
               }`}>
                 {lastSignal.action}
               </span>
@@ -431,22 +431,22 @@ export const AutoTradingPanel = ({ symbol }: { symbol: string }) => {
             className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-lg p-3"
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] text-slate-400 uppercase font-bold">Open Position</span>
+              <span className="text-[10px] text-slate-300 uppercase font-bold">Open Position</span>
               <span className={`text-xs font-bold ${openPosition.side === 'long' ? 'text-green-400' : 'text-red-400'}`}>
                 {openPosition.side.toUpperCase()}
               </span>
             </div>
             <div className="space-y-1 text-xs">
               <div className="flex justify-between">
-                <span className="text-slate-400">Entry:</span>
+                <span className="text-slate-300">Entry:</span>
                 <span className="text-white font-mono">${openPosition.entryPrice.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Current:</span>
+                <span className="text-slate-300">Current:</span>
                 <span className="text-white font-mono">${currentPrice.toFixed(2)}</span>
               </div>
               <div className="flex justify-between border-t border-white/10 pt-1">
-                <span className="text-slate-400">Unrealized P&L:</span>
+                <span className="text-slate-300">Unrealized P&L:</span>
                 <span className={`font-mono font-bold ${openPosition.unrealizedPnL >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                   {openPosition.unrealizedPnL >= 0 ? '+' : ''}{openPosition.unrealizedPnL.toFixed(2)} USDT
                 </span>
@@ -457,7 +457,7 @@ export const AutoTradingPanel = ({ symbol }: { symbol: string }) => {
 
         {/* Activity Logs */}
         <div className="space-y-2 flex-1">
-          <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Activity Log</label>
+          <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">Activity Log</label>
           <div className="bg-black/40 rounded-lg p-3 font-mono text-[10px] space-y-1 h-40 overflow-y-auto border border-white/5 custom-scrollbar">
             {logs.length === 0 && (
               <span className="text-slate-600 italic">System ready. Select a strategy and start trading.</span>

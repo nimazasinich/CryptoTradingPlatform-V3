@@ -18,7 +18,7 @@ const MetricCard = ({ title, value, unit, data, color, icon: Icon }: any) => (
   <div className="glass-card p-6">
     <div className="flex justify-between items-start">
       <div>
-        <h4 className="text-slate-400 text-sm font-medium uppercase">{title}</h4>
+        <h4 className="text-slate-300 text-sm font-medium uppercase">{title}</h4>
         <div className="text-2xl font-bold text-white mt-1">
           {value} <span className="text-sm text-slate-500">{unit}</span>
         </div>
@@ -113,16 +113,16 @@ export const SystemMonitoring = () => {
             <tbody className="divide-y divide-white/5">
               <tr className="hover:bg-white/5">
                 <td className="px-6 py-4 font-medium text-white">admin@crypto.one</td>
-                <td className="px-6 py-4 text-slate-400">192.168.1.42</td>
-                <td className="px-6 py-4 text-slate-400">New York, US</td>
-                <td className="px-6 py-4 text-slate-400">2h 15m</td>
+                <td className="px-6 py-4 text-slate-300">192.168.1.42</td>
+                <td className="px-6 py-4 text-slate-300">New York, US</td>
+                <td className="px-6 py-4 text-slate-300">2h 15m</td>
                 <td className="px-6 py-4"><span className="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs font-bold">Active</span></td>
               </tr>
               <tr className="hover:bg-white/5">
                 <td className="px-6 py-4 font-medium text-white">trader_pro</td>
-                <td className="px-6 py-4 text-slate-400">10.0.0.15</td>
-                <td className="px-6 py-4 text-slate-400">London, UK</td>
-                <td className="px-6 py-4 text-slate-400">45m</td>
+                <td className="px-6 py-4 text-slate-300">10.0.0.15</td>
+                <td className="px-6 py-4 text-slate-300">London, UK</td>
+                <td className="px-6 py-4 text-slate-300">45m</td>
                 <td className="px-6 py-4"><span className="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs font-bold">Idle</span></td>
               </tr>
             </tbody>

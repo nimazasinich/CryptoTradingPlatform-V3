@@ -19,7 +19,7 @@ export function SignalDisplay() {
     return (
       <div className="glass-card p-8 text-center">
         <Target className="w-12 h-12 text-slate-500 mx-auto mb-3" />
-        <p className="text-slate-400">No active signals</p>
+        <p className="text-slate-300">No active signals</p>
         <p className="text-slate-500 text-sm mt-1">
           Waiting for high-quality opportunities...
         </p>
@@ -47,7 +47,7 @@ export function SignalDisplay() {
               )}
               <div>
                 <div className="text-white font-semibold">{signal.symbol}</div>
-                <div className="text-slate-400 text-sm">
+                <div className="text-slate-300 text-sm">
                   {new Date(signal.timestamp).toLocaleTimeString()}
                 </div>
               </div>
@@ -59,7 +59,7 @@ export function SignalDisplay() {
                 ? 'bg-green-500/20 text-green-400'
                 : signal.confidence >= 0.7
                 ? 'bg-yellow-500/20 text-yellow-400'
-                : 'bg-slate-500/20 text-slate-400'
+                : 'bg-slate-500/20 text-slate-300'
             }`}>
               {(signal.confidence * 100).toFixed(0)}% Confidence
             </div>
@@ -68,15 +68,15 @@ export function SignalDisplay() {
           {/* Price Levels */}
           <div className="grid grid-cols-3 gap-3 text-sm">
             <div>
-              <div className="text-slate-400 mb-1">Entry</div>
+              <div className="text-slate-300 mb-1">Entry</div>
               <div className="text-white font-mono">${signal.entry_price.toFixed(2)}</div>
             </div>
             <div>
-              <div className="text-slate-400 mb-1">Target</div>
+              <div className="text-slate-300 mb-1">Target</div>
               <div className="text-green-400 font-mono">${signal.target_price.toFixed(2)}</div>
             </div>
             <div>
-              <div className="text-slate-400 mb-1">Stop Loss</div>
+              <div className="text-slate-300 mb-1">Stop Loss</div>
               <div className="text-red-400 font-mono">${signal.stop_loss.toFixed(2)}</div>
             </div>
           </div>

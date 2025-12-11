@@ -71,7 +71,7 @@ export function StrategySelector() {
               <span className="text-2xl">{strategy.icon}</span>
               <div className="flex-1 text-left">
                 <div className="text-white font-medium">{strategy.name}</div>
-                <div className="text-slate-400 text-xs">{strategy.description}</div>
+                <div className="text-slate-300 text-xs">{strategy.description}</div>
               </div>
               {strategy.id === selectedId && (
                 <Check className="w-5 h-5 text-green-500" />

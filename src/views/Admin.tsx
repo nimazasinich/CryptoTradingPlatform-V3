@@ -25,25 +25,25 @@ export default function Admin() {
              <ShieldCheck className="text-red-500" />
              Admin Console
            </h1>
-           <p className="text-slate-400">System monitoring and maintenance dashboard.</p>
+           <p className="text-slate-300">System monitoring and maintenance dashboard.</p>
          </div>
          
          <div className="flex bg-white/5 p-1 rounded-xl">
            <button 
              onClick={() => setActiveTab('health')}
-             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'health' ? 'bg-purple-600 text-white' : 'text-slate-400'}`}
+             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'health' ? 'bg-purple-600 text-white' : 'text-slate-300'}`}
            >
              Health
            </button>
            <button 
              onClick={() => setActiveTab('monitoring')}
-             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'monitoring' ? 'bg-purple-600 text-white' : 'text-slate-400'}`}
+             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'monitoring' ? 'bg-purple-600 text-white' : 'text-slate-300'}`}
            >
              Monitoring
            </button>
            <button 
              onClick={() => setActiveTab('logs')}
-             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'logs' ? 'bg-purple-600 text-white' : 'text-slate-400'}`}
+             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'logs' ? 'bg-purple-600 text-white' : 'text-slate-300'}`}
            >
              Logs
            </button>

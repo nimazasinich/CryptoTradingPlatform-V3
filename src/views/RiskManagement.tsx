@@ -14,7 +14,7 @@ export default function RiskManagement() {
           <ShieldCheck className="text-purple-400" size={32} />
           Risk Management
         </h1>
-        <p className="text-slate-400">Monitor portfolio health, exposure, and set up safety alerts.</p>
+        <p className="text-slate-300">Monitor portfolio health, exposure, and set up safety alerts.</p>
       </div>
 
       <PortfolioSummary />

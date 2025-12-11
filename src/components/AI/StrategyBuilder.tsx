@@ -130,7 +130,7 @@ export const StrategyBuilder = () => {
             <BrainCircuit className="text-purple-400" />
             Strategy Builder
           </h2>
-          <p className="text-slate-400 text-sm mt-1">Design custom trading strategies with visual conditions</p>
+          <p className="text-slate-300 text-sm mt-1">Design custom trading strategies with visual conditions</p>
         </div>
         <div className="flex gap-2">
           <button 
@@ -151,7 +151,7 @@ export const StrategyBuilder = () => {
       <div className="space-y-6 max-w-5xl mx-auto">
         {/* Conditions Section */}
         <div className="space-y-4">
-          <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+          <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
             Entry Conditions
           </h3>
           
@@ -164,7 +164,7 @@ export const StrategyBuilder = () => {
                     className={`px-3 py-1 rounded text-xs font-bold transition-all ${
                       cond.logic === 'AND' 
                         ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' 
-                        : 'bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10'
+                        : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                     }`}
                   >
                     AND
@@ -174,7 +174,7 @@ export const StrategyBuilder = () => {
                     className={`px-3 py-1 rounded text-xs font-bold transition-all ${
                       cond.logic === 'OR' 
                         ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' 
-                        : 'bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10'
+                        : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                     }`}
                   >
                     OR
@@ -243,28 +243,28 @@ export const StrategyBuilder = () => {
         {/* Action Arrow */}
         <div className="flex justify-center py-4">
           <div className="bg-white/5 p-3 rounded-full border border-white/10 shadow-lg">
-            <ArrowRight className="text-slate-400" size={24} />
+            <ArrowRight className="text-slate-300" size={24} />
           </div>
         </div>
 
         {/* Action Section */}
         <div className="space-y-4">
-          <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Action to Execute</h3>
+          <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Action to Execute</h3>
           <div className={`p-6 rounded-xl border transition-all ${action === 'BUY' ? 'bg-green-500/10 border-green-500/30' : 'bg-red-500/10 border-red-500/30'}`}>
              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                <div className="space-y-4">
                  <div>
-                   <label className="text-xs text-slate-400 uppercase font-bold mb-2 block">Action Type</label>
+                   <label className="text-xs text-slate-300 uppercase font-bold mb-2 block">Action Type</label>
                    <div className="flex bg-slate-900 rounded-lg p-1">
                      <button 
                        onClick={() => setAction('BUY')}
-                       className={`flex-1 px-6 py-2 rounded-md font-bold transition-all ${action === 'BUY' ? 'bg-green-600 text-white' : 'text-slate-400 hover:text-white'}`}
+                       className={`flex-1 px-6 py-2 rounded-md font-bold transition-all ${action === 'BUY' ? 'bg-green-600 text-white' : 'text-slate-300 hover:text-white'}`}
                      >
                        BUY
                      </button>
                      <button 
                        onClick={() => setAction('SELL')}
-                       className={`flex-1 px-6 py-2 rounded-md font-bold transition-all ${action === 'SELL' ? 'bg-red-600 text-white' : 'text-slate-400 hover:text-white'}`}
+                       className={`flex-1 px-6 py-2 rounded-md font-bold transition-all ${action === 'SELL' ? 'bg-red-600 text-white' : 'text-slate-300 hover:text-white'}`}
                      >
                        SELL
                      </button>
@@ -272,7 +272,7 @@ export const StrategyBuilder = () => {
                  </div>
 
                  <div>
-                   <label className="text-xs text-slate-400 uppercase font-bold mb-2 block">Order Type</label>
+                   <label className="text-xs text-slate-300 uppercase font-bold mb-2 block">Order Type</label>
                    <select 
                      value={orderType}
                      onChange={(e) => setOrderType(e.target.value)}
@@ -288,7 +288,7 @@ export const StrategyBuilder = () => {
                <div className="space-y-4">
                  <div className="grid grid-cols-2 gap-3">
                    <div>
-                     <label className="text-xs text-slate-400 uppercase font-bold mb-2 block">Take Profit %</label>
+                     <label className="text-xs text-slate-300 uppercase font-bold mb-2 block">Take Profit %</label>
                      <input 
                        type="number"
                        value={takeProfit}
@@ -297,7 +297,7 @@ export const StrategyBuilder = () => {
                      />
                    </div>
                    <div>
-                     <label className="text-xs text-slate-400 uppercase font-bold mb-2 block">Stop Loss %</label>
+                     <label className="text-xs text-slate-300 uppercase font-bold mb-2 block">Stop Loss %</label>
                      <input 
                        type="number"
                        value={stopLoss}
@@ -308,7 +308,7 @@ export const StrategyBuilder = () => {
                  </div>
 
                  <div>
-                   <label className="text-xs text-slate-400 uppercase font-bold mb-2 block">Position Size</label>
+                   <label className="text-xs text-slate-300 uppercase font-bold mb-2 block">Position Size</label>
                    <div className="flex gap-2">
                      <input 
                        type="number"
@@ -385,7 +385,7 @@ export const StrategyBuilder = () => {
                   <div key={strategy.id} className="bg-white/5 border border-white/10 rounded-lg p-4 flex items-center justify-between hover:bg-white/10 transition-colors">
                     <div className="flex-1">
                       <div className="font-bold text-white">{strategy.name}</div>
-                      <div className="text-xs text-slate-400 mt-1">
+                      <div className="text-xs text-slate-300 mt-1">
                         {strategy.conditions.length} conditions · {strategy.action} · 
                         Created {new Date(strategy.created_at).toLocaleDateString()}
                       </div>

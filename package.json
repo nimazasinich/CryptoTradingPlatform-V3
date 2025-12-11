@@ -9,13 +9,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "clsx": "2.1.0",
+    "framer-motion": "10.18.0",
+    "lucide-react": "0.344.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "lucide-react": "0.344.0",
-    "framer-motion": "10.18.0",
-    "clsx": "2.1.0",
-    "tailwind-merge": "2.2.1",
-    "sql.js": "latest"
+    "react-focus-lock": "^2.13.7",
+    "sql.js": "latest",
+    "tailwind-merge": "2.2.1"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

@@ -22,7 +22,7 @@ export const SignalCard = ({ signal }: { signal: AISignal }) => {
           <CoinIcon symbol={signal.symbol} size="md" />
           <div>
             <h3 className="font-bold text-lg text-white">{signal.symbol}/USDT</h3>
-            <span className="text-xs text-slate-400">{new Date(signal.timestamp).toLocaleString()}</span>
+            <span className="text-xs text-slate-300">{new Date(signal.timestamp).toLocaleString()}</span>
           </div>
         </div>
         <div className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${isBuy ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
@@ -53,7 +53,7 @@ export const SignalCard = ({ signal }: { signal: AISignal }) => {
 
       <div className="mb-4 relative z-10">
         <div className="flex justify-between text-xs mb-1">
-          <span className="text-slate-400">Confidence Score</span>
+          <span className="text-slate-300">Confidence Score</span>
           <span className="text-white font-bold">{signal.confidence}%</span>
         </div>
         <div className="h-2 bg-slate-800 rounded-full overflow-hidden">

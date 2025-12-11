@@ -79,7 +79,7 @@ export const AlertsManager = () => {
                 <CoinIcon symbol={alert.symbol} size="sm" />
                 <div className="text-sm">
                    <div className="font-bold text-white">{alert.symbol}</div>
-                   <div className="text-xs text-slate-400 capitalize">{alert.condition} ${alert.price.toLocaleString()}</div>
+                   <div className="text-xs text-slate-300 capitalize">{alert.condition} ${alert.price.toLocaleString()}</div>
                 </div>
              </div>
              <div className="flex items-center gap-3">

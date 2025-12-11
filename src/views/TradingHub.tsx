@@ -253,7 +253,7 @@ export default function TradingHub() {
          <div className="flex gap-2">
             <button 
               onClick={toggleFavorite}
-              className={`p-2 rounded-lg transition-all ${isFavorite ? 'text-yellow-400 bg-yellow-500/10' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
+              className={`p-2 rounded-lg transition-all ${isFavorite ? 'text-yellow-400 bg-yellow-500/10' : 'text-slate-300 hover:text-white hover:bg-white/5'}`}
               title="Add to favorites"
             >
               <Star size={18} fill={isFavorite ? 'currentColor' : 'none'} />
@@ -264,7 +264,7 @@ export default function TradingHub() {
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all transform hover:scale-105 ${
                 showBot 
                   ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg shadow-cyan-900/30' 
-                  : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'
+                  : 'bg-white/5 text-slate-300 hover:text-white hover:bg-white/10'
               }`}
             >
               <Bot size={18} />
@@ -288,7 +288,7 @@ export default function TradingHub() {
                <div className="px-4 py-2 border-b border-white/5 flex gap-6 text-sm font-bold bg-slate-900/30">
                   <button 
                     onClick={() => setActiveTab('positions')}
-                    className={`pb-2 transition-colors relative ${activeTab === 'positions' ? 'text-white' : 'text-slate-400 hover:text-white'}`}
+                    className={`pb-2 transition-colors relative ${activeTab === 'positions' ? 'text-white' : 'text-slate-300 hover:text-white'}`}
                   >
                     Positions ({positions.length})
                     {activeTab === 'positions' && (
@@ -300,7 +300,7 @@ export default function TradingHub() {
                   </button>
                   <button 
                     onClick={() => setActiveTab('orders')}
-                    className={`pb-2 transition-colors relative ${activeTab === 'orders' ? 'text-white' : 'text-slate-400 hover:text-white'}`}
+                    className={`pb-2 transition-colors relative ${activeTab === 'orders' ? 'text-white' : 'text-slate-300 hover:text-white'}`}
                   >
                     Open Orders (0)
                     {activeTab === 'orders' && (
@@ -312,7 +312,7 @@ export default function TradingHub() {
                   </button>
                   <button 
                     onClick={() => setActiveTab('history')}
-                    className={`pb-2 transition-colors relative ${activeTab === 'history' ? 'text-white' : 'text-slate-400 hover:text-white'}`}
+                    className={`pb-2 transition-colors relative ${activeTab === 'history' ? 'text-white' : 'text-slate-300 hover:text-white'}`}
                   >
                     Trade History
                     {activeTab === 'history' && (

@@ -23,7 +23,7 @@ const PageLoader = () => (
       <div className="absolute inset-0 rounded-full border-4 border-t-purple-500 animate-spin"></div>
       <div className="absolute inset-4 rounded-full bg-purple-500/20 blur-sm animate-pulse"></div>
     </div>
-    <div className="mt-4 text-slate-400 font-medium animate-pulse">Loading Workspace...</div>
+    <div className="mt-4 text-slate-300 font-medium animate-pulse">Loading Workspace...</div>
   </div>
 );
 
@@ -33,7 +33,7 @@ const PagePlaceholder = ({ title }: { title: string }) => (
       <Zap className="text-purple-400" size={32} />
     </div>
     <h1 className="text-3xl font-bold mb-4 text-gradient">{title}</h1>
-    <p className="text-slate-400">This module is scheduled for implementation in upcoming phases.</p>
+    <p className="text-slate-300">This module is scheduled for implementation in upcoming phases.</p>
   </div>
 );
 

@@ -150,7 +150,7 @@ export const PriceChart = ({ symbol }: { symbol: string }) => {
                 onClick={() => setTimeframe(tf)}
                 className={cn(
                   "px-3 py-1 rounded text-xs font-medium transition-all",
-                  timeframe === tf ? "bg-purple-600 text-white shadow-md shadow-purple-900/20" : "text-slate-400 hover:text-white"
+                  timeframe === tf ? "bg-purple-600 text-white shadow-md shadow-purple-900/20" : "text-slate-300 hover:text-white"
                 )}
               >
                 {tf}
@@ -158,7 +158,7 @@ export const PriceChart = ({ symbol }: { symbol: string }) => {
             ))}
           </div>
         </div>
-        <div className="flex gap-2 text-slate-400">
+        <div className="flex gap-2 text-slate-300">
            <button onClick={fetchData} className="p-2 hover:bg-white/10 rounded-lg transition-colors hover:text-white"><RefreshCw size={18} /></button>
            <button className="p-2 hover:bg-white/10 rounded-lg transition-colors hover:text-white"><Layers size={18} /></button>
            <button className="p-2 hover:bg-white/10 rounded-lg transition-colors hover:text-white"><Maximize2 size={18} /></button>

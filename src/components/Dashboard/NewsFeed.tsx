@@ -17,7 +17,7 @@ const NewsItem = ({ article, index }: { article: NewsArticle; index: number }) =
   const theme = 
     sentiment === 'positive' ? { border: 'border-l-emerald-500', text: 'text-emerald-400', bg: 'bg-emerald-500/10', icon: TrendingUp } :
     sentiment === 'negative' ? { border: 'border-l-rose-500', text: 'text-rose-400', bg: 'bg-rose-500/10', icon: TrendingDown } :
-    { border: 'border-l-slate-500', text: 'text-slate-400', bg: 'bg-slate-500/10', icon: Minus };
+    { border: 'border-l-slate-500', text: 'text-slate-300', bg: 'bg-slate-500/10', icon: Minus };
     
   const SentimentIcon = theme.icon;
 
@@ -122,7 +122,7 @@ const NewsItem = ({ article, index }: { article: NewsArticle; index: number }) =
         </div>
 
         <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/5 group-hover:border-white/10 transition-colors">
-          <span className="text-[11px] font-medium text-slate-400 group-hover:text-slate-200 transition-colors flex items-center gap-1">
+          <span className="text-[11px] font-medium text-slate-300 group-hover:text-slate-200 transition-colors flex items-center gap-1">
              <Newspaper size={12} className="opacity-70 group-hover:opacity-100 transition-opacity" />
              {article.source || 'CryptoWire'}
           </span>
@@ -166,7 +166,7 @@ export const NewsFeed = () => {
           </div>
           Market News
         </h3>
-        <button className="text-xs font-medium text-slate-400 hover:text-white transition-colors px-2 py-1 rounded hover:bg-white/5">
+        <button className="text-xs font-medium text-slate-300 hover:text-white transition-colors px-2 py-1 rounded hover:bg-white/5">
           View All
         </button>
       </div>

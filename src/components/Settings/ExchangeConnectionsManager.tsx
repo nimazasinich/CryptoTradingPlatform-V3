@@ -98,7 +98,7 @@ export const ExchangeConnectionsManager = ({ exchanges, onUpdate }: Props) => {
         </h3>
         <form onSubmit={handleConnectExchange} className="space-y-4 max-w-2xl">
           <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-400 uppercase">Exchange</label>
+            <label className="text-xs font-bold text-slate-300 uppercase">Exchange</label>
             <select 
               value={exchangeForm.exchange}
               onChange={e => setExchangeForm({...exchangeForm, exchange: e.target.value})}
@@ -112,7 +112,7 @@ export const ExchangeConnectionsManager = ({ exchanges, onUpdate }: Props) => {
             </select>
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-400 uppercase">API Key</label>
+            <label className="text-xs font-bold text-slate-300 uppercase">API Key</label>
             <input 
               value={exchangeForm.apiKey}
               onChange={e => setExchangeForm({...exchangeForm, apiKey: e.target.value})}
@@ -122,7 +122,7 @@ export const ExchangeConnectionsManager = ({ exchanges, onUpdate }: Props) => {
             />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-400 uppercase">API Secret</label>
+            <label className="text-xs font-bold text-slate-300 uppercase">API Secret</label>
             <input 
               type="password"
               value={exchangeForm.apiSecret}
@@ -134,7 +134,7 @@ export const ExchangeConnectionsManager = ({ exchanges, onUpdate }: Props) => {
           </div>
           {['kucoin', 'okx'].includes(exchangeForm.exchange) && (
             <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-400 uppercase">
+              <label className="text-xs font-bold text-slate-300 uppercase">
                 Passphrase {exchangeForm.exchange === 'kucoin' ? '(Required)' : '(Optional)'}
               </label>
               <input 
@@ -148,7 +148,7 @@ export const ExchangeConnectionsManager = ({ exchanges, onUpdate }: Props) => {
             </div>
           )}
           <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-400 uppercase block">Permissions</label>
+            <label className="text-xs font-bold text-slate-300 uppercase block">Permissions</label>
             <div className="flex gap-3">
               {[
                 { id: 'read', label: 'Read', desc: 'View account data' },
