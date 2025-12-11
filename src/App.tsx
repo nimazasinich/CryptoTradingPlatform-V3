@@ -1,20 +1,20 @@
 
 import React, { useState, Suspense, lazy, useEffect } from 'react';
-import { Sidebar } from './src/components/Sidebar/Sidebar';
+import { Sidebar } from './components/Sidebar/Sidebar';
 import { Menu, Zap } from 'lucide-react';
-import { AppProvider } from './src/context/AppContext';
-import { ErrorBoundary } from './src/components/ErrorBoundary';
-import { databaseService } from './src/services/database';
-import { backgroundTasks } from './src/services/backgroundTasks';
+import { AppProvider } from './context/AppContext';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { databaseService } from './services/database';
+import { backgroundTasks } from './services/backgroundTasks';
 
 // Lazy Load Views
-const Dashboard = lazy(() => import('./src/views/Dashboard'));
-const MarketAnalysis = lazy(() => import('./src/views/MarketAnalysis'));
-const TradingHub = lazy(() => import('./src/views/TradingHub'));
-const AILab = lazy(() => import('./src/views/AILab'));
-const RiskManagement = lazy(() => import('./src/views/RiskManagement'));
-const Settings = lazy(() => import('./src/views/Settings'));
-const Admin = lazy(() => import('./src/views/Admin'));
+const Dashboard = lazy(() => import('./views/Dashboard'));
+const MarketAnalysis = lazy(() => import('./views/MarketAnalysis'));
+const TradingHub = lazy(() => import('./views/TradingHub'));
+const AILab = lazy(() => import('./views/AILab'));
+const RiskManagement = lazy(() => import('./views/RiskManagement'));
+const Settings = lazy(() => import('./views/Settings'));
+const Admin = lazy(() => import('./views/Admin'));
 
 const PageLoader = () => (
   <div className="h-full flex flex-col items-center justify-center">
