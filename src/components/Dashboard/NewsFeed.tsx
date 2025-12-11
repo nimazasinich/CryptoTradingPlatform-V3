@@ -65,15 +65,23 @@ const NewsItem = ({ article, index }: { article: NewsArticle; index: number }) =
       target="_blank" 
       rel="noopener noreferrer"
       className={cn(
-        "group flex gap-4 p-4 rounded-xl hover:bg-white/[0.04] transition-all duration-300",
-        "border border-white/5 hover:border-white/10 hover:shadow-lg hover:shadow-black/20",
-        "bg-slate-900/40 backdrop-blur-md mb-3 last:mb-0 relative overflow-hidden"
+        "group flex gap-4 p-4 rounded-xl transition-all duration-300",
+        "border border-white/5 hover:border-white/20",
+        "bg-slate-900/40 backdrop-blur-md mb-3 last:mb-0 relative overflow-hidden",
+        "hover:bg-white/[0.08] hover:scale-[1.01] hover:shadow-xl hover:shadow-purple-500/10",
+        "transform-gpu"
       )}
     >
-      <div className={cn("absolute left-0 top-0 bottom-0 w-1 transition-all group-hover:w-1.5", theme.border)} />
+      {/* Hover Glow Effect */}
+      <div className={cn(
+        "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none blur-xl",
+        sentiment === 'positive' ? "bg-emerald-500/10" : sentiment === 'negative' ? "bg-rose-500/10" : "bg-purple-500/10"
+      )} />
+      
+      <div className={cn("absolute left-0 top-0 bottom-0 w-1 transition-all group-hover:w-2", theme.border)} />
 
-      <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden relative shadow-lg bg-slate-800">
-        <div className="absolute inset-0 bg-slate-900/10 z-10 group-hover:bg-transparent transition-colors" />
+      <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden relative shadow-lg bg-slate-800 ring-1 ring-white/5 group-hover:ring-white/20 transition-all">
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black/20 z-10 group-hover:opacity-0 transition-opacity" />
         <img 
           src={getImageUrl()} 
           alt={article.title}
@@ -82,7 +90,7 @@ const NewsItem = ({ article, index }: { article: NewsArticle; index: number }) =
             (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150/0f172a/334155?text=NEWS';
           }}
         />
-        <div className="absolute bottom-1 right-1 bg-black/60 backdrop-blur-sm p-1 rounded text-[10px] text-white font-bold uppercase">
+        <div className="absolute bottom-1 right-1 bg-black/70 backdrop-blur-sm px-1.5 py-0.5 rounded text-[9px] text-white font-bold uppercase tracking-wider shadow-lg">
             {article.source?.slice(0, 2) || 'CW'}
         </div>
       </div>
@@ -108,18 +116,18 @@ const NewsItem = ({ article, index }: { article: NewsArticle; index: number }) =
             </div>
           </div>
           
-          <h4 className="text-sm font-semibold text-slate-100 leading-snug line-clamp-2 group-hover:text-purple-300 transition-colors">
+          <h4 className="text-sm font-semibold text-slate-100 leading-snug line-clamp-2 group-hover:text-purple-200 transition-colors duration-300">
             {article.title}
           </h4>
         </div>
 
-        <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/5">
-          <span className="text-[11px] font-medium text-slate-400 group-hover:text-slate-300 transition-colors flex items-center gap-1">
-             <Newspaper size={12} />
+        <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/5 group-hover:border-white/10 transition-colors">
+          <span className="text-[11px] font-medium text-slate-400 group-hover:text-slate-200 transition-colors flex items-center gap-1">
+             <Newspaper size={12} className="opacity-70 group-hover:opacity-100 transition-opacity" />
              {article.source || 'CryptoWire'}
           </span>
-          <span className="flex items-center gap-1 text-[10px] text-purple-400 opacity-0 group-hover:opacity-100 transition-all transform -translate-x-2 group-hover:translate-x-0 duration-300">
-            Read Article <ExternalLink size={10} />
+          <span className="flex items-center gap-1 text-[10px] text-purple-400 font-bold opacity-0 group-hover:opacity-100 transition-all transform -translate-x-2 group-hover:translate-x-0 duration-300">
+            Read <ExternalLink size={10} className="animate-pulse" />
           </span>
         </div>
       </div>

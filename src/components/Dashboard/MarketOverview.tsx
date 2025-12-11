@@ -30,34 +30,47 @@ const SectionHeader = ({ title, icon: Icon, color }: { title: string; icon: any;
   </div>
 );
 
-const CoinRow = ({ coin, rank, type }: { coin: CryptoPrice; rank: number; type: 'gainer' | 'loser' }) => (
-  <motion.div 
-    initial={{ opacity: 0, x: -20 }}
-    animate={{ opacity: 1, x: 0 }}
-    transition={{ delay: rank * 0.05 }}
-    className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 cursor-pointer transition-colors group"
-  >
-    <div className="flex items-center gap-3">
-      <span className="text-slate-500 text-sm font-mono w-4">{rank}</span>
-      <CoinIcon symbol={coin.symbol} size="md" />
-      <div>
-        <div className="font-bold text-sm text-white group-hover:text-purple-400 transition-colors">{coin.symbol.toUpperCase()}</div>
-        <div className="text-xs text-slate-500">{coin.name}</div>
-      </div>
-    </div>
-    <div className="text-right">
-      <div className="font-mono text-sm font-medium text-slate-200">
-        {formatPrice(coin.current_price)}
-      </div>
+const CoinRow = ({ coin, rank, type }: { coin: CryptoPrice; rank: number; type: 'gainer' | 'loser' }) => {
+  const isGainer = type === 'gainer';
+  return (
+    <motion.div 
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: rank * 0.05 }}
+      className={cn(
+        "flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-300 group relative",
+        "hover:bg-white/[0.08] hover:scale-[1.02]",
+        isGainer ? "hover:shadow-lg hover:shadow-green-500/20" : "hover:shadow-lg hover:shadow-red-500/20"
+      )}
+    >
+      {/* Hover Glow Effect */}
       <div className={cn(
-        "text-xs font-semibold flex items-center justify-end gap-1",
-        type === 'gainer' ? "text-green-400" : "text-red-400"
-      )}>
-        {type === 'gainer' ? '+' : ''}{coin.price_change_percentage_24h.toFixed(2)}%
+        "absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none blur-md -z-10",
+        isGainer ? "bg-green-500/10" : "bg-red-500/10"
+      )} />
+      
+      <div className="flex items-center gap-3 relative z-10">
+        <span className="text-slate-500 text-sm font-mono w-4">{rank}</span>
+        <CoinIcon symbol={coin.symbol} size="md" />
+        <div>
+          <div className="font-bold text-sm text-white group-hover:text-purple-400 transition-colors">{coin.symbol.toUpperCase()}</div>
+          <div className="text-xs text-slate-500 group-hover:text-slate-400 transition-colors">{coin.name}</div>
+        </div>
       </div>
-    </div>
-  </motion.div>
-);
+      <div className="text-right relative z-10">
+        <div className="font-mono text-sm font-medium text-slate-200 group-hover:text-white transition-colors">
+          {formatPrice(coin.current_price)}
+        </div>
+        <div className={cn(
+          "text-sm font-bold flex items-center justify-end gap-1 transition-all",
+          isGainer ? "text-green-400 group-hover:text-green-300" : "text-red-400 group-hover:text-red-300"
+        )}>
+          {isGainer ? '+' : ''}{coin.price_change_percentage_24h.toFixed(2)}%
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
 const VolumeRow = ({ coin, rank, maxVolume }: { coin: CryptoPrice; rank: number; maxVolume: number }) => {
   const percentage = (coin.total_volume / maxVolume) * 100;
@@ -67,27 +80,44 @@ const VolumeRow = ({ coin, rank, maxVolume }: { coin: CryptoPrice; rank: number;
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: rank * 0.05 }}
-      className="p-3 rounded-xl hover:bg-white/5 cursor-pointer transition-colors group relative overflow-hidden"
+      className="p-4 rounded-xl hover:bg-white/[0.08] cursor-pointer transition-all duration-300 group relative overflow-hidden hover:scale-[1.01]"
     >
-      <div className="flex items-center justify-between mb-2 relative z-10">
+      {/* Hover Glow Background */}
+      <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-cyan-500/5 blur-sm" />
+      
+      <div className="flex items-center justify-between mb-3 relative z-10">
         <div className="flex items-center gap-3">
-          <span className="text-slate-500 text-sm font-mono w-4">{rank}</span>
-          <CoinIcon symbol={coin.symbol} size="sm" />
-          <span className="font-bold text-sm text-white group-hover:text-cyan-400 transition-colors">{coin.symbol.toUpperCase()}</span>
+          <span className="text-slate-500 text-sm font-mono w-4 group-hover:text-slate-400 transition-colors">{rank}</span>
+          <CoinIcon symbol={coin.symbol} size="md" />
+          <span className="font-bold text-base text-white group-hover:text-cyan-300 transition-colors">{coin.symbol.toUpperCase()}</span>
         </div>
-        <span className="font-mono text-xs text-slate-300">
+        <span className="font-mono text-sm text-cyan-400 font-bold group-hover:text-cyan-300 transition-colors">
           ${formatCompactNumber(coin.total_volume)}
         </span>
       </div>
       
-      {/* Progress Bar Background */}
-      <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+      {/* Enhanced Progress Bar with Better Gradient */}
+      <div className="relative h-3 w-full bg-white/5 rounded-full overflow-hidden shadow-inner">
         <motion.div 
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}
-          transition={{ duration: 1, delay: 0.5 + (rank * 0.1) }}
-          className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"
-        />
+          transition={{ duration: 1.2, delay: 0.3 + (rank * 0.1), ease: "easeOut" }}
+          className="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 rounded-full relative overflow-hidden group-hover:shadow-lg group-hover:shadow-cyan-500/50"
+        >
+          {/* Animated Shine Effect */}
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+            animate={{ x: ['-100%', '200%'] }}
+            transition={{ duration: 2, delay: 0.5 + (rank * 0.1), ease: "easeInOut" }}
+          />
+        </motion.div>
+        
+        {/* Percentage Label on Bar */}
+        <div className="absolute inset-0 flex items-center justify-end pr-2">
+          <span className="text-[10px] font-bold text-white/80 drop-shadow-md">
+            {percentage.toFixed(0)}%
+          </span>
+        </div>
       </div>
     </motion.div>
   );

@@ -1,7 +1,8 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { X, CheckCircle, AlertTriangle, Info, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { databaseService } from '../services/database';
 
 type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -16,6 +17,7 @@ interface AppContextType {
   setTheme: (theme: 'dark' | 'light') => void;
   addToast: (message: string, type?: ToastType) => void;
   user: any;
+  isInitialized: boolean;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -24,6 +26,35 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [user] = useState({ name: 'Admin User', email: 'admin@crypto.one' }); // Mock User
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Initialize database on app start
+  useEffect(() => {
+    const init = async () => {
+      try {
+        await databaseService.initDatabase();
+        databaseService.clearExpiredCache();
+        console.log('✅ Database initialized');
+        setIsInitialized(true);
+      } catch (err) {
+        console.warn('⚠️ Database init warning:', err);
+        setIsInitialized(true); // Continue anyway
+      }
+    };
+
+    init();
+
+    // Periodic cache cleanup
+    const cleanupInterval = setInterval(() => {
+      try {
+        databaseService.clearExpiredCache();
+      } catch (e) {
+        // Silent fail
+      }
+    }, 5 * 60 * 1000);
+
+    return () => clearInterval(cleanupInterval);
+  }, []);
 
   const addToast = (message: string, type: ToastType = 'info') => {
     const id = Math.random().toString(36).substring(7);
@@ -38,7 +69,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AppContext.Provider value={{ theme, setTheme, addToast, user }}>
+    <AppContext.Provider value={{ theme, setTheme, addToast, user, isInitialized }}>
       {children}
       
       {/* Toast Container */}

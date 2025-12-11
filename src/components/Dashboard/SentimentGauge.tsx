@@ -77,8 +77,8 @@ export const SentimentGauge = () => {
       </div>
 
       {/* Main Gauge Area */}
-      <div className="flex-1 flex flex-col items-center justify-end pb-2 relative z-10">
-        <div className="relative w-full max-w-[240px] aspect-[2/1] mb-2">
+      <div className="flex-1 flex flex-col items-center justify-center relative z-10 py-4">
+        <div className="relative w-full max-w-[220px] aspect-[2/1]">
           <svg viewBox="0 0 200 100" className="w-full h-full overflow-visible">
             <defs>
               <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -133,33 +133,34 @@ export const SentimentGauge = () => {
               transition={{ type: "spring", stiffness: 40, damping: 12, mass: 1 }}
               style={{ originX: "100px", originY: "100px" }}
             >
-              <path d="M 100 100 L 100 25" stroke="white" strokeWidth="2" />
-              <circle cx="100" cy="100" r="4" fill="white" />
-              <circle cx="100" cy="25" r="3" fill="white" />
+              <path d="M 100 100 L 100 25" stroke="white" strokeWidth="2.5" />
+              <circle cx="100" cy="100" r="5" fill="white" stroke={strokeColor} strokeWidth="2" />
+              <circle cx="100" cy="25" r="4" fill="white" />
               {/* Needle Glow */}
-              <circle cx="100" cy="25" r="6" fill={strokeColor} opacity="0.5" filter="url(#glow)" />
+              <circle cx="100" cy="25" r="8" fill={strokeColor} opacity="0.5" filter="url(#glow)" />
             </motion.g>
           </svg>
           
-          {/* Central Score */}
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-center transform translate-y-1/2">
+          {/* Central Score - Fixed positioning */}
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-center transform translate-y-2">
              <motion.div 
                initial={{ scale: 0.5, opacity: 0 }}
                animate={{ scale: 1, opacity: 1 }}
                key={score}
-               className={cn("text-4xl font-black tracking-tighter text-glow drop-shadow-2xl", colorClass)}
+               className={cn("text-5xl font-black tracking-tighter drop-shadow-2xl", colorClass)}
+               style={{ textShadow: `0 0 30px ${strokeColor}` }}
              >
                {Math.round(score)}
              </motion.div>
           </div>
         </div>
 
-        {/* Status Text */}
-        <div className="text-center mt-6 space-y-1">
-          <div className={cn("text-lg font-bold uppercase tracking-widest", colorClass)}>
+        {/* Status Text - Better positioning and sizing */}
+        <div className="text-center mt-8 space-y-1.5">
+          <div className={cn("text-xl font-black uppercase tracking-[0.2em] drop-shadow-md", colorClass)}>
             {status}
           </div>
-          <div className="text-xs text-slate-500 font-medium">
+          <div className="text-[11px] text-slate-500 font-medium">
             Updated: <span className="text-slate-300">Just now</span>
           </div>
         </div>
