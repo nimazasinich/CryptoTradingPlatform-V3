@@ -203,7 +203,7 @@ export default function Dashboard() {
         <p className="text-slate-400 text-sm">Real-time market insights and portfolio tracking.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 grid-mobile stack-mobile">
         {loading ? (
           <>
             <SkeletonCard />
@@ -217,42 +217,50 @@ export default function Dashboard() {
           </div>
         ) : marketOverview ? (
           <>
-            <StatCard
-              title="Total Market Cap"
-              value={marketOverview.total_market_cap}
-              prefix="$"
-              change={marketOverview.market_cap_change_percentage_24h}
-              icon={DollarSign}
-              chartData={btcSparkline}
-              delay={0}
-              type="currency"
-            />
-            <StatCard
-              title="24h Volume"
-              value={marketOverview.total_volume_24h}
-              prefix="$"
-              change={marketOverview.volume_change_percentage_24h}
-              icon={BarChart3}
-              chartData={ethSparkline}
-              delay={1}
-              type="currency"
-            />
-            <StatCard
-              title="BTC Dominance"
-              value={marketOverview.btc_dominance}
-              suffix="%"
-              icon={Bitcoin}
-              type="percent"
-              delay={2}
-            />
-            <StatCard
-              title="Active Coins"
-              value={marketOverview.active_cryptocurrencies}
-              suffix="+"
-              icon={Coins}
-              type="number"
-              delay={3}
-            />
+            <div className="stat-card-mobile">
+              <StatCard
+                title="Total Market Cap"
+                value={marketOverview.total_market_cap}
+                prefix="$"
+                change={marketOverview.market_cap_change_percentage_24h}
+                icon={DollarSign}
+                chartData={btcSparkline}
+                delay={0}
+                type="currency"
+              />
+            </div>
+            <div className="stat-card-mobile">
+              <StatCard
+                title="24h Volume"
+                value={marketOverview.total_volume_24h}
+                prefix="$"
+                change={marketOverview.volume_change_percentage_24h}
+                icon={BarChart3}
+                chartData={ethSparkline}
+                delay={1}
+                type="currency"
+              />
+            </div>
+            <div className="stat-card-mobile">
+              <StatCard
+                title="BTC Dominance"
+                value={marketOverview.btc_dominance}
+                suffix="%"
+                icon={Bitcoin}
+                type="percent"
+                delay={2}
+              />
+            </div>
+            <div className="stat-card-mobile">
+              <StatCard
+                title="Active Coins"
+                value={marketOverview.active_cryptocurrencies}
+                suffix="+"
+                icon={Coins}
+                type="number"
+                delay={3}
+              />
+            </div>
           </>
         ) : null}
       </div>

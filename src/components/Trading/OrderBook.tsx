@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { wsOrderBook, OrderBookLevel } from '../../services/websocketOrderBook';
+import { Wifi, WifiOff } from 'lucide-react';
 
 function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
@@ -17,9 +19,40 @@ interface OrderRow {
 export const OrderBook = ({ symbol, currentPrice }: { symbol: string, currentPrice: number }) => {
   const [bids, setBids] = useState<OrderRow[]>([]);
   const [asks, setAsks] = useState<OrderRow[]>([]);
+  const [isConnected, setIsConnected] = useState(false);
+  const [useWebSocket, setUseWebSocket] = useState(true);
 
   useEffect(() => {
-    // Safety check for currentPrice
+    if (!useWebSocket) {
+      // Fallback to simulated data
+      generateSimulatedData();
+      return;
+    }
+
+    // Connect to WebSocket
+    wsOrderBook.connect(symbol);
+    setIsConnected(wsOrderBook.isConnected());
+
+    // Subscribe to updates
+    const unsubscribe = wsOrderBook.subscribe((data) => {
+      setBids(data.bids);
+      setAsks(data.asks);
+      setIsConnected(true);
+    });
+
+    // Check connection status
+    const statusCheck = setInterval(() => {
+      setIsConnected(wsOrderBook.isConnected());
+    }, 1000);
+
+    return () => {
+      unsubscribe();
+      wsOrderBook.disconnect();
+      clearInterval(statusCheck);
+    };
+  }, [symbol, useWebSocket]);
+
+  const generateSimulatedData = () => {
     const safePrice = currentPrice || 0;
     if (!safePrice) return;
 
@@ -42,7 +75,6 @@ export const OrderBook = ({ symbol, currentPrice }: { symbol: string, currentPri
         });
       }
       
-      // Calculate depth percentage relative to total volume in view
       const maxTotal = accumulated;
       rows = rows.map(r => ({ ...r, percent: Math.min(100, (r.total / maxTotal) * 100) }));
       
@@ -58,7 +90,14 @@ export const OrderBook = ({ symbol, currentPrice }: { symbol: string, currentPri
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [currentPrice]);
+  };
+
+  useEffect(() => {
+    if (!useWebSocket) {
+      const cleanup = generateSimulatedData();
+      return cleanup;
+    }
+  }, [currentPrice, useWebSocket]);
 
   const Row = ({ row, type }: { row: OrderRow, type: 'bid' | 'ask' }) => (
     <div className="flex justify-between text-xs py-0.5 relative group hover:bg-white/5 cursor-pointer select-none">
@@ -90,13 +129,31 @@ export const OrderBook = ({ symbol, currentPrice }: { symbol: string, currentPri
       <div className="p-3 border-b border-white/5 font-semibold text-sm text-slate-300 flex justify-between bg-slate-900/30">
         <div className="flex items-center gap-2">
           <span>Order Book</span>
-          <span className="text-[9px] text-yellow-400 bg-yellow-500/10 px-1.5 py-0.5 rounded border border-yellow-500/20 font-bold uppercase" title="This order book uses simulated data for demonstration">
-            Demo Data
-          </span>
+          {isConnected && useWebSocket ? (
+            <span className="text-[9px] text-green-400 bg-green-500/10 px-1.5 py-0.5 rounded border border-green-500/20 font-bold uppercase flex items-center gap-1" title="Connected to Binance WebSocket">
+              <Wifi size={10} />
+              Live
+            </span>
+          ) : useWebSocket ? (
+            <span className="text-[9px] text-yellow-400 bg-yellow-500/10 px-1.5 py-0.5 rounded border border-yellow-500/20 font-bold uppercase flex items-center gap-1 animate-pulse" title="Connecting...">
+              <WifiOff size={10} />
+              Connecting
+            </span>
+          ) : (
+            <span className="text-[9px] text-yellow-400 bg-yellow-500/10 px-1.5 py-0.5 rounded border border-yellow-500/20 font-bold uppercase" title="Using simulated data">
+              Demo
+            </span>
+          )}
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
+           <button
+             onClick={() => setUseWebSocket(!useWebSocket)}
+             className="text-[10px] text-slate-400 hover:text-white transition-colors px-2 py-1 rounded hover:bg-white/5"
+             title={useWebSocket ? 'Switch to demo mode' : 'Connect to live data'}
+           >
+             {useWebSocket ? 'Live' : 'Demo'}
+           </button>
            <span className="text-[10px] text-slate-500 bg-white/5 px-2 py-0.5 rounded">0.01</span>
-           <span className="text-[10px] text-slate-500 bg-white/5 px-2 py-0.5 rounded">0.1</span>
         </div>
       </div>
       

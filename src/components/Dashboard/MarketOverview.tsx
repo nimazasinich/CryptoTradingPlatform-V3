@@ -1,9 +1,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, TrendingUp, TrendingDown, BarChart2 } from 'lucide-react';
+import { ArrowRight, TrendingUp, TrendingDown, BarChart2, Download } from 'lucide-react';
 import { marketService } from '../../services/marketService';
 import { CryptoPrice } from '../../types';
+import { exportTable } from '../../utils/exportTable';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { CoinIcon } from '../Common/CoinIcon';
@@ -15,7 +16,7 @@ function cn(...inputs: (string | undefined | null | false)[]) {
 
 // --- Sub-components ---
 
-const SectionHeader = ({ title, icon: Icon, color }: { title: string; icon: any; color: string }) => (
+const SectionHeader = ({ title, icon: Icon, color, onExport }: { title: string; icon: any; color: string; onExport?: () => void }) => (
   <div className="flex items-center justify-between mb-6">
     <div className="flex items-center gap-3">
       <div className={cn("p-2 rounded-lg bg-white/5", color)}>
@@ -23,10 +24,21 @@ const SectionHeader = ({ title, icon: Icon, color }: { title: string; icon: any;
       </div>
       <h3 className="font-bold text-lg text-white">{title}</h3>
     </div>
-    <button className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors group">
-      View All 
-      <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
-    </button>
+    <div className="flex items-center gap-2">
+      {onExport && (
+        <button 
+          onClick={onExport}
+          className="p-1.5 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+          title="Export to CSV"
+        >
+          <Download size={14} />
+        </button>
+      )}
+      <button className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors group">
+        View All 
+        <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+      </button>
+    </div>
   </div>
 );
 
@@ -190,11 +202,29 @@ export const MarketOverview = () => {
     );
   }
 
+  const handleExport = (data: CryptoPrice[], name: string) => {
+    const exportData = data.map(coin => ({
+      Rank: coin.market_cap_rank,
+      Symbol: coin.symbol,
+      Name: coin.name,
+      Price: coin.current_price,
+      '24h Change (%)': coin.price_change_percentage_24h,
+      'Market Cap': coin.market_cap,
+      'Volume': coin.total_volume
+    }));
+    exportTable(exportData, { filename: `${name}_${new Date().toISOString().split('T')[0]}` });
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {/* Top Gainers */}
       <div className="glass-card p-6">
-        <SectionHeader title="Top Gainers" icon={TrendingUp} color="text-green-400" />
+        <SectionHeader 
+          title="Top Gainers" 
+          icon={TrendingUp} 
+          color="text-green-400"
+          onExport={() => handleExport(gainers, 'top_gainers')}
+        />
         {loading && data.length === 0 ? <SkeletonList /> : (
           <div className="space-y-1">
             {gainers.map((coin, index) => (
@@ -207,7 +237,12 @@ export const MarketOverview = () => {
 
       {/* Top Losers */}
       <div className="glass-card p-6">
-        <SectionHeader title="Top Losers" icon={TrendingDown} color="text-red-400" />
+        <SectionHeader 
+          title="Top Losers" 
+          icon={TrendingDown} 
+          color="text-red-400"
+          onExport={() => handleExport(losers, 'top_losers')}
+        />
         {loading && data.length === 0 ? <SkeletonList /> : (
           <div className="space-y-1">
             {losers.map((coin, index) => (
@@ -220,7 +255,12 @@ export const MarketOverview = () => {
 
       {/* Volume Leaders */}
       <div className="glass-card p-6">
-        <SectionHeader title="Volume Leaders" icon={BarChart2} color="text-cyan-400" />
+        <SectionHeader 
+          title="Volume Leaders" 
+          icon={BarChart2} 
+          color="text-cyan-400"
+          onExport={() => handleExport(volumeLeaders, 'volume_leaders')}
+        />
         {loading && data.length === 0 ? <SkeletonList /> : (
           <div className="space-y-2">
             {volumeLeaders.map((coin, index) => (

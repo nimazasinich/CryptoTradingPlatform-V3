@@ -1,0 +1,235 @@
+/* Mobile Layout Optimizations */
+
+/* Compress cards on mobile */
+@media (max-width: 768px) {
+  /* Dashboard hero cards */
+  .stat-card-mobile {
+    padding: 0.75rem !important;
+    height: auto !important;
+    min-height: 120px;
+  }
+
+  .stat-card-mobile h3 {
+    font-size: 0.65rem !important;
+  }
+
+  .stat-card-mobile .stat-value {
+    font-size: 1.25rem !important;
+  }
+
+  .stat-card-mobile .stat-change {
+    font-size: 0.7rem !important;
+    padding: 0.25rem 0.5rem !important;
+  }
+
+  /* Glass cards */
+  .glass-card {
+    padding: 0.875rem !important;
+    border-radius: 0.75rem !important;
+  }
+
+  /* Table cells */
+  .mobile-table td,
+  .mobile-table th {
+    padding: 0.5rem 0.25rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* Form inputs */
+  .input-glass {
+    padding: 0.625rem 0.75rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  /* Buttons */
+  .btn-primary,
+  .btn-secondary {
+    padding: 0.625rem 1rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  /* Modal dialogs */
+  .modal-content {
+    padding: 1rem !important;
+    max-width: 95vw !important;
+  }
+
+  /* Chart containers */
+  .chart-container {
+    height: 300px !important;
+  }
+
+  /* Sidebar when open on mobile */
+  .sidebar-mobile {
+    width: 280px !important;
+  }
+
+  /* Compress grid gaps */
+  .grid-mobile {
+    gap: 0.75rem !important;
+  }
+
+  /* Stack columns on mobile */
+  .stack-mobile {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 375px) {
+  .glass-card {
+    padding: 0.75rem !important;
+    border-radius: 0.625rem !important;
+  }
+
+  .stat-card-mobile {
+    padding: 0.625rem !important;
+    min-height: 100px;
+  }
+
+  .stat-card-mobile .stat-value {
+    font-size: 1.125rem !important;
+  }
+
+  .input-glass,
+  .btn-primary,
+  .btn-secondary {
+    font-size: 0.8125rem !important;
+  }
+
+  /* Make text more readable */
+  body {
+    font-size: 14px !important;
+  }
+
+  /* Compress spacing */
+  .space-y-6 > * + * {
+    margin-top: 1rem !important;
+  }
+
+  .space-y-4 > * + * {
+    margin-top: 0.75rem !important;
+  }
+}
+
+/* Landscape mobile */
+@media (max-width: 896px) and (orientation: landscape) {
+  .glass-card {
+    padding: 0.625rem !important;
+  }
+
+  .sidebar-mobile {
+    width: 240px !important;
+  }
+}
+
+/* Touch-friendly tap targets */
+@media (hover: none) and (pointer: coarse) {
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Larger touch areas for icons */
+  .icon-button {
+    padding: 0.75rem !important;
+  }
+
+  /* Better spacing for touch */
+  .touch-list > * + * {
+    margin-top: 0.5rem;
+  }
+}
+
+/* Prevent horizontal scroll */
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Optimize animations for mobile */
+  * {
+    animation-duration: 0.2s !important;
+    transition-duration: 0.2s !important;
+  }
+}
+
+/* Mobile-specific utility classes */
+.mobile-hide {
+  display: none !important;
+}
+
+@media (min-width: 768px) {
+  .mobile-hide {
+    display: block !important;
+  }
+
+  .desktop-hide {
+    display: none !important;
+  }
+}
+
+.mobile-full-width {
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+}
+
+/* Mobile navigation */
+@media (max-width: 768px) {
+  .mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: rgba(2, 6, 23, 0.95);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 0.5rem;
+  }
+
+  .mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    font-size: 0.625rem;
+    text-align: center;
+  }
+}
+
+/* Improved scrolling */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.3);
+  border-radius: 3px;
+}
+
+@media (max-width: 768px) {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+}
