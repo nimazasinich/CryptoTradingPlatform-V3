@@ -80,5 +80,16 @@ Configuration is located in `src/config/api.ts`.
 *   **Effects**: Backdrop Blur (Glassmorphism), Shimmer Loading States.
 *   **Typography**: Sans-serif, Mono for financial data.
 
+## 📚 Documentation Archive
+
+Historical documentation, implementation reports, testing guides, and audit summaries have been organized in the `/archive` directory:
+
+*   **Implementation Docs**: `/archive/docs/` - Feature implementation reports and guides
+*   **QA Reports**: `/archive/QA_REPORT/` - Testing checklists and quality assurance reports
+*   **Development Logs**: `/archive/logs/` - Historical error logs and debugging information
+*   **Dev Artifacts**: `/archive/dev/` - Development metadata and configuration references
+
+For a complete overview of the reorganization, see [`/archive/REORGANIZATION_SUMMARY.md`](archive/REORGANIZATION_SUMMARY.md).
+
 ---
 Built for the Future of Decentralized Finance.
