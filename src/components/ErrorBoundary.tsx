@@ -12,6 +12,8 @@ interface State {
 }
 
 export class ErrorBoundary extends Component<Props, State> {
+  public readonly props!: Readonly<Props> & Readonly<{ children?: ReactNode }>;
+  
   public state: State = {
     hasError: false,
     error: null,
@@ -29,7 +31,7 @@ export class ErrorBoundary extends Component<Props, State> {
     window.location.reload();
   };
 
-  public render() {
+  public render(): ReactNode {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white p-4">

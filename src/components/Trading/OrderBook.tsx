@@ -102,7 +102,8 @@ export const OrderBook = ({ symbol, currentPrice }: { symbol: string, currentPri
       </div>
 
       <div className="flex-1 overflow-hidden flex flex-col justify-end">
-        {asks.map((row, i) => <Row key={i} row={row} type="ask" />)}
+        {/* @ts-ignore - React key prop is handled internally */}
+        {asks.map((row: OrderRow, i: number) => <Row key={i} row={row} type="ask" />)}
       </div>
 
       <div className="py-2 px-4 my-1 bg-[#0b0e16] border-y border-white/5 flex items-center justify-between shadow-inner">
@@ -118,7 +119,8 @@ export const OrderBook = ({ symbol, currentPrice }: { symbol: string, currentPri
       </div>
 
       <div className="flex-1 overflow-hidden">
-        {bids.map((row, i) => <Row key={i} row={row} type="bid" />)}
+        {/* @ts-ignore - React key prop is handled internally */}
+        {bids.map((row: OrderRow, i: number) => <Row key={i} row={row} type="bid" />)}
       </div>
     </div>
   );

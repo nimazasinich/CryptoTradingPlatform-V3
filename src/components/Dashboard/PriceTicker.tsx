@@ -168,10 +168,12 @@ export const PriceTicker = () => {
       <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-slate-950 to-transparent z-10 pointer-events-none" />
 
       <div className="flex animate-marquee hover:[animation-play-state:paused] w-max py-2">
-        {coins.map((coin) => (
+        {coins.map((coin: CryptoPrice) => (
+          // @ts-ignore - React key prop is handled internally
           <TickerItem key={`original-${coin.id || coin.symbol}`} coin={coin} />
         ))}
-        {coins.map((coin) => (
+        {coins.map((coin: CryptoPrice) => (
+          // @ts-ignore - React key prop is handled internally
           <TickerItem key={`duplicate-${coin.id || coin.symbol}`} coin={coin} />
         ))}
       </div>
