@@ -7,11 +7,15 @@ import { databaseService } from './database';
 export const marketService = {
   // GET /api/market
   getMarketOverview: async (): Promise<MarketOverview> => {
-    const cached = databaseService.getCachedResponse<MarketOverview>(API_ENDPOINTS.MARKET_OVERVIEW);
-    if (cached) return cached;
+    const cacheKey = API_ENDPOINTS.MARKET_OVERVIEW;
+    const cached = databaseService.getCachedResponse<MarketOverview>(cacheKey);
+    if (cached) {
+      console.log('📦 Market overview from cache');
+      return cached;
+    }
 
     const data = await HttpClient.get<MarketOverview>(API_ENDPOINTS.MARKET_OVERVIEW);
-    databaseService.cacheApiResponse(API_ENDPOINTS.MARKET_OVERVIEW, data, 60); // 60s
+    databaseService.cacheApiResponse(cacheKey, data, 30); // 30s TTL
     return data;
   },
 
@@ -19,7 +23,10 @@ export const marketService = {
   getTopCoins: async (limit: number = 50): Promise<CryptoPrice[]> => {
     const cacheKey = `${API_ENDPOINTS.COINS_TOP}?limit=${limit}`;
     const cached = databaseService.getCachedResponse<CryptoPrice[]>(cacheKey);
-    if (cached) return cached;
+    if (cached) {
+      console.log(`📦 Top ${limit} coins from cache`);
+      return cached;
+    }
 
     try {
       const response = await HttpClient.get<any>(API_ENDPOINTS.COINS_TOP, { limit });
@@ -64,8 +71,14 @@ export const marketService = {
         };
       }).filter(c => c.current_price > 0); // Only return valid prices
 
+      // Cache individual coin data as well
+      normalizedData.forEach(coin => {
+        databaseService.cacheMarketData(coin.symbol, coin, 30);
+      });
+
       if (normalizedData.length > 0) {
-        databaseService.cacheApiResponse(cacheKey, normalizedData, 30); // 30s
+        databaseService.cacheApiResponse(cacheKey, normalizedData, 30); // 30s TTL
+        console.log(`✅ Cached ${normalizedData.length} coins`);
       }
       
       return normalizedData;
@@ -77,8 +90,12 @@ export const marketService = {
 
   // GET /api/trending
   getTrendingCoins: async (): Promise<CryptoPrice[]> => {
-    const cached = databaseService.getCachedResponse<CryptoPrice[]>(API_ENDPOINTS.MARKET_TRENDING);
-    if (cached) return cached;
+    const cacheKey = API_ENDPOINTS.MARKET_TRENDING;
+    const cached = databaseService.getCachedResponse<CryptoPrice[]>(cacheKey);
+    if (cached) {
+      console.log('📦 Trending coins from cache');
+      return cached;
+    }
 
     try {
       const response = await HttpClient.get<any>(API_ENDPOINTS.MARKET_TRENDING);
@@ -95,12 +112,13 @@ export const marketService = {
         id: coin.id || coin.symbol,
         symbol: coin.symbol || '',
         name: coin.name || '',
-        current_price: Number(coin.current_price || coin.price_btc || 0), // Fallback might be needed
+        current_price: Number(coin.current_price || coin.price_btc || 0),
         price_change_percentage_24h: Number(coin.price_change_percentage_24h || 0)
       }));
 
       if (normalizedData.length > 0) {
-        databaseService.cacheApiResponse(API_ENDPOINTS.MARKET_TRENDING, normalizedData, 60);
+        databaseService.cacheApiResponse(cacheKey, normalizedData, 60); // 60s TTL
+        console.log(`✅ Cached ${normalizedData.length} trending coins`);
       }
       
       return normalizedData as CryptoPrice[];
@@ -112,9 +130,20 @@ export const marketService = {
 
   // GET /api/service/history
   getHistory: async (symbol: string, interval: string = '1h', limit: number = 100) => {
+    // Check OHLCV cache first
+    const cachedOHLCV = databaseService.getOHLCV(symbol, interval, limit);
+    if (cachedOHLCV.length >= limit) {
+      console.log(`📦 OHLCV data for ${symbol} ${interval} from cache`);
+      return cachedOHLCV;
+    }
+
+    // Check API cache as fallback
     const cacheKey = `${API_ENDPOINTS.HISTORY}:${symbol}:${interval}:${limit}`;
     const cached = databaseService.getCachedResponse(cacheKey);
-    if (cached) return cached;
+    if (cached) {
+      console.log(`📦 History for ${symbol} from API cache`);
+      return cached;
+    }
 
     try {
       const data = await HttpClient.get<any>(API_ENDPOINTS.HISTORY, { 
@@ -123,29 +152,37 @@ export const marketService = {
         limit 
       });
       
-      if (data) {
-        databaseService.cacheApiResponse(cacheKey, data, 60);
+      if (data && Array.isArray(data)) {
+        // Cache in both API cache and OHLCV cache
+        databaseService.cacheApiResponse(cacheKey, data, 60); // 60s TTL
+        databaseService.cacheOHLCV(symbol, interval, data);
+        console.log(`✅ Cached ${data.length} candles for ${symbol} ${interval}`);
       }
       return data;
     } catch (e) {
+      console.error('Error fetching history:', e);
       return [];
     }
   },
 
   // GET /api/service/rate
   getRate: async (pair: string) => {
-    // Short cache for rates
+    // Short cache for rates (10s)
     const cacheKey = `${API_ENDPOINTS.RATE}:${pair}`;
     const cached = databaseService.getCachedResponse(cacheKey);
-    if (cached) return cached;
+    if (cached) {
+      console.log(`📦 Rate for ${pair} from cache`);
+      return cached;
+    }
 
     try {
       const data = await HttpClient.get<any>(API_ENDPOINTS.RATE, { pair });
       if (data) {
-        databaseService.cacheApiResponse(cacheKey, data, 10);
+        databaseService.cacheApiResponse(cacheKey, data, 10); // 10s TTL for real-time rates
       }
       return data;
     } catch (e) {
+      console.error(`Error fetching rate for ${pair}:`, e);
       return null;
     }
   },
@@ -153,15 +190,20 @@ export const marketService = {
   getCategory: async (name: string) => {
     const cacheKey = `/api/resources/category/${name}`;
     const cached = databaseService.getCachedResponse(cacheKey);
-    if (cached) return cached;
+    if (cached) {
+      console.log(`📦 Category ${name} from cache`);
+      return cached;
+    }
 
     try {
       const data = await HttpClient.get<any>(cacheKey);
       if (data) {
-        databaseService.cacheApiResponse(cacheKey, data, 300);
+        databaseService.cacheApiResponse(cacheKey, data, 300); // 5min TTL
+        console.log(`✅ Cached category ${name}`);
       }
       return data;
     } catch (e) {
+      console.error(`Error fetching category ${name}:`, e);
       return null;
     }
   }

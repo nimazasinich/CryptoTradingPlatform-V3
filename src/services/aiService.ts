@@ -320,18 +320,34 @@ export const aiService = {
   },
 
   /**
-   * Save a custom strategy to local storage
+   * Save a custom strategy to database
    */
   saveStrategy: async (strategy: any): Promise<void> => {
     try {
-      const existing = localStorage.getItem('ai_strategies');
-      const strategies = existing ? JSON.parse(existing) : [];
-      strategies.push({
-        ...strategy,
-        id: strategy.id || Date.now().toString(),
-        created_at: Date.now()
-      });
-      localStorage.setItem('ai_strategies', JSON.stringify(strategies));
+      // Prepare strategy data for database
+      const strategyData = {
+        id: strategy.id || `STRAT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        name: strategy.name || 'Unnamed Strategy',
+        description: strategy.description || '',
+        conditions: JSON.stringify(strategy.conditions || {}),
+        risk_management: JSON.stringify(strategy.riskManagement || {
+          stopLoss: 5,
+          takeProfit: 10,
+          maxPositionSize: 0.1
+        }),
+        performance_stats: JSON.stringify(strategy.performanceStats || {
+          totalTrades: 0,
+          winRate: 0,
+          totalReturn: 0,
+          sharpeRatio: 0
+        }),
+        created_at: strategy.created_at || Date.now(),
+        is_active: strategy.isActive || false
+      };
+
+      // Save to database
+      databaseService.saveStrategy(strategyData);
+      console.log('✅ Strategy saved to database:', strategyData.name);
     } catch (error) {
       console.error('Failed to save strategy:', error);
       throw error;
@@ -339,12 +355,23 @@ export const aiService = {
   },
 
   /**
-   * Load all saved strategies from local storage
+   * Load all saved strategies from database
    */
   loadStrategies: async (): Promise<any[]> => {
     try {
-      const saved = localStorage.getItem('ai_strategies');
-      return saved ? JSON.parse(saved) : [];
+      const strategies = databaseService.getStrategies();
+      
+      // Parse JSON fields and convert to frontend format
+      return strategies.map(s => ({
+        id: s.id,
+        name: s.name,
+        description: s.description,
+        conditions: s.conditions ? JSON.parse(s.conditions) : {},
+        riskManagement: s.risk_management ? JSON.parse(s.risk_management) : {},
+        performanceStats: s.performance_stats ? JSON.parse(s.performance_stats) : {},
+        created_at: s.created_at,
+        isActive: s.is_active
+      }));
     } catch (error) {
       console.error('Failed to load strategies:', error);
       return [];
@@ -356,14 +383,57 @@ export const aiService = {
    */
   deleteStrategy: async (id: string): Promise<void> => {
     try {
-      const existing = localStorage.getItem('ai_strategies');
-      if (existing) {
-        const strategies = JSON.parse(existing);
-        const filtered = strategies.filter((s: any) => s.id !== id);
-        localStorage.setItem('ai_strategies', JSON.stringify(filtered));
+      // For now, mark as inactive (soft delete)
+      // In production, you'd add a deleteStrategy method to database service
+      const strategies = databaseService.getStrategies();
+      const strategy = strategies.find(s => s.id === id);
+      
+      if (strategy) {
+        databaseService.saveStrategy({
+          ...strategy,
+          is_active: false,
+          description: strategy.description + ' [DELETED]'
+        });
+        console.log('✅ Strategy marked as deleted:', id);
       }
     } catch (error) {
       console.error('Failed to delete strategy:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Update strategy performance stats after backtest
+   */
+  updateStrategyPerformance: async (id: string, stats: any): Promise<void> => {
+    try {
+      databaseService.updateStrategyStats(id, stats);
+      console.log('✅ Strategy performance updated:', id);
+    } catch (error) {
+      console.error('Failed to update strategy performance:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Activate a strategy
+   */
+  activateStrategy: async (id: string): Promise<void> => {
+    try {
+      // Deactivate all strategies first
+      const strategies = databaseService.getStrategies();
+      strategies.forEach(s => {
+        databaseService.saveStrategy({ ...s, is_active: false });
+      });
+      
+      // Activate the selected strategy
+      const strategy = strategies.find(s => s.id === id);
+      if (strategy) {
+        databaseService.saveStrategy({ ...strategy, is_active: true });
+        console.log('✅ Strategy activated:', strategy.name);
+      }
+    } catch (error) {
+      console.error('Failed to activate strategy:', error);
       throw error;
     }
   }

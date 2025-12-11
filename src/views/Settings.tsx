@@ -732,17 +732,29 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
 
               <div className="pt-6">
                 <h3 className="font-bold text-lg text-white mb-6 flex items-center gap-2">
-                  <Server size={18} className="text-cyan-400" /> Local Database (SQLite)
+                  <Database size={18} className="text-cyan-400" /> Local Database (SQLite)
                 </h3>
                 
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="bg-white/5 p-4 rounded-xl">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  <div className="bg-white/5 p-4 rounded-xl border border-white/5">
                     <div className="text-slate-400 text-xs uppercase mb-1">Storage Size</div>
                     <div className="text-2xl font-mono text-white">{(dbStats.size / 1024).toFixed(2)} KB</div>
                   </div>
-                  <div className="bg-white/5 p-4 rounded-xl">
-                    <div className="text-slate-400 text-xs uppercase mb-1">Tables</div>
+                  <div className="bg-white/5 p-4 rounded-xl border border-white/5">
+                    <div className="text-slate-400 text-xs uppercase mb-1">Total Tables</div>
                     <div className="text-2xl font-mono text-white">{dbStats.tables.length}</div>
+                  </div>
+                  <div className="bg-white/5 p-4 rounded-xl border border-white/5">
+                    <div className="text-slate-400 text-xs uppercase mb-1">Total Records</div>
+                    <div className="text-2xl font-mono text-white">
+                      {dbStats.tables.reduce((sum, t) => sum + t.count, 0).toLocaleString()}
+                    </div>
+                  </div>
+                  <div className="bg-white/5 p-4 rounded-xl border border-white/5">
+                    <div className="text-slate-400 text-xs uppercase mb-1">Last Saved</div>
+                    <div className="text-sm font-mono text-white">
+                      {dbStats.lastSaved ? new Date(dbStats.lastSaved).toLocaleTimeString() : 'N/A'}
+                    </div>
                   </div>
                 </div>
 
@@ -765,44 +777,109 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                   </table>
                 </div>
 
-                <div className="flex gap-4 justify-end">
-                  <button onClick={() => {
-                    try {
-                      const data = localStorage.getItem('crypto_platform.db');
-                      if (!data) {
-                        addToast("No database data to backup", "warning");
+                <div className="flex flex-wrap gap-3 justify-end">
+                  {/* Export Database */}
+                  <button 
+                    onClick={() => {
+                      try {
+                        const blob = databaseService.exportDatabase();
+                        if (!blob) {
+                          addToast("No database to export", "warning");
+                          return;
+                        }
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `crypto_backup_${new Date().toISOString().split('T')[0]}.db`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        addToast("Database exported successfully", "success");
+                      } catch (err) {
+                        addToast("Failed to export database", "error");
+                      }
+                    }} 
+                    className="flex items-center gap-2 px-4 py-2 border border-cyan-500/20 bg-cyan-500/10 text-cyan-400 rounded-lg hover:bg-cyan-500/20 text-sm transition-colors"
+                  >
+                    <Download size={16} /> Export
+                  </button>
+
+                  {/* Import Database */}
+                  <button 
+                    onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.accept = '.db';
+                      input.onchange = async (e: any) => {
+                        const file = e.target.files[0];
+                        if (!file) return;
+                        
+                        try {
+                          await databaseService.importDatabase(file);
+                          const newStats = databaseService.getStats();
+                          setDbStats(newStats);
+                          addToast("Database imported successfully", "success");
+                        } catch (err) {
+                          addToast("Failed to import database", "error");
+                        }
+                      };
+                      input.click();
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 border border-white/10 rounded-lg text-slate-300 hover:bg-white/5 text-sm transition-colors"
+                  >
+                    <Upload size={16} /> Import
+                  </button>
+
+                  {/* Vacuum Database */}
+                  <button 
+                    onClick={async () => {
+                      try {
+                        addToast("Optimizing database...", "info");
+                        await databaseService.initDatabase();
+                        databaseService.vacuum();
+                        const newStats = databaseService.getStats();
+                        setDbStats(newStats);
+                        addToast("Database optimized successfully", "success");
+                      } catch (err) {
+                        addToast("Failed to optimize database", "error");
+                      }
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 border border-purple-500/20 bg-purple-500/10 text-purple-400 rounded-lg hover:bg-purple-500/20 text-sm transition-colors"
+                  >
+                    <Activity size={16} /> Optimize
+                  </button>
+
+                  {/* Clear All Data */}
+                  <button 
+                    onClick={async () => {
+                      if (!confirm("⚠️ WARNING: This will permanently delete ALL local data including:\n\n• Trading positions\n• Trade history\n• Cached market data\n• Price alerts\n• AI signals\n• Strategies\n\nThis action CANNOT be undone!\n\nAre you absolutely sure?")) {
                         return;
                       }
-                      const blob = new Blob([data], {type: "application/octet-stream"});
-                      const url = URL.createObjectURL(blob);
-                      const a = document.createElement('a');
-                      a.href = url;
-                      a.download = `crypto_backup_${new Date().toISOString().split('T')[0]}.db`;
-                      document.body.appendChild(a);
-                      a.click();
-                      document.body.removeChild(a);
-                      URL.revokeObjectURL(url);
-                      addToast("Database backup downloaded", "success");
-                    } catch (err) {
-                      addToast("Failed to backup database", "error");
-                    }
-                  }} className="flex items-center gap-2 px-4 py-2 border border-white/10 rounded-lg text-slate-300 hover:bg-white/5 text-sm transition-colors">
-                    <Download size={16} /> Backup
-                  </button>
-                  <button onClick={async () => {
-                    if (!confirm("⚠️ WARNING: This will permanently delete ALL local data including:\n\n• Trading positions\n• Trade history\n• Cached market data\n• Price alerts\n• AI signals\n\nThis action CANNOT be undone!\n\nAre you absolutely sure?")) {
-                      return;
-                    }
-                    try {
-                      await databaseService.initDatabase();
-                      databaseService.clearAllData();
-                      setDbStats({ size: 0, tables: [] });
-                      addToast("Database cleared successfully", "success");
-                    } catch (err) {
-                      addToast("Failed to clear database", "error");
-                    }
-                  }} className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg hover:bg-red-500/20 text-sm transition-colors">
-                    <Trash2 size={16} /> Clear Data
+                      
+                      // Double confirmation
+                      if (!confirm("⚠️ FINAL WARNING: Type 'DELETE' in the next prompt to confirm")) {
+                        return;
+                      }
+                      
+                      const userInput = prompt("Type 'DELETE' to confirm:");
+                      if (userInput !== 'DELETE') {
+                        addToast("Database clear cancelled", "info");
+                        return;
+                      }
+                      
+                      try {
+                        await databaseService.initDatabase();
+                        databaseService.clearAllData();
+                        setDbStats({ size: 0, tables: [] });
+                        addToast("Database cleared successfully", "success");
+                      } catch (err) {
+                        addToast("Failed to clear database", "error");
+                      }
+                    }} 
+                    className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg hover:bg-red-500/20 text-sm transition-colors"
+                  >
+                    <Trash2 size={16} /> Clear All
                   </button>
                 </div>
               </div>
