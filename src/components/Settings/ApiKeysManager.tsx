@@ -136,14 +136,24 @@ export const ApiKeysManager = ({ apiKeys, onUpdate }: Props) => {
       <div className="space-y-3">
         {apiKeys.map(key => (
           <div key={key.id} className="glass-card p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 flex-1">
               <div className="p-3 bg-purple-500/10 rounded-lg text-purple-400">
                 {key.provider === 'huggingface' ? <Server size={20} /> : <Key size={20} />}
               </div>
-              <div>
+              <div className="flex-1 min-w-0">
                 <div className="font-bold text-white">{key.name}</div>
                 <div className="text-xs text-slate-500">
                   Created: {new Date(key.created).toLocaleDateString()} • {key.provider === 'huggingface' ? 'HuggingFace' : 'Custom'}
+                </div>
+                <div className="flex items-center gap-3 mt-1">
+                  <span className="text-xs text-slate-600 flex items-center gap-1">
+                    <span className="text-cyan-400 font-bold">{key.usageCount}</span> uses
+                  </span>
+                  {key.lastUsed && (
+                    <span className="text-xs text-slate-600">
+                      Last used: <span className="text-purple-400">{new Date(key.lastUsed).toLocaleString()}</span>
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
