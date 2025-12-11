@@ -198,8 +198,33 @@ class SettingsService {
 
   public async testApiConnection(key: string, provider: string): Promise<boolean> {
     await new Promise(r => setTimeout(r, 1500));
-    // Mock validation logic
-    if (!key || key.length < 10) throw new Error("Invalid API Key format");
+    
+    // Format validation
+    if (!key || key.length < 10) {
+      throw new Error("Invalid API Key format");
+    }
+
+    // Provider-specific validation
+    if (provider === 'huggingface') {
+      if (!key.startsWith('hf_')) {
+        throw new Error("HuggingFace tokens must start with 'hf_'");
+      }
+      // Simulate API call to validate token
+      try {
+        const response = await fetch('https://huggingface.co/api/whoami', {
+          headers: { 'Authorization': `Bearer ${key}` }
+        });
+        if (!response.ok) {
+          throw new Error("Invalid HuggingFace token");
+        }
+        return true;
+      } catch (err) {
+        // If network error or invalid, throw error
+        throw new Error("Failed to validate HuggingFace token. Check your internet connection.");
+      }
+    }
+
+    // For custom keys, just validate format
     return true;
   }
 
@@ -210,10 +235,36 @@ class SettingsService {
 
   public async connectExchange(exchange: string, apiKey: string, apiSecret: string): Promise<ExchangeConnection> {
     await new Promise(r => setTimeout(r, 1200));
-    if (apiKey.length < 5 || apiSecret.length < 5) throw new Error("Invalid credentials");
+    
+    // Validate credentials
+    if (!apiKey || apiKey.length < 10) {
+      throw new Error("API Key must be at least 10 characters");
+    }
+    if (!apiSecret || apiSecret.length < 10) {
+      throw new Error("API Secret must be at least 10 characters");
+    }
+
+    // Exchange-specific validation
+    const exchangeLower = exchange.toLowerCase();
+    if (exchangeLower === 'binance') {
+      if (apiKey.length !== 64) {
+        throw new Error("Binance API keys are typically 64 characters");
+      }
+    } else if (exchangeLower === 'coinbase') {
+      if (!apiKey.includes('-')) {
+        throw new Error("Coinbase API keys typically contain hyphens");
+      }
+    }
+
+    // Simulate testing connection to exchange
+    // In production, this would make a real API call to test credentials
+    const isValid = await this.testExchangeConnection(exchange, apiKey, apiSecret);
+    if (!isValid) {
+      throw new Error(`Failed to connect to ${exchange}. Check your credentials.`);
+    }
 
     const conn: ExchangeConnection = {
-      id: exchange.toLowerCase(),
+      id: exchangeLower,
       exchange,
       apiKey: encrypt(apiKey),
       apiSecret: encrypt(apiSecret),
@@ -229,6 +280,15 @@ class SettingsService {
     
     this.save();
     return conn;
+  }
+
+  private async testExchangeConnection(exchange: string, apiKey: string, apiSecret: string): Promise<boolean> {
+    // Simulate network latency
+    await new Promise(r => setTimeout(r, 800));
+    
+    // In production, make real API calls to exchange endpoints
+    // For now, simulate success if credentials meet basic format requirements
+    return true;
   }
 
   public async disconnectExchange(id: string) {
@@ -250,10 +310,49 @@ class SettingsService {
   }
 
   public async sendTestMessage(chatId: string, token: string): Promise<boolean> {
-    await new Promise(r => setTimeout(r, 1000));
-    if (!chatId.startsWith('@') && !/^\d+$/.test(chatId)) throw new Error("Invalid Chat ID");
-    if (!token) throw new Error("Missing Bot Token");
-    return true;
+    // Validate inputs
+    if (!token || token.length < 20) {
+      throw new Error("Invalid Bot Token format");
+    }
+    if (!chatId) {
+      throw new Error("Chat ID is required");
+    }
+    if (!chatId.startsWith('@') && !/^-?\d+$/.test(chatId)) {
+      throw new Error("Invalid Chat ID format. Use @username or numeric ID");
+    }
+
+    // Attempt to send test message via Telegram Bot API
+    try {
+      const decryptedToken = token.startsWith('enc_') ? decrypt(token) : token;
+      const message = `🤖 Test message from Crypto Trading Platform\n\n✅ Your Telegram bot is configured correctly!\n\nTimestamp: ${new Date().toLocaleString()}`;
+      
+      const response = await fetch(`https://api.telegram.org/bot${decryptedToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: message,
+          parse_mode: 'Markdown'
+        })
+      });
+
+      const data = await response.json();
+      
+      if (!data.ok) {
+        throw new Error(data.description || "Failed to send message");
+      }
+      
+      return true;
+    } catch (err: any) {
+      if (err.message.includes('chat not found')) {
+        throw new Error("Chat ID not found. Make sure you've started a conversation with the bot first.");
+      } else if (err.message.includes('Unauthorized')) {
+        throw new Error("Invalid bot token. Get a new token from @BotFather");
+      } else if (err.message.includes('Failed to fetch')) {
+        throw new Error("Network error. Check your internet connection.");
+      }
+      throw new Error(err.message || "Failed to send test message");
+    }
   }
 
   // --- Preferences ---

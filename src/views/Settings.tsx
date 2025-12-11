@@ -43,7 +43,6 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
 
   // Form State
   const [passwordForm, setPasswordForm] = useState({ current: '', new: '', confirm: '' });
-  const [keyForm, setKeyForm] = useState({ name: '', key: '', show: false });
 
   useEffect(() => {
     if (defaultTab) setActiveTab(defaultTab);
@@ -52,6 +51,10 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
   const loadAllSettings = async () => {
     try {
       setIsLoading(true);
+      
+      // Initialize database if needed
+      await databaseService.initDatabase();
+      
       const [p, k, e, t, pr, d] = await Promise.all([
         settingsService.getProfile(),
         settingsService.getApiKeys(),
@@ -60,14 +63,16 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
         settingsService.getPreferences(),
         Promise.resolve(databaseService.getStats())
       ]);
+      
       setProfile(p);
       setApiKeys(k);
       setExchanges(e);
       setTelegram(t);
       setPrefs(pr);
       setDbStats(d);
-    } catch (err) {
-      addToast("Failed to load settings", "error");
+    } catch (err: any) {
+      console.error("Failed to load settings:", err);
+      addToast(err.message || "Failed to load settings", "error");
     } finally {
       setIsLoading(false);
     }
@@ -82,52 +87,114 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile) return;
+    
+    // Validation
+    if (!profile.name || profile.name.trim().length < 2) {
+      addToast("Name must be at least 2 characters", "error");
+      return;
+    }
+    if (!profile.username || profile.username.trim().length < 3) {
+      addToast("Username must be at least 3 characters", "error");
+      return;
+    }
+    if (!profile.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profile.email)) {
+      addToast("Please enter a valid email address", "error");
+      return;
+    }
+    
     setIsSaving(true);
     try {
       await settingsService.saveProfile(profile);
-      addToast("Profile updated", "success");
-    } catch (error) { addToast("Update failed", "error"); }
-    setIsSaving(false);
+      addToast("Profile updated successfully", "success");
+    } catch (error: any) { 
+      addToast(error.message || "Failed to update profile", "error"); 
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
-      try {
-        const base64 = await settingsService.uploadAvatar(e.target.files[0]);
-        setProfile(prev => prev ? ({ ...prev, avatarUrl: base64 }) : null);
-        await settingsService.saveProfile({ avatarUrl: base64 });
-        addToast("Avatar updated", "success");
-      } catch (err: any) { addToast(err.message, "error"); }
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      addToast("Please select an image file", "error");
+      return;
+    }
+    
+    try {
+      const base64 = await settingsService.uploadAvatar(file);
+      setProfile(prev => prev ? ({ ...prev, avatarUrl: base64 }) : null);
+      await settingsService.saveProfile({ avatarUrl: base64 });
+      addToast("Avatar updated successfully", "success");
+    } catch (err: any) { 
+      addToast(err.message || "Failed to upload avatar", "error"); 
     }
   };
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (passwordForm.new !== passwordForm.confirm) return addToast("New passwords do not match", "error");
+    
+    // Validation
+    if (!passwordForm.current) {
+      addToast("Current password is required", "error");
+      return;
+    }
+    if (!passwordForm.new || passwordForm.new.length < 8) {
+      addToast("New password must be at least 8 characters", "error");
+      return;
+    }
+    if (passwordForm.new !== passwordForm.confirm) {
+      addToast("New passwords do not match", "error");
+      return;
+    }
+    if (passwordForm.new === passwordForm.current) {
+      addToast("New password must be different from current password", "error");
+      return;
+    }
+    
     try {
       await settingsService.changePassword(passwordForm.current, passwordForm.new);
       addToast("Password changed successfully", "success");
       setPasswordForm({ current: '', new: '', confirm: '' });
-    } catch (err: any) { addToast(err.message, "error"); }
-  };
-
-  const handleAddKey = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const newKey = await settingsService.saveApiKey(keyForm.name, keyForm.key);
-      setApiKeys(prev => [...prev, newKey]);
-      setKeyForm({ name: '', key: '', show: false });
-      addToast("API Key added", "success");
-    } catch (err) { addToast("Failed to add key", "error"); }
+    } catch (err: any) { 
+      addToast(err.message || "Failed to change password", "error"); 
+    }
   };
 
   const handleSavePrefs = async () => {
     if (!prefs) return;
+    
+    // Validate refresh rates
+    if (prefs.dataSource.refreshRateMarket < 10) {
+      addToast("Market refresh rate must be at least 10 seconds", "error");
+      return;
+    }
+    if (prefs.dataSource.refreshRateNews < 10) {
+      addToast("News refresh rate must be at least 10 seconds", "error");
+      return;
+    }
+    if (prefs.dataSource.refreshRateSentiment < 10) {
+      addToast("Sentiment refresh rate must be at least 10 seconds", "error");
+      return;
+    }
+    
+    // Validate quiet hours if enabled
+    if (prefs.quietHours.enabled) {
+      if (!prefs.quietHours.start || !prefs.quietHours.end) {
+        addToast("Please set both start and end times for quiet hours", "error");
+        return;
+      }
+    }
+    
     try {
       await settingsService.savePreferences(prefs);
       setTheme(prefs.theme);
-      addToast("Preferences updated", "success");
-    } catch (err) { addToast("Update failed", "error"); }
+      addToast("Preferences saved successfully", "success");
+    } catch (err: any) { 
+      addToast(err.message || "Failed to save preferences", "error"); 
+    }
   };
 
   if (isLoading || !profile) return <div className="flex h-screen items-center justify-center"><div className="animate-spin w-8 h-8 border-4 border-purple-500 rounded-full border-t-transparent" /></div>;
@@ -247,7 +314,7 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-lg font-bold text-white">Primary Data Source</h3>
-                    <p className="text-sm text-slate-400">HuggingFace Inference Token</p>
+                    <p className="text-sm text-slate-400">HuggingFace Inference Token (Optional)</p>
                   </div>
                   <div className="p-2 bg-purple-500/10 rounded-lg text-purple-400"><Server size={24} /></div>
                 </div>
@@ -266,59 +333,8 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                 </div>
               </div>
 
-              {/* Custom Keys */}
-              <div className="glass-card p-8">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-lg font-bold text-white">Custom API Keys</h3>
-                  <button onClick={() => setKeyForm({...keyForm, show: !keyForm.show})} className="text-xs bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg text-white transition-colors">
-                    {keyForm.show ? 'Cancel' : '+ New Key'}
-                  </button>
-                </div>
-
-                {keyForm.show && (
-                  <form onSubmit={handleAddKey} className="bg-slate-900/50 p-4 rounded-xl border border-white/5 mb-6 animate-fade-in">
-                    <div className="flex gap-4">
-                      <input 
-                        placeholder="Key Name (e.g. Trading Bot)" 
-                        value={keyForm.name}
-                        onChange={e => setKeyForm({...keyForm, name: e.target.value})}
-                        className="input-glass flex-1" 
-                        required 
-                      />
-                      <input 
-                        placeholder="Secret Key" 
-                        value={keyForm.key}
-                        onChange={e => setKeyForm({...keyForm, key: e.target.value})}
-                        className="input-glass flex-1" 
-                        required 
-                      />
-                      <button type="submit" className="btn-primary">Save</button>
-                    </div>
-                  </form>
-                )}
-
-                <div className="space-y-3">
-                  {apiKeys.map(key => (
-                    <div key={key.id} className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5">
-                      <div className="flex items-center gap-4">
-                        <div className="p-2 bg-slate-800 rounded-lg text-slate-400"><Key size={20} /></div>
-                        <div>
-                          <div className="font-bold text-white">{key.name}</div>
-                          <div className="text-xs text-slate-500 font-mono">ID: {key.id} • Created: {new Date(key.created).toLocaleDateString()}</div>
-                        </div>
-                      </div>
-                      <button onClick={async () => {
-                        await settingsService.deleteApiKey(key.id);
-                        setApiKeys(prev => prev.filter(k => k.id !== key.id));
-                        addToast("Key deleted", "success");
-                      }} className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  ))}
-                  {apiKeys.length === 0 && <div className="text-center text-slate-500 py-4 italic">No custom keys generated</div>}
-                </div>
-              </div>
+              {/* Custom Keys Manager */}
+              <ApiKeysManager apiKeys={apiKeys} onUpdate={setApiKeys} />
             </div>
           )}
 
@@ -524,23 +540,39 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
 
                 <div className="flex gap-4 justify-end">
                   <button onClick={() => {
-                    const data = localStorage.getItem('crypto_platform.db');
-                    if (data) {
-                      const blob = new Blob([data], {type: "text/plain"});
+                    try {
+                      const data = localStorage.getItem('crypto_platform.db');
+                      if (!data) {
+                        addToast("No database data to backup", "warning");
+                        return;
+                      }
+                      const blob = new Blob([data], {type: "application/octet-stream"});
                       const url = URL.createObjectURL(blob);
                       const a = document.createElement('a');
                       a.href = url;
-                      a.download = "backup.db";
+                      a.download = `crypto_backup_${new Date().toISOString().split('T')[0]}.db`;
+                      document.body.appendChild(a);
                       a.click();
+                      document.body.removeChild(a);
+                      URL.revokeObjectURL(url);
+                      addToast("Database backup downloaded", "success");
+                    } catch (err) {
+                      addToast("Failed to backup database", "error");
                     }
                   }} className="flex items-center gap-2 px-4 py-2 border border-white/10 rounded-lg text-slate-300 hover:bg-white/5 text-sm transition-colors">
                     <Download size={16} /> Backup
                   </button>
-                  <button onClick={() => {
-                    if (confirm("Clear all local data? This cannot be undone.")) {
+                  <button onClick={async () => {
+                    if (!confirm("⚠️ WARNING: This will permanently delete ALL local data including:\n\n• Trading positions\n• Trade history\n• Cached market data\n• Price alerts\n• AI signals\n\nThis action CANNOT be undone!\n\nAre you absolutely sure?")) {
+                      return;
+                    }
+                    try {
+                      await databaseService.initDatabase();
                       databaseService.clearAllData();
                       setDbStats({ size: 0, tables: [] });
-                      addToast("Database cleared", "success");
+                      addToast("Database cleared successfully", "success");
+                    } catch (err) {
+                      addToast("Failed to clear database", "error");
                     }
                   }} className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg hover:bg-red-500/20 text-sm transition-colors">
                     <Trash2 size={16} /> Clear Data
