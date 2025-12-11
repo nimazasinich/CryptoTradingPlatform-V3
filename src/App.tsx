@@ -64,7 +64,8 @@ function AppContent() {
     
     if (currentPath.startsWith('/trade')) {
       if (currentPath.includes('spot')) return <TradingHub />;
-      return <PagePlaceholder title="Advanced Trading" />;
+      // Removed placeholder pages - only show Spot Trading
+      return <TradingHub />;
     }
     
     if (currentPath.startsWith('/ai')) {
@@ -74,6 +75,13 @@ function AppContent() {
     }
     
     if (currentPath === '/risk') return <RiskManagement />;
+    
+    // Strategy Manager route
+    if (currentPath.startsWith('/strategy')) {
+      // Import StrategyManager lazily
+      const StrategyManager = lazy(() => import('./views/StrategyManager'));
+      return <StrategyManager />;
+    }
     
     // Handle Settings sub-routes
     if (currentPath.startsWith('/settings')) {

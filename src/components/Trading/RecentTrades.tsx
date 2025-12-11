@@ -45,8 +45,13 @@ export const RecentTrades = ({ symbol, currentPrice }: { symbol: string, current
 
   return (
     <div className="glass-card flex flex-col h-full overflow-hidden">
-      <div className="p-3 border-b border-white/5 font-semibold text-sm text-slate-300">
-        Recent Trades
+      <div className="p-3 border-b border-white/5 font-semibold text-sm text-slate-300 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span>Recent Trades</span>
+          <span className="text-[9px] text-yellow-400 bg-yellow-500/10 px-1.5 py-0.5 rounded border border-yellow-500/20 font-bold uppercase" title="This trade feed uses simulated data for demonstration">
+            Demo Data
+          </span>
+        </div>
       </div>
       
       <div className="flex justify-between px-3 py-2 text-xs text-slate-500 font-medium">

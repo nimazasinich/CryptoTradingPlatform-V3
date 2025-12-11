@@ -88,7 +88,12 @@ export const OrderBook = ({ symbol, currentPrice }: { symbol: string, currentPri
   return (
     <div className="glass-card flex flex-col h-full overflow-hidden border-t-4 border-t-purple-500/50">
       <div className="p-3 border-b border-white/5 font-semibold text-sm text-slate-300 flex justify-between bg-slate-900/30">
-        <span>Order Book</span>
+        <div className="flex items-center gap-2">
+          <span>Order Book</span>
+          <span className="text-[9px] text-yellow-400 bg-yellow-500/10 px-1.5 py-0.5 rounded border border-yellow-500/20 font-bold uppercase" title="This order book uses simulated data for demonstration">
+            Demo Data
+          </span>
+        </div>
         <div className="flex gap-2">
            <span className="text-[10px] text-slate-500 bg-white/5 px-2 py-0.5 rounded">0.01</span>
            <span className="text-[10px] text-slate-500 bg-white/5 px-2 py-0.5 rounded">0.1</span>
