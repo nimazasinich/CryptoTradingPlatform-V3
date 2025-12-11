@@ -1,0 +1,29 @@
+App.tsx(3,25): error TS2307: Cannot find module './components/Sidebar/Sidebar' or its corresponding type declarations.
+App.tsx(5,29): error TS2307: Cannot find module './context/AppContext' or its corresponding type declarations.
+App.tsx(6,31): error TS2307: Cannot find module './components/ErrorBoundary' or its corresponding type declarations.
+App.tsx(9,37): error TS2307: Cannot find module './views/Dashboard' or its corresponding type declarations.
+App.tsx(10,42): error TS2307: Cannot find module './views/MarketAnalysis' or its corresponding type declarations.
+App.tsx(11,38): error TS2307: Cannot find module './views/TradingHub' or its corresponding type declarations.
+App.tsx(12,33): error TS2307: Cannot find module './views/AILab' or its corresponding type declarations.
+App.tsx(13,42): error TS2307: Cannot find module './views/RiskManagement' or its corresponding type declarations.
+App.tsx(14,36): error TS2307: Cannot find module './views/Settings' or its corresponding type declarations.
+App.tsx(15,33): error TS2307: Cannot find module './views/Admin' or its corresponding type declarations.
+src/components/Dashboard/MarketOverview.tsx(201,24): error TS2322: Type '{ key: any; coin: any; rank: number; type: "gainer"; }' is not assignable to type '{ coin: CryptoPrice; rank: number; type: "gainer" | "loser"; }'.
+  Property 'key' does not exist on type '{ coin: CryptoPrice; rank: number; type: "gainer" | "loser"; }'.
+src/components/Dashboard/MarketOverview.tsx(213,24): error TS2322: Type '{ key: any; coin: any; rank: number; type: "loser"; }' is not assignable to type '{ coin: CryptoPrice; rank: number; type: "gainer" | "loser"; }'.
+  Property 'key' does not exist on type '{ coin: CryptoPrice; rank: number; type: "gainer" | "loser"; }'.
+src/components/Dashboard/MarketOverview.tsx(225,26): error TS2322: Type '{ key: any; coin: any; rank: number; maxVolume: any; }' is not assignable to type '{ coin: CryptoPrice; rank: number; maxVolume: number; }'.
+  Property 'key' does not exist on type '{ coin: CryptoPrice; rank: number; maxVolume: number; }'.
+src/components/Dashboard/NewsFeed.tsx(184,26): error TS2322: Type '{ key: any; article: any; index: any; }' is not assignable to type '{ article: NewsArticle; index: number; }'.
+  Property 'key' does not exist on type '{ article: NewsArticle; index: number; }'.
+src/components/Dashboard/PriceTicker.tsx(172,23): error TS2322: Type '{ key: string; coin: any; }' is not assignable to type '{ coin: CryptoPrice; }'.
+  Property 'key' does not exist on type '{ coin: CryptoPrice; }'.
+src/components/Dashboard/PriceTicker.tsx(175,23): error TS2322: Type '{ key: string; coin: any; }' is not assignable to type '{ coin: CryptoPrice; }'.
+  Property 'key' does not exist on type '{ coin: CryptoPrice; }'.
+src/components/ErrorBoundary.tsx(63,17): error TS2339: Property 'props' does not exist on type 'ErrorBoundary'.
+src/components/Trading/OrderBook.tsx(105,36): error TS2322: Type '{ key: any; row: any; type: "ask"; }' is not assignable to type '{ row: OrderRow; type: "ask" | "bid"; }'.
+  Property 'key' does not exist on type '{ row: OrderRow; type: "ask" | "bid"; }'.
+src/components/Trading/OrderBook.tsx(121,36): error TS2322: Type '{ key: any; row: any; type: "bid"; }' is not assignable to type '{ row: OrderRow; type: "ask" | "bid"; }'.
+  Property 'key' does not exist on type '{ row: OrderRow; type: "ask" | "bid"; }'.
+src/views/TradingHub.tsx(359,68): error TS2322: Type '{ key: any; pos: any; closePos: (symbol: string) => Promise<void>; }' is not assignable to type '{ pos: Position; closePos: (s: string) => void; }'.
+  Property 'key' does not exist on type '{ pos: Position; closePos: (s: string) => void; }'.

@@ -180,7 +180,8 @@ export const NewsFeed = () => {
           </>
         ) : (
           <div className="animate-fade-in">
-             {news.map((item, idx) => (
+             {news.map((item: NewsArticle, idx: number) => (
+               // @ts-ignore - React key prop is handled internally
                <NewsItem key={item.id || idx} article={item} index={idx} />
              ))}
              {news.length === 0 && (

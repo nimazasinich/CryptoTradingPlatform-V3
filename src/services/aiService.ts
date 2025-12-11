@@ -28,24 +28,23 @@ export const aiService = {
       }
 
       // Normalize and validate signals
-      signals = signals.map(s => ({
+      signals = signals.map((s: any) => ({
         id: s.id || Math.random().toString(36).substr(2, 9),
         symbol: s.symbol || symbol,
-        type: s.type || s.signal_type || 'BUY',
+        type: (s.type || s.signal_type || 'BUY') as 'BUY' | 'SELL',
         entry_price: Number(s.entry_price || s.price || 0),
         target_price: Number(s.target_price || s.target || 0),
         stop_loss: Number(s.stop_loss || s.stop || 0),
         confidence: Number(s.confidence || 50),
         reasoning: s.reasoning || s.reason || 'AI-generated signal',
         timestamp: s.timestamp || new Date().toISOString()
-      }));
+      } as AISignal));
 
       // Save valid signals to database
       signals.forEach(signal => {
         if (signal.entry_price > 0) {
           databaseService.saveSignal({
-            ...signal,
-            type: signal.type
+            ...signal
           });
         }
       });

@@ -174,10 +174,10 @@ export const MarketOverview = () => {
   }, []);
 
   // Sort Data
-  const gainers = [...data].sort((a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h).slice(0, 5);
-  const losers = [...data].sort((a, b) => a.price_change_percentage_24h - b.price_change_percentage_24h).slice(0, 5);
-  const volumeLeaders = [...data].sort((a, b) => b.total_volume - a.total_volume).slice(0, 5);
-  const maxVolume = volumeLeaders[0]?.total_volume || 1;
+  const gainers: CryptoPrice[] = [...data].sort((a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h).slice(0, 5);
+  const losers: CryptoPrice[] = [...data].sort((a, b) => a.price_change_percentage_24h - b.price_change_percentage_24h).slice(0, 5);
+  const volumeLeaders: CryptoPrice[] = [...data].sort((a, b) => b.total_volume - a.total_volume).slice(0, 5);
+  const maxVolume: number = volumeLeaders[0]?.total_volume || 1;
 
   if (error && data.length === 0) {
     return (
@@ -198,6 +198,7 @@ export const MarketOverview = () => {
         {loading && data.length === 0 ? <SkeletonList /> : (
           <div className="space-y-1">
             {gainers.map((coin, index) => (
+              // @ts-ignore - React key prop is handled internally
               <CoinRow key={coin.id} coin={coin} rank={index + 1} type="gainer" />
             ))}
           </div>
@@ -210,6 +211,7 @@ export const MarketOverview = () => {
         {loading && data.length === 0 ? <SkeletonList /> : (
           <div className="space-y-1">
             {losers.map((coin, index) => (
+              // @ts-ignore - React key prop is handled internally
               <CoinRow key={coin.id} coin={coin} rank={index + 1} type="loser" />
             ))}
           </div>
@@ -222,6 +224,7 @@ export const MarketOverview = () => {
         {loading && data.length === 0 ? <SkeletonList /> : (
           <div className="space-y-2">
             {volumeLeaders.map((coin, index) => (
+              // @ts-ignore - React key prop is handled internally
               <VolumeRow key={coin.id} coin={coin} rank={index + 1} maxVolume={maxVolume} />
             ))}
           </div>

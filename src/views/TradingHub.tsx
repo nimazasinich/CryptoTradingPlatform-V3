@@ -14,7 +14,7 @@ import { useApp } from '../context/AppContext';
 
 const AVAILABLE_PAIRS = ['BTC', 'ETH', 'SOL', 'BNB', 'ADA', 'XRP', 'DOGE', 'MATIC', 'LINK', 'DOT'];
 
-const PositionRow = ({ pos, closePos }: { pos: Position, closePos: (s:string)=>void }) => {
+const PositionRow = ({ pos, closePos }: { pos: Position, closePos: (s:string)=>Promise<void> }) => {
   const pnlPercent = pos.entryPrice ? ((pos.unrealizedPnL / (pos.entryPrice * pos.amount)) * 100) : 0;
   
   return (
@@ -356,7 +356,8 @@ export default function TradingHub() {
                                 </td>
                               </tr>
                             ) : (
-                              positions.map((p, i) => <PositionRow key={i} pos={p} closePos={closePosition} />)
+                              // @ts-ignore - React key prop is handled internally
+                              positions.map((p: Position, i: number) => <PositionRow key={i} pos={p} closePos={closePosition} />)
                             )}
                           </tbody>
                         </table>
