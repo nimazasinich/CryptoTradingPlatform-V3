@@ -29,12 +29,6 @@ const TickerSparkline = ({ data, isPositive }: { data: number[], isPositive: boo
 
   return (
     <svg width={width} height={height} className="overflow-visible ml-4 opacity-70 group-hover:opacity-100 transition-opacity">
-      <defs>
-        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="2" result="blur" />
-          <feComposite in="SourceGraphic" in2="blur" operator="over" />
-        </filter>
-      </defs>
       <polyline
         fill="none"
         stroke={isPositive ? '#4ade80' : '#f87171'}
@@ -42,7 +36,7 @@ const TickerSparkline = ({ data, isPositive }: { data: number[], isPositive: boo
         strokeLinecap="round"
         strokeLinejoin="round"
         points={points}
-        filter="url(#glow)"
+        style={{ filter: 'drop-shadow(0 0 2px currentColor)' }}
       />
     </svg>
   );
@@ -69,14 +63,20 @@ const TickerItem = ({ coin }: { coin: CryptoPrice }) => {
   const sparklineData = coin.sparkline_in_7d?.price || [];
 
   return (
-    <div 
+    <button 
       className={cn(
         "flex items-center justify-between w-[240px] h-[88px] mx-3 px-5 py-3 rounded-2xl",
         "bg-white/[0.03] border border-white/5 backdrop-blur-md hover:bg-white/[0.08] hover:border-white/10",
         "transition-all duration-300 cursor-pointer group relative overflow-hidden",
+        "focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-950",
         flash === 'green' && "bg-green-500/10 border-green-500/30",
         flash === 'red' && "bg-red-500/10 border-red-500/30"
       )}
+      onClick={() => {
+        // Navigate to trading pair or show details
+        console.log(`Selected ${coin.symbol}`);
+      }}
+      aria-label={`${coin.symbol} price ${formatPrice(coin.current_price)}, ${priceChange >= 0 ? 'up' : 'down'} ${Math.abs(priceChange).toFixed(2)} percent`}
     >
       <div className={cn(
         "absolute inset-0 opacity-0 transition-opacity duration-500",
@@ -104,7 +104,7 @@ const TickerItem = ({ coin }: { coin: CryptoPrice }) => {
       </div>
       
       <TickerSparkline data={sparklineData} isPositive={isPositive} />
-    </div>
+    </button>
   );
 };
 

@@ -70,7 +70,7 @@ export function AutoTradeToggle() {
         {status === 'idle' && (
           <>
             <div className="w-4 h-4 rounded-full bg-slate-500" />
-            <span className="text-slate-400">Standby</span>
+            <span className="text-slate-300">Standby</span>
           </>
         )}
         {status === 'error' && (

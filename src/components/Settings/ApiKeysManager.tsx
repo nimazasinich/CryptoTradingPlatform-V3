@@ -75,7 +75,7 @@ export const ApiKeysManager = ({ apiKeys, onUpdate }: Props) => {
       <div className="flex justify-between items-center">
         <div>
           <h3 className="text-lg font-bold text-white">API Keys</h3>
-          <p className="text-sm text-slate-400">Manage access keys for third-party integrations.</p>
+          <p className="text-sm text-slate-300">Manage access keys for third-party integrations.</p>
         </div>
         <button 
           onClick={() => setShowForm(!showForm)}
@@ -89,7 +89,7 @@ export const ApiKeysManager = ({ apiKeys, onUpdate }: Props) => {
         <form onSubmit={handleAddKey} className="glass-card p-6 border-l-4 border-l-purple-500 animate-fade-in">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-xs font-bold text-slate-400 uppercase block mb-2">Key Name</label>
+              <label className="text-xs font-bold text-slate-300 uppercase block mb-2">Key Name</label>
               <input
                 type="text"
                 value={keyForm.name}
@@ -100,7 +100,7 @@ export const ApiKeysManager = ({ apiKeys, onUpdate }: Props) => {
               />
             </div>
             <div>
-              <label className="text-xs font-bold text-slate-400 uppercase block mb-2">Provider</label>
+              <label className="text-xs font-bold text-slate-300 uppercase block mb-2">Provider</label>
               <select
                 value={keyForm.provider}
                 onChange={e => setKeyForm({ ...keyForm, provider: e.target.value as any })}
@@ -112,7 +112,7 @@ export const ApiKeysManager = ({ apiKeys, onUpdate }: Props) => {
             </div>
           </div>
           <div className="mt-4">
-            <label className="text-xs font-bold text-slate-400 uppercase block mb-2">API Key / Token</label>
+            <label className="text-xs font-bold text-slate-300 uppercase block mb-2">API Key / Token</label>
             <input
               type="password"
               value={keyForm.key}

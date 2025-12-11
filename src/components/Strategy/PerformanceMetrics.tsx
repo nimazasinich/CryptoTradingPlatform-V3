@@ -18,7 +18,7 @@ export function PerformanceMetrics() {
   if (!metrics) {
     return (
       <div className="glass-card p-8 text-center">
-        <div className="text-slate-400">Loading metrics...</div>
+        <div className="text-slate-300">Loading metrics...</div>
       </div>
     );
   }
@@ -60,7 +60,7 @@ export function PerformanceMetrics() {
           <div className={`w-10 h-10 rounded-xl bg-${stat.color}-500/20 flex items-center justify-center mb-3`}>
             <stat.icon className={`w-6 h-6 text-${stat.color}-500`} />
           </div>
-          <div className="text-slate-400 text-sm mb-1">{stat.label}</div>
+          <div className="text-slate-300 text-sm mb-1">{stat.label}</div>
           <div className={`text-2xl font-bold text-${stat.color}-400`}>
             {stat.value}
           </div>

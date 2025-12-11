@@ -28,13 +28,13 @@ const SectionHeader = ({ title, icon: Icon, color, onExport }: { title: string; 
       {onExport && (
         <button 
           onClick={onExport}
-          className="p-1.5 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+          className="p-1.5 text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
           title="Export to CSV"
         >
           <Download size={14} />
         </button>
       )}
-      <button className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors group">
+      <button className="text-xs text-slate-300 hover:text-white flex items-center gap-1 transition-colors group">
         View All 
         <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
       </button>
@@ -66,7 +66,7 @@ const CoinRow = ({ coin, rank, type }: { coin: CryptoPrice; rank: number; type: 
         <CoinIcon symbol={coin.symbol} size="md" />
         <div>
           <div className="font-bold text-sm text-white group-hover:text-purple-400 transition-colors">{coin.symbol.toUpperCase()}</div>
-          <div className="text-xs text-slate-500 group-hover:text-slate-400 transition-colors">{coin.name}</div>
+          <div className="text-xs text-slate-500 group-hover:text-slate-300 transition-colors">{coin.name}</div>
         </div>
       </div>
       <div className="text-right relative z-10">
@@ -99,7 +99,7 @@ const VolumeRow = ({ coin, rank, maxVolume }: { coin: CryptoPrice; rank: number;
       
       <div className="flex items-center justify-between mb-3 relative z-10">
         <div className="flex items-center gap-3">
-          <span className="text-slate-500 text-sm font-mono w-4 group-hover:text-slate-400 transition-colors">{rank}</span>
+          <span className="text-slate-500 text-sm font-mono w-4 group-hover:text-slate-300 transition-colors">{rank}</span>
           <CoinIcon symbol={coin.symbol} size="md" />
           <span className="font-bold text-base text-white group-hover:text-cyan-300 transition-colors">{coin.symbol.toUpperCase()}</span>
         </div>

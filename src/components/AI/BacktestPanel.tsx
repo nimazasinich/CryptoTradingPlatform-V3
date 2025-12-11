@@ -149,7 +149,7 @@ export const BacktestPanel = () => {
             <BarChart className="text-cyan-400" />
             Strategy Backtester
           </h2>
-          <p className="text-slate-400 text-sm mt-1">Test strategies against historical data</p>
+          <p className="text-slate-300 text-sm mt-1">Test strategies against historical data</p>
         </div>
       </div>
 
@@ -226,30 +226,30 @@ export const BacktestPanel = () => {
           {/* Metrics */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className={`border p-4 rounded-xl text-center transition-all hover:scale-[1.02] ${Number(result.totalReturn) >= 0 ? 'bg-green-500/10 border-green-500/20' : 'bg-red-500/10 border-red-500/20'}`}>
-              <div className="text-xs text-slate-400 uppercase mb-1">Total Return</div>
+              <div className="text-xs text-slate-300 uppercase mb-1">Total Return</div>
               <div className={`text-2xl font-bold ${Number(result.totalReturn) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                 {result.totalReturn}%
               </div>
               <div className="text-xs text-slate-500 mt-1">${result.finalBalance}</div>
             </div>
             <div className="bg-white/5 border border-white/10 p-4 rounded-xl text-center transition-all hover:scale-[1.02] hover:bg-white/10">
-              <div className="text-xs text-slate-400 uppercase mb-1">Win Rate</div>
+              <div className="text-xs text-slate-300 uppercase mb-1">Win Rate</div>
               <div className="text-2xl font-bold text-cyan-400">{result.winRate}%</div>
               <div className="text-xs text-slate-500 mt-1">{result.trades} trades</div>
             </div>
             <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl text-center transition-all hover:scale-[1.02]">
-              <div className="text-xs text-slate-400 uppercase mb-1">Max Drawdown</div>
+              <div className="text-xs text-slate-300 uppercase mb-1">Max Drawdown</div>
               <div className="text-2xl font-bold text-red-400">{result.drawdown}%</div>
             </div>
             <div className="bg-purple-500/10 border border-purple-500/20 p-4 rounded-xl text-center transition-all hover:scale-[1.02]">
-              <div className="text-xs text-slate-400 uppercase mb-1">Sharpe Ratio</div>
+              <div className="text-xs text-slate-300 uppercase mb-1">Sharpe Ratio</div>
               <div className="text-2xl font-bold text-purple-400">{result.sharpeRatio}</div>
             </div>
           </div>
 
           {/* Equity Curve Chart */}
           <div className="glass-card p-6 border border-white/5">
-            <h3 className="text-sm font-bold text-slate-400 uppercase mb-4 flex items-center gap-2">
+            <h3 className="text-sm font-bold text-slate-300 uppercase mb-4 flex items-center gap-2">
               <TrendingUp size={16} />
               Equity Curve
             </h3>
@@ -300,7 +300,7 @@ export const BacktestPanel = () => {
           {/* Trade History */}
           {trades.length > 0 && (
             <div className="glass-card p-6 border border-white/5">
-              <h3 className="text-sm font-bold text-slate-400 uppercase mb-4 flex items-center gap-2">
+              <h3 className="text-sm font-bold text-slate-300 uppercase mb-4 flex items-center gap-2">
                 <Activity size={16} />
                 Recent Trades (Last 10)
               </h3>
@@ -308,12 +308,12 @@ export const BacktestPanel = () => {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-white/5">
-                      <th className="text-left py-2 px-3 text-xs font-semibold text-slate-400">Date</th>
-                      <th className="text-left py-2 px-3 text-xs font-semibold text-slate-400">Type</th>
-                      <th className="text-right py-2 px-3 text-xs font-semibold text-slate-400">Price</th>
-                      <th className="text-right py-2 px-3 text-xs font-semibold text-slate-400">Amount</th>
-                      <th className="text-right py-2 px-3 text-xs font-semibold text-slate-400">P&L</th>
-                      <th className="text-center py-2 px-3 text-xs font-semibold text-slate-400">Status</th>
+                      <th className="text-left py-2 px-3 text-xs font-semibold text-slate-300">Date</th>
+                      <th className="text-left py-2 px-3 text-xs font-semibold text-slate-300">Type</th>
+                      <th className="text-right py-2 px-3 text-xs font-semibold text-slate-300">Price</th>
+                      <th className="text-right py-2 px-3 text-xs font-semibold text-slate-300">Amount</th>
+                      <th className="text-right py-2 px-3 text-xs font-semibold text-slate-300">P&L</th>
+                      <th className="text-center py-2 px-3 text-xs font-semibold text-slate-300">Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
@@ -327,14 +327,14 @@ export const BacktestPanel = () => {
                         </td>
                         <td className="py-2 px-3 text-right font-mono text-slate-300">${trade.price.toFixed(2)}</td>
                         <td className="py-2 px-3 text-right font-mono text-slate-300">{trade.amount.toFixed(4)}</td>
-                        <td className={`py-2 px-3 text-right font-mono font-bold ${trade.pnl > 0 ? 'text-green-400' : trade.pnl < 0 ? 'text-red-400' : 'text-slate-400'}`}>
+                        <td className={`py-2 px-3 text-right font-mono font-bold ${trade.pnl > 0 ? 'text-green-400' : trade.pnl < 0 ? 'text-red-400' : 'text-slate-300'}`}>
                           {trade.pnl !== 0 ? `$${trade.pnl.toFixed(2)}` : '-'}
                         </td>
                         <td className="py-2 px-3 text-center">
                           <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${
                             trade.status === 'WIN' ? 'bg-green-500/20 text-green-400' :
                             trade.status === 'LOSS' ? 'bg-red-500/20 text-red-400' :
-                            'bg-slate-500/20 text-slate-400'
+                            'bg-slate-500/20 text-slate-300'
                           }`}>
                             {trade.status}
                           </span>

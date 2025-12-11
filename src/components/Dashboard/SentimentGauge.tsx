@@ -61,15 +61,15 @@ export const SentimentGauge = () => {
             <Zap className="w-4 h-4 text-purple-400" fill="currentColor" />
             Market Sentiment
           </h3>
-          <p className="text-xs text-slate-400 mt-1">Fear & Greed Index</p>
+          <p className="text-xs text-slate-300 mt-1">Fear & Greed Index</p>
         </div>
         <div className="flex gap-1">
-           <button className="p-1.5 hover:bg-white/10 rounded-lg transition-colors text-slate-400 hover:text-white">
+           <button className="p-1.5 hover:bg-white/10 rounded-lg transition-colors text-slate-300 hover:text-white">
              <Info size={14} />
            </button>
            <button 
              disabled={loading}
-             className="p-1.5 hover:bg-white/10 rounded-lg transition-colors text-slate-400 hover:text-white"
+             className="p-1.5 hover:bg-white/10 rounded-lg transition-colors text-slate-300 hover:text-white"
            >
              <RefreshCcw size={14} className={cn(loading && "animate-spin")} />
            </button>

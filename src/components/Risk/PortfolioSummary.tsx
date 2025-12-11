@@ -12,7 +12,7 @@ const StatCard = ({ title, value, subValue, icon: Icon, color }: any) => (
       </div>
     </div>
     <div className="relative z-10">
-      <h3 className="text-slate-400 text-sm font-medium">{title}</h3>
+      <h3 className="text-slate-300 text-sm font-medium">{title}</h3>
       <div className="text-2xl font-bold text-white mt-1">{value}</div>
       {subValue && <div className="text-sm mt-1">{subValue}</div>}
     </div>
@@ -53,14 +53,14 @@ export const PortfolioSummary = () => {
       <StatCard 
         title="Asset Allocation"
         value="Dynamic"
-        subValue={<span className="text-slate-400">Real-time weighting</span>}
+        subValue={<span className="text-slate-300">Real-time weighting</span>}
         icon={PieChart}
         color="from-purple-500 to-pink-500"
       />
       <StatCard 
         title="Open Positions"
         value={`${stats.activePositionsCount} Active`}
-        subValue={<span className="text-slate-400">Tracking market</span>}
+        subValue={<span className="text-slate-300">Tracking market</span>}
         icon={Layers}
         color="from-emerald-500 to-teal-600"
       />

@@ -17,13 +17,20 @@ const StrategyManager = lazy(() => import('./src/views/StrategyManager'));
 
 // Loading Fallback Component
 const PageLoader = () => (
-  <div className="h-full flex flex-col items-center justify-center">
-    <div className="relative w-16 h-16">
+  <div 
+    className="h-full flex flex-col items-center justify-center"
+    role="status"
+    aria-live="polite"
+    aria-label="Loading workspace content"
+  >
+    <div className="relative w-16 h-16" aria-hidden="true">
       <div className="absolute inset-0 rounded-full border-4 border-purple-500/20"></div>
       <div className="absolute inset-0 rounded-full border-4 border-t-purple-500 animate-spin"></div>
       <div className="absolute inset-4 rounded-full bg-purple-500/20 blur-sm animate-pulse"></div>
     </div>
-    <div className="mt-4 text-slate-400 font-medium animate-pulse">Loading Workspace...</div>
+    <div className="mt-4 text-slate-300 font-medium animate-pulse">
+      Loading Workspace...
+    </div>
   </div>
 );
 
@@ -33,13 +40,27 @@ const PagePlaceholder = ({ title }: { title: string }) => (
       <Zap className="text-purple-400" size={32} />
     </div>
     <h1 className="text-3xl font-bold mb-4 text-gradient">{title}</h1>
-    <p className="text-slate-400">This module is scheduled for implementation in upcoming phases.</p>
+    <p className="text-slate-300">This module is scheduled for implementation in upcoming phases.</p>
   </div>
 );
 
 function AppContent() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState('/');
+
+  // Pause animations when page is hidden (battery optimization)
+  React.useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        document.documentElement.classList.add('page-hidden');
+      } else {
+        document.documentElement.classList.remove('page-hidden');
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
 
   const renderContent = () => {
     switch (currentPath) {
@@ -87,6 +108,14 @@ function AppContent() {
 
   return (
     <div className="flex min-h-screen bg-slate-950 text-white font-sans selection:bg-purple-500/30">
+      {/* Skip to Main Content Link */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[1000] focus:px-4 focus:py-2 focus:bg-purple-600 focus:text-white focus:rounded-lg"
+      >
+        Skip to main content
+      </a>
+      
       <Sidebar 
         isMobileOpen={isMobileOpen}
         setIsMobileOpen={setIsMobileOpen}
@@ -107,7 +136,7 @@ function AppContent() {
         </div>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 relative custom-scrollbar">
+        <main id="main-content" className="flex-1 overflow-y-auto p-4 md:p-8 relative custom-scrollbar">
           <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-[-1]">
              <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[120px]" />
              <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-cyan-600/5 rounded-full blur-[100px]" />

@@ -52,13 +52,13 @@ export const TelegramBotManager = ({ config, onUpdate }: Props) => {
         </div>
         <div>
           <h2 className="text-xl font-bold text-white">Telegram Bot</h2>
-          <p className="text-slate-400 text-sm">Receive trading signals and alerts directly on Telegram.</p>
+          <p className="text-slate-300 text-sm">Receive trading signals and alerts directly on Telegram.</p>
         </div>
       </div>
 
       <div className="space-y-6 max-w-2xl">
         <div className="space-y-1">
-          <label className="text-xs font-bold text-slate-400 uppercase">Bot Token</label>
+          <label className="text-xs font-bold text-slate-300 uppercase">Bot Token</label>
           <input 
             type="password" 
             value={localConfig.botToken} 
@@ -70,7 +70,7 @@ export const TelegramBotManager = ({ config, onUpdate }: Props) => {
         </div>
         
         <div className="space-y-1">
-          <label className="text-xs font-bold text-slate-400 uppercase">Chat ID</label>
+          <label className="text-xs font-bold text-slate-300 uppercase">Chat ID</label>
           <input 
             type="text" 
             value={localConfig.chatId} 
@@ -83,7 +83,7 @@ export const TelegramBotManager = ({ config, onUpdate }: Props) => {
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-400 uppercase">Frequency</label>
+            <label className="text-xs font-bold text-slate-300 uppercase">Frequency</label>
             <select 
               value={localConfig.frequency} 
               onChange={e => setLocalConfig({...localConfig, frequency: e.target.value as any})}
@@ -95,7 +95,7 @@ export const TelegramBotManager = ({ config, onUpdate }: Props) => {
             </select>
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-400 uppercase">Min Confidence</label>
+            <label className="text-xs font-bold text-slate-300 uppercase">Min Confidence</label>
             <div className="flex items-center gap-3 h-[42px] px-2">
               <input 
                 type="range" 
@@ -110,7 +110,7 @@ export const TelegramBotManager = ({ config, onUpdate }: Props) => {
         </div>
 
         <div className="bg-slate-900/50 p-4 rounded-xl space-y-3 border border-white/5">
-          <h4 className="text-xs font-bold text-slate-400 uppercase mb-2">Notification Types</h4>
+          <h4 className="text-xs font-bold text-slate-300 uppercase mb-2">Notification Types</h4>
           <label className="flex items-center gap-3 cursor-pointer">
             <input 
               type="checkbox" 

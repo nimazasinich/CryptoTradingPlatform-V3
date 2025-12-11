@@ -3,123 +3,162 @@
 /* Compress cards on mobile */
 @media (max-width: 768px) {
   /* Dashboard hero cards */
-  .stat-card-mobile {
-    padding: 0.75rem !important;
-    height: auto !important;
+  body .stat-card-mobile,
+  #root .stat-card-mobile {
+    padding: 0.75rem;
+    height: auto;
     min-height: 120px;
   }
 
-  .stat-card-mobile h3 {
-    font-size: 0.65rem !important;
+  body .stat-card-mobile h3,
+  #root .stat-card-mobile h3 {
+    font-size: 0.65rem;
   }
 
-  .stat-card-mobile .stat-value {
-    font-size: 1.25rem !important;
+  body .stat-card-mobile .stat-value,
+  #root .stat-card-mobile .stat-value {
+    font-size: 1.25rem;
   }
 
-  .stat-card-mobile .stat-change {
-    font-size: 0.7rem !important;
-    padding: 0.25rem 0.5rem !important;
+  body .stat-card-mobile .stat-change,
+  #root .stat-card-mobile .stat-change {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
   }
 
   /* Glass cards */
-  .glass-card {
-    padding: 0.875rem !important;
-    border-radius: 0.75rem !important;
+  body .glass-card,
+  #root .glass-card {
+    padding: 0.875rem;
+    border-radius: 0.75rem;
   }
 
   /* Table cells */
-  .mobile-table td,
-  .mobile-table th {
-    padding: 0.5rem 0.25rem !important;
-    font-size: 0.75rem !important;
+  body .mobile-table td,
+  body .mobile-table th,
+  #root .mobile-table td,
+  #root .mobile-table th {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.75rem;
   }
 
   /* Form inputs */
-  .input-glass {
-    padding: 0.625rem 0.75rem !important;
-    font-size: 0.875rem !important;
+  body .input-glass,
+  #root .input-glass {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
   }
 
   /* Buttons */
-  .btn-primary,
-  .btn-secondary {
-    padding: 0.625rem 1rem !important;
-    font-size: 0.875rem !important;
+  body .btn-primary,
+  body .btn-secondary,
+  #root .btn-primary,
+  #root .btn-secondary {
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
   }
 
   /* Modal dialogs */
-  .modal-content {
-    padding: 1rem !important;
-    max-width: 95vw !important;
+  body .modal-content,
+  #root .modal-content {
+    padding: 1rem;
+    max-width: 95vw;
   }
 
   /* Chart containers */
-  .chart-container {
-    height: 300px !important;
+  body .chart-container,
+  #root .chart-container {
+    height: 300px;
   }
 
   /* Sidebar when open on mobile */
-  .sidebar-mobile {
-    width: 280px !important;
+  body .sidebar-mobile,
+  #root .sidebar-mobile {
+    width: 280px;
   }
 
   /* Compress grid gaps */
-  .grid-mobile {
-    gap: 0.75rem !important;
+  body .grid-mobile,
+  #root .grid-mobile {
+    gap: 0.75rem;
   }
 
   /* Stack columns on mobile */
-  .stack-mobile {
-    grid-template-columns: 1fr !important;
+  body .stack-mobile,
+  #root .stack-mobile {
+    grid-template-columns: 1fr;
   }
 }
 
 /* Small mobile devices */
 @media (max-width: 375px) {
-  .glass-card {
-    padding: 0.75rem !important;
-    border-radius: 0.625rem !important;
+  body .glass-card,
+  #root .glass-card {
+    padding: 0.75rem;
+    border-radius: 0.625rem;
   }
 
-  .stat-card-mobile {
-    padding: 0.625rem !important;
+  body .stat-card-mobile,
+  #root .stat-card-mobile {
+    padding: 0.625rem;
     min-height: 100px;
   }
 
-  .stat-card-mobile .stat-value {
-    font-size: 1.125rem !important;
+  body .stat-card-mobile .stat-value,
+  #root .stat-card-mobile .stat-value {
+    font-size: 1.125rem;
   }
 
-  .input-glass,
-  .btn-primary,
-  .btn-secondary {
-    font-size: 0.8125rem !important;
+  body .input-glass,
+  body .btn-primary,
+  body .btn-secondary,
+  #root .input-glass,
+  #root .btn-primary,
+  #root .btn-secondary {
+    font-size: 0.8125rem;
   }
 
-  /* Make text more readable */
+  /* Improve readability on small screens */
   body {
-    font-size: 14px !important;
+    font-size: 0.9375rem; /* 15px */
+  }
+
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+
+  .text-base { font-size: 0.9375rem; }
+  .text-sm { font-size: 0.8125rem; }
+  .text-xs { font-size: 0.6875rem; }
+
+  /* Ensure buttons remain readable */
+  button {
+    font-size: 0.875rem;
+    min-height: 44px;
   }
 
   /* Compress spacing */
-  .space-y-6 > * + * {
-    margin-top: 1rem !important;
+  body .space-y-6 > * + *,
+  #root .space-y-6 > * + * {
+    margin-top: 1rem;
   }
 
-  .space-y-4 > * + * {
-    margin-top: 0.75rem !important;
+  body .space-y-4 > * + *,
+  #root .space-y-4 > * + * {
+    margin-top: 0.75rem;
   }
 }
 
 /* Landscape mobile */
 @media (max-width: 896px) and (orientation: landscape) {
-  .glass-card {
-    padding: 0.625rem !important;
+  body .glass-card,
+  #root .glass-card {
+    padding: 0.625rem;
   }
 
-  .sidebar-mobile {
-    width: 240px !important;
+  body .sidebar-mobile,
+  #root .sidebar-mobile {
+    width: 240px;
   }
 }
 
@@ -135,8 +174,9 @@
   }
 
   /* Larger touch areas for icons */
-  .icon-button {
-    padding: 0.75rem !important;
+  body .icon-button,
+  #root .icon-button {
+    padding: 0.75rem;
   }
 
   /* Better spacing for touch */
@@ -157,8 +197,8 @@
 
   /* Optimize animations for mobile */
   * {
-    animation-duration: 0.2s !important;
-    transition-duration: 0.2s !important;
+    animation-duration: 0.2s;
+    transition-duration: 0.2s;
   }
 }
 

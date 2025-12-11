@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, 
   LineChart, 
@@ -104,6 +104,12 @@ export function Sidebar({ isMobileOpen, setIsMobileOpen, currentPath, onNavigate
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [expandedMenus, setExpandedMenus] = useState<string[]>(['settings']);
   const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const [showPing, setShowPing] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowPing(false), 5000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const toggleSubmenu = (menuId: string) => {
     if (isCollapsed) setIsCollapsed(false);
@@ -170,14 +176,14 @@ export function Sidebar({ isMobileOpen, setIsMobileOpen, currentPath, onNavigate
           
           <button 
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="hidden md:flex p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+            className="hidden md:flex p-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500"
           >
             {isCollapsed ? <ChevronRight size={18} /> : <Menu size={18} />}
           </button>
           
           <button 
             onClick={() => setIsMobileOpen(false)}
-            className="md:hidden p-1.5 rounded-lg hover:bg-white/10 text-slate-400"
+            className="md:hidden p-1.5 rounded-lg hover:bg-white/10 text-slate-300"
           >
             <X size={20} />
           </button>
@@ -196,7 +202,7 @@ export function Sidebar({ isMobileOpen, setIsMobileOpen, currentPath, onNavigate
                   onClick={() => item.subItems ? toggleSubmenu(item.id) : handleNavigate(item.path!)}
                   className={cn(
                     "w-full flex items-center gap-4 px-3 py-3 rounded-xl transition-all duration-200 relative",
-                    isActive ? "bg-white/5 text-white" : "text-slate-400 hover:text-white hover:bg-white/5",
+                    isActive ? "bg-white/5 text-white" : "text-slate-300 hover:text-white hover:bg-white/5",
                     isCollapsed ? "justify-center" : "justify-between"
                   )}
                   title={isCollapsed ? item.label : undefined}
@@ -207,7 +213,7 @@ export function Sidebar({ isMobileOpen, setIsMobileOpen, currentPath, onNavigate
                     <item.icon 
                       className={cn(
                         "w-5 h-5 transition-colors",
-                        isActive ? "text-purple-400" : "text-slate-400 group-hover:text-white"
+                        isActive ? "text-purple-400" : "text-slate-300 group-hover:text-white"
                       )} 
                     />
                     {!isCollapsed && (
@@ -287,7 +293,9 @@ export function Sidebar({ isMobileOpen, setIsMobileOpen, currentPath, onNavigate
              {!isCollapsed && (
                <div className="flex items-center gap-3">
                  <div className="relative flex h-2.5 w-2.5">
-                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                   {showPing && (
+                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                   )}
                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
                  </div>
                  <div className="flex flex-col">
@@ -295,7 +303,7 @@ export function Sidebar({ isMobileOpen, setIsMobileOpen, currentPath, onNavigate
                  </div>
                </div>
              )}
-             <div className="p-2 rounded-lg bg-white/5 text-slate-400">
+             <div className="p-2 rounded-lg bg-white/5 text-slate-300">
                <Activity size={16} />
              </div>
            </div>

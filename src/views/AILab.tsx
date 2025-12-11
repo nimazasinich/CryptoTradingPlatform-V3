@@ -136,7 +136,7 @@ export default function AILab({ defaultTab = 'signals' }: AILabProps) {
           <BrainCircuit className="text-purple-400" size={32} />
           AI Trading Lab
         </h1>
-        <p className="text-slate-400">Leverage machine learning models for market analysis and automated trading strategies.</p>
+        <p className="text-slate-300">Leverage machine learning models for market analysis and automated trading strategies.</p>
       </div>
 
       {/* Tabs */}
@@ -148,7 +148,7 @@ export default function AILab({ defaultTab = 'signals' }: AILabProps) {
             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold whitespace-nowrap transition-all duration-300 ${
               activeTab === tab.id 
                 ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-900/30 scale-[1.02]' 
-                : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 hover:scale-[1.01]'
+                : 'bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 hover:scale-[1.01]'
             }`}
           >
             <tab.icon size={18} />
@@ -166,7 +166,7 @@ export default function AILab({ defaultTab = 'signals' }: AILabProps) {
               <div className="flex flex-wrap gap-3 items-center">
                 <div className="flex items-center gap-2">
                   <TrendingUp className="text-purple-400" size={20} />
-                  <span className="text-sm text-slate-400 font-medium">Symbol:</span>
+                  <span className="text-sm text-slate-300 font-medium">Symbol:</span>
                   <select 
                     value={selectedSymbol}
                     onChange={(e) => setSelectedSymbol(e.target.value)}
@@ -180,7 +180,7 @@ export default function AILab({ defaultTab = 'signals' }: AILabProps) {
 
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${showFilters ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' : 'bg-white/5 text-slate-400 border border-white/10 hover:text-white hover:bg-white/10'}`}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${showFilters ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' : 'bg-white/5 text-slate-300 border border-white/10 hover:text-white hover:bg-white/10'}`}
                 >
                   <Filter size={16} />
                   Filters
@@ -202,7 +202,7 @@ export default function AILab({ defaultTab = 'signals' }: AILabProps) {
               <div className="glass-card p-4 space-y-4 animate-fade-in">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs text-slate-400 uppercase font-bold mb-2 block">Min Confidence: {minConfidence}%</label>
+                    <label className="text-xs text-slate-300 uppercase font-bold mb-2 block">Min Confidence: {minConfidence}%</label>
                     <input 
                       type="range"
                       min="0"
@@ -214,7 +214,7 @@ export default function AILab({ defaultTab = 'signals' }: AILabProps) {
                   </div>
                   
                   <div>
-                    <label className="text-xs text-slate-400 uppercase font-bold mb-2 block">Signal Type</label>
+                    <label className="text-xs text-slate-300 uppercase font-bold mb-2 block">Signal Type</label>
                     <div className="flex gap-2">
                       {(['ALL', 'BUY', 'SELL'] as const).map(type => (
                         <button
@@ -225,7 +225,7 @@ export default function AILab({ defaultTab = 'signals' }: AILabProps) {
                               ? type === 'BUY' ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
                               : type === 'SELL' ? 'bg-red-500/20 text-red-400 border border-red-500/30'
                               : 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                              : 'bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10'
+                              : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                           }`}
                         >
                           {type}
@@ -249,7 +249,7 @@ export default function AILab({ defaultTab = 'signals' }: AILabProps) {
                 <div className="col-span-full glass-card p-12 text-center">
                   <Bot className="mx-auto mb-4 text-slate-600" size={48} />
                   <h3 className="text-xl font-bold text-white mb-2">No Signals Found</h3>
-                  <p className="text-slate-400">Try adjusting your filters or check back later.</p>
+                  <p className="text-slate-300">Try adjusting your filters or check back later.</p>
                 </div>
               ) : (
                 filteredSignals.map((signal, index) => (

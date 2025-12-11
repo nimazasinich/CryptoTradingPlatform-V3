@@ -98,7 +98,7 @@ export const MarketScanner = () => {
             <Search className="text-purple-400" size={24} />
             Market Scanner
           </h2>
-          <p className="text-slate-400 text-sm">Real-time opportunity finder with advanced filters</p>
+          <p className="text-slate-300 text-sm">Real-time opportunity finder with advanced filters</p>
         </div>
         
         <div className="flex gap-2">
@@ -130,7 +130,7 @@ export const MarketScanner = () => {
       {/* Filters */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
-          <label className="text-xs text-slate-400 uppercase font-bold mb-2 block">Search</label>
+          <label className="text-xs text-slate-300 uppercase font-bold mb-2 block">Search</label>
           <input 
             type="text"
             value={searchTerm}
@@ -141,7 +141,7 @@ export const MarketScanner = () => {
         </div>
 
         <div>
-          <label className="text-xs text-slate-400 uppercase font-bold mb-2 block">Price Range ($)</label>
+          <label className="text-xs text-slate-300 uppercase font-bold mb-2 block">Price Range ($)</label>
           <div className="flex gap-2">
             <input 
               type="number"
@@ -161,7 +161,7 @@ export const MarketScanner = () => {
         </div>
 
         <div>
-          <label className="text-xs text-slate-400 uppercase font-bold mb-2 block">Min Volume</label>
+          <label className="text-xs text-slate-300 uppercase font-bold mb-2 block">Min Volume</label>
           <select 
             value={minVolume} 
             onChange={(e) => setMinVolume(Number(e.target.value))}
@@ -176,7 +176,7 @@ export const MarketScanner = () => {
         </div>
 
         <div>
-          <label className="text-xs text-slate-400 uppercase font-bold mb-2 block">Change % (24h): {minChange}% to {maxChange}%</label>
+          <label className="text-xs text-slate-300 uppercase font-bold mb-2 block">Change % (24h): {minChange}% to {maxChange}%</label>
           <div className="flex gap-2">
             <input 
               type="range"
@@ -198,7 +198,7 @@ export const MarketScanner = () => {
         </div>
 
         <div>
-          <label className="text-xs text-slate-400 uppercase font-bold mb-2 block">Min Market Cap</label>
+          <label className="text-xs text-slate-300 uppercase font-bold mb-2 block">Min Market Cap</label>
           <select 
             value={minMarketCap} 
             onChange={(e) => setMinMarketCap(Number(e.target.value))}
@@ -226,19 +226,19 @@ export const MarketScanner = () => {
 
       {/* Results */}
       <div className="flex-1 overflow-x-auto">
-        <div className="mb-3 text-sm text-slate-400">
+        <div className="mb-3 text-sm text-slate-300">
           Found <span className="text-white font-bold">{filteredCoins.length}</span> coins matching criteria
         </div>
         <table className="w-full">
           <thead>
             <tr className="border-b border-white/5">
-              <th className="text-left py-3 px-4 text-xs font-semibold text-slate-400 uppercase">Rank</th>
-              <th className="text-left py-3 px-4 text-xs font-semibold text-slate-400 uppercase">Asset</th>
-              <th className="text-right py-3 px-4 text-xs font-semibold text-slate-400 uppercase">Price</th>
-              <th className="text-right py-3 px-4 text-xs font-semibold text-slate-400 uppercase">24h Change</th>
-              <th className="text-right py-3 px-4 text-xs font-semibold text-slate-400 uppercase">Volume</th>
-              <th className="text-right py-3 px-4 text-xs font-semibold text-slate-400 uppercase">Market Cap</th>
-              <th className="text-center py-3 px-4 text-xs font-semibold text-slate-400 uppercase">Signal</th>
+              <th className="text-left py-3 px-4 text-xs font-semibold text-slate-300 uppercase">Rank</th>
+              <th className="text-left py-3 px-4 text-xs font-semibold text-slate-300 uppercase">Asset</th>
+              <th className="text-right py-3 px-4 text-xs font-semibold text-slate-300 uppercase">Price</th>
+              <th className="text-right py-3 px-4 text-xs font-semibold text-slate-300 uppercase">24h Change</th>
+              <th className="text-right py-3 px-4 text-xs font-semibold text-slate-300 uppercase">Volume</th>
+              <th className="text-right py-3 px-4 text-xs font-semibold text-slate-300 uppercase">Market Cap</th>
+              <th className="text-center py-3 px-4 text-xs font-semibold text-slate-300 uppercase">Signal</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
@@ -257,7 +257,7 @@ export const MarketScanner = () => {
             ) : (
                filteredCoins.map((coin, index) => (
                  <tr key={coin.id} className="hover:bg-white/5 transition-colors group">
-                   <td className="py-3 px-4 text-slate-400 font-mono text-sm">#{coin.market_cap_rank}</td>
+                   <td className="py-3 px-4 text-slate-300 font-mono text-sm">#{coin.market_cap_rank}</td>
                    <td className="py-3 px-4">
                      <div className="flex items-center gap-3">
                        <CoinIcon symbol={coin.symbol} size="sm" />
@@ -277,7 +277,7 @@ export const MarketScanner = () => {
                      <span className={`inline-block px-2 py-1 rounded text-xs font-bold ${
                        coin.price_change_percentage_24h > 5 ? 'bg-green-500/20 text-green-400' :
                        coin.price_change_percentage_24h < -5 ? 'bg-red-500/20 text-red-400' :
-                       'bg-slate-500/20 text-slate-400'
+                       'bg-slate-500/20 text-slate-300'
                      }`}>
                        {coin.price_change_percentage_24h > 5 ? 'BULLISH' :
                         coin.price_change_percentage_24h < -5 ? 'BEARISH' : 'NEUTRAL'}

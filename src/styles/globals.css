@@ -5,6 +5,11 @@
 
 :root {
   color-scheme: dark;
+  --radius-sm: 0.5rem;    /* 8px */
+  --radius-md: 0.75rem;   /* 12px */
+  --radius-lg: 1rem;      /* 16px */
+  --radius-xl: 1.25rem;   /* 20px */
+  --radius-2xl: 1.5rem;   /* 24px */
 }
 
 body {
@@ -19,6 +24,8 @@ body {
   /* Premium Glass Card */
   .glass-card {
     @apply bg-[#0f172a]/60 backdrop-blur-xl border border-white/[0.08] rounded-2xl shadow-2xl shadow-black/40;
+    will-change: backdrop-filter;
+    transform: translateZ(0);
   }
   
   .glass-card-hover {
@@ -27,6 +34,14 @@ body {
   
   .glass-panel {
     @apply bg-slate-950/40 backdrop-blur-md border border-white/5 rounded-xl;
+  }
+
+  /* Reduce blur on low-end devices */
+  @media (prefers-reduced-data: reduce) {
+    .glass-card,
+    .glass-panel {
+      backdrop-filter: blur(8px) !important;
+    }
   }
   
   .btn-primary {
@@ -39,6 +54,13 @@ body {
     @apply bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2.5 outline-none text-white
            focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 transition-all duration-200
            placeholder:text-slate-600;
+  }
+
+  /* Placeholder colors for accessibility */
+  input::placeholder,
+  textarea::placeholder,
+  select::placeholder {
+    @apply text-slate-500;
   }
 
   .skeleton {
@@ -56,6 +78,38 @@ body {
   
   .drop-shadow-glow {
     filter: drop-shadow(0 0 8px currentColor);
+  }
+
+  /* Universal focus indicators for accessibility */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [role="button"]:focus-visible,
+  [role="tab"]:focus-visible,
+  [tabindex]:focus-visible {
+    @apply outline-none ring-2 ring-purple-500 ring-offset-2 ring-offset-slate-950;
+  }
+
+  /* Enhanced input focus (increase from ring-1 to ring-2) */
+  .input-glass:focus {
+    @apply border-purple-500 ring-2 ring-purple-500/50;
+  }
+
+  /* Primary button focus */
+  .btn-primary:focus-visible {
+    @apply ring-2 ring-purple-400 ring-offset-2 ring-offset-slate-950;
+  }
+
+  /* Remove default browser outline */
+  *:focus {
+    outline: none;
+  }
+
+  *:focus-visible {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
   }
 }
 
@@ -183,4 +237,77 @@ body {
 
 .animate-marquee {
   animation: marquee 45s linear infinite;
+}
+
+/* Reduced Motion Support - WCAG 2.1 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Stop continuous animations */
+  .animate-spin,
+  .animate-pulse,
+  .animate-shimmer,
+  .animate-marquee,
+  .animate-text-flow,
+  .animate-ping,
+  .animate-bounce {
+    animation: none !important;
+  }
+
+  /* Disable hover transforms */
+  .glass-card-hover:hover,
+  .group:hover {
+    transform: none !important;
+  }
+
+  /* Show content immediately */
+  .animate-fade-in {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+
+  /* Disable backdrop animations */
+  .backdrop-blur-xl,
+  .backdrop-blur-md {
+    backdrop-filter: none !important;
+    background-color: rgba(15, 23, 42, 0.95) !important;
+  }
+}
+
+/* Pause animations when page is hidden */
+html.page-hidden .animate-marquee,
+html.page-hidden .animate-ping,
+html.page-hidden .animate-shimmer {
+  animation-play-state: paused !important;
+}
+
+/* Screen Reader Only - Skip to Main Content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.focus\:not-sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
 }

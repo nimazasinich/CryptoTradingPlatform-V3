@@ -112,7 +112,7 @@ export const OrderBook = ({ symbol, currentPrice }: { symbol: string, currentPri
       <span className={cn("z-10 font-mono w-1/3 text-left pl-3 font-medium", type === 'bid' ? "text-green-400" : "text-red-400")}>
         {(row.price || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}
       </span>
-      <span className="z-10 text-slate-400 w-1/3 text-right font-mono">
+      <span className="z-10 text-slate-300 w-1/3 text-right font-mono">
         {row.amount.toFixed(4)}
       </span>
       <span className="z-10 text-slate-500 w-1/3 text-right pr-3 font-mono opacity-60">
@@ -148,7 +148,7 @@ export const OrderBook = ({ symbol, currentPrice }: { symbol: string, currentPri
         <div className="flex gap-2 items-center">
            <button
              onClick={() => setUseWebSocket(!useWebSocket)}
-             className="text-[10px] text-slate-400 hover:text-white transition-colors px-2 py-1 rounded hover:bg-white/5"
+             className="text-[10px] text-slate-300 hover:text-white transition-colors px-2 py-1 rounded hover:bg-white/5"
              title={useWebSocket ? 'Switch to demo mode' : 'Connect to live data'}
            >
              {useWebSocket ? 'Live' : 'Demo'}

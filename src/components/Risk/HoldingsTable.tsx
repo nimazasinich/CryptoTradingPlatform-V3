@@ -49,11 +49,11 @@ export const HoldingsTable = () => {
         <table className="w-full">
           <thead>
             <tr className="bg-white/5 text-left">
-              <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase">Asset</th>
-              <th className="px-6 py-4 text-right text-xs font-semibold text-slate-400 uppercase">Balance</th>
-              <th className="px-6 py-4 text-right text-xs font-semibold text-slate-400 uppercase">Current Price</th>
-              <th className="px-6 py-4 text-right text-xs font-semibold text-slate-400 uppercase">Value</th>
-              <th className="px-6 py-4 text-right text-xs font-semibold text-slate-400 uppercase">Allocation</th>
+              <th className="px-6 py-4 text-xs font-semibold text-slate-300 uppercase">Asset</th>
+              <th className="px-6 py-4 text-right text-xs font-semibold text-slate-300 uppercase">Balance</th>
+              <th className="px-6 py-4 text-right text-xs font-semibold text-slate-300 uppercase">Current Price</th>
+              <th className="px-6 py-4 text-right text-xs font-semibold text-slate-300 uppercase">Value</th>
+              <th className="px-6 py-4 text-right text-xs font-semibold text-slate-300 uppercase">Allocation</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
@@ -82,7 +82,7 @@ export const HoldingsTable = () => {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2 justify-end">
-                      <span className="text-xs text-slate-400 w-8 text-right">{asset.allocation.toFixed(1)}%</span>
+                      <span className="text-xs text-slate-300 w-8 text-right">{asset.allocation.toFixed(1)}%</span>
                       <div className="w-16 h-1.5 bg-slate-800 rounded-full overflow-hidden">
                         <div className="h-full bg-purple-500 rounded-full" style={{ width: `${asset.allocation}%` }} />
                       </div>

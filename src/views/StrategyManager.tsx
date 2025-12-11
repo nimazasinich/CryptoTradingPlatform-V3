@@ -74,7 +74,7 @@ export default function StrategyManager() {
         <div className="glass-card p-5">
           <div className="text-2xl mb-2">🔍</div>
           <h3 className="text-white font-semibold mb-2">14 Detectors</h3>
-          <p className="text-slate-400 text-sm">
+          <p className="text-slate-300 text-sm">
             Core indicators, SMC, patterns, sentiment, and ML analysis
           </p>
         </div>
@@ -82,7 +82,7 @@ export default function StrategyManager() {
         <div className="glass-card p-5">
           <div className="text-2xl mb-2">⏱️</div>
           <h3 className="text-white font-semibold mb-2">Multi-Timeframe</h3>
-          <p className="text-slate-400 text-sm">
+          <p className="text-slate-300 text-sm">
             15min, 1hour, and 4hour synchronized analysis
           </p>
         </div>
@@ -90,7 +90,7 @@ export default function StrategyManager() {
         <div className="glass-card p-5">
           <div className="text-2xl mb-2">🛡️</div>
           <h3 className="text-white font-semibold mb-2">Risk Management</h3>
-          <p className="text-slate-400 text-sm">
+          <p className="text-slate-300 text-sm">
             Dynamic position sizing, cooldowns, and stop-loss automation
           </p>
         </div>
@@ -98,7 +98,7 @@ export default function StrategyManager() {
         <div className="glass-card p-5">
           <div className="text-2xl mb-2">📈</div>
           <h3 className="text-white font-semibold mb-2">5-Layer Validation</h3>
-          <p className="text-slate-400 text-sm">
+          <p className="text-slate-300 text-sm">
             Price action, indicators, timeframes, volume, and risk scoring
           </p>
         </div>
@@ -106,7 +106,7 @@ export default function StrategyManager() {
         <div className="glass-card p-5">
           <div className="text-2xl mb-2">🎯</div>
           <h3 className="text-white font-semibold mb-2">Confluence System</h3>
-          <p className="text-slate-400 text-sm">
+          <p className="text-slate-300 text-sm">
             AI, technical, and context signals must align for execution
           </p>
         </div>
@@ -114,7 +114,7 @@ export default function StrategyManager() {
         <div className="glass-card p-5">
           <div className="text-2xl mb-2">⚡</div>
           <h3 className="text-white font-semibold mb-2">Real-Time Execution</h3>
-          <p className="text-slate-400 text-sm">
+          <p className="text-slate-300 text-sm">
             Automated trade execution with trailing stops and position laddering
           </p>
         </div>
@@ -128,27 +128,27 @@ export default function StrategyManager() {
         </h3>
         <div className="grid md:grid-cols-2 gap-4 text-sm">
           <div>
-            <span className="text-slate-400">Min Confidence:</span>
+            <span className="text-slate-300">Min Confidence:</span>
             <span className="text-white ml-2 font-mono">70%</span>
           </div>
           <div>
-            <span className="text-slate-400">Confluence Threshold:</span>
+            <span className="text-slate-300">Confluence Threshold:</span>
             <span className="text-white ml-2 font-mono">60%</span>
           </div>
           <div>
-            <span className="text-slate-400">Max Risk Per Trade:</span>
+            <span className="text-slate-300">Max Risk Per Trade:</span>
             <span className="text-white ml-2 font-mono">2%</span>
           </div>
           <div>
-            <span className="text-slate-400">Max Open Positions:</span>
+            <span className="text-slate-300">Max Open Positions:</span>
             <span className="text-white ml-2 font-mono">3</span>
           </div>
           <div>
-            <span className="text-slate-400">Leverage Range:</span>
+            <span className="text-slate-300">Leverage Range:</span>
             <span className="text-white ml-2 font-mono">2x - 10x</span>
           </div>
           <div>
-            <span className="text-slate-400">Stop Loss Mode:</span>
+            <span className="text-slate-300">Stop Loss Mode:</span>
             <span className="text-white ml-2 font-mono">ATR-based</span>
           </div>
         </div>

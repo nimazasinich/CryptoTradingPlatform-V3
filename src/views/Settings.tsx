@@ -204,7 +204,7 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
     <div className="max-w-7xl mx-auto pb-20 animate-fade-in">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">Settings</h1>
-        <p className="text-slate-400">Manage your account, security, and integration preferences.</p>
+        <p className="text-slate-300">Manage your account, security, and integration preferences.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -219,7 +219,7 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                   "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 mb-1 last:mb-0",
                   activeTab === tab.id 
                     ? "bg-purple-600 text-white shadow-lg shadow-purple-900/20" 
-                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                    : "text-slate-300 hover:text-white hover:bg-white/5"
                 )}
               >
                 <tab.icon size={18} />
@@ -255,7 +255,7 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                         </span>
                       )}
                     </h2>
-                    <div className="text-slate-400">@{profile.username}</div>
+                    <div className="text-slate-300">@{profile.username}</div>
                     <div className="flex items-center gap-1 text-sm text-slate-500 mt-1">
                       <Mail size={14} />
                       {profile.email}
@@ -266,20 +266,20 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                 <form onSubmit={handleSaveProfile} className="space-y-4 max-w-2xl">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs font-bold text-slate-400 uppercase">Full Name</label>
+                      <label className="text-xs font-bold text-slate-300 uppercase">Full Name</label>
                       <input value={profile.name} onChange={e => setProfile({...profile, name: e.target.value})} className="input-glass w-full mt-1" />
                     </div>
                     <div>
-                      <label className="text-xs font-bold text-slate-400 uppercase">Username</label>
+                      <label className="text-xs font-bold text-slate-300 uppercase">Username</label>
                       <input value={profile.username} onChange={e => setProfile({...profile, username: e.target.value})} className="input-glass w-full mt-1" />
                     </div>
                   </div>
                   <div>
-                    <label className="text-xs font-bold text-slate-400 uppercase">Email</label>
+                    <label className="text-xs font-bold text-slate-300 uppercase">Email</label>
                     <input value={profile.email} onChange={e => setProfile({...profile, email: e.target.value})} className="input-glass w-full mt-1" />
                   </div>
                   <div>
-                    <label className="text-xs font-bold text-slate-400 uppercase">Bio</label>
+                    <label className="text-xs font-bold text-slate-300 uppercase">Bio</label>
                     <textarea value={profile.bio} onChange={e => setProfile({...profile, bio: e.target.value})} className="input-glass w-full h-24 resize-none mt-1" />
                   </div>
                   <div className="flex items-center justify-between pt-4 border-t border-white/5">
@@ -297,16 +297,16 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                 <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2"><Lock size={18} className="text-purple-400" /> Security</h3>
                 <form onSubmit={handleChangePassword} className="space-y-4 max-w-2xl">
                   <div>
-                    <label className="text-xs font-bold text-slate-400 uppercase">Current Password</label>
+                    <label className="text-xs font-bold text-slate-300 uppercase">Current Password</label>
                     <input type="password" value={passwordForm.current} onChange={e => setPasswordForm({...passwordForm, current: e.target.value})} className="input-glass w-full mt-1" required />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs font-bold text-slate-400 uppercase">New Password</label>
+                      <label className="text-xs font-bold text-slate-300 uppercase">New Password</label>
                       <input type="password" value={passwordForm.new} onChange={e => setPasswordForm({...passwordForm, new: e.target.value})} className="input-glass w-full mt-1" required />
                     </div>
                     <div>
-                      <label className="text-xs font-bold text-slate-400 uppercase">Confirm Password</label>
+                      <label className="text-xs font-bold text-slate-300 uppercase">Confirm Password</label>
                       <input type="password" value={passwordForm.confirm} onChange={e => setPasswordForm({...passwordForm, confirm: e.target.value})} className="input-glass w-full mt-1" required />
                     </div>
                   </div>
@@ -326,7 +326,7 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-lg font-bold text-white">Primary Data Source</h3>
-                    <p className="text-sm text-slate-400">HuggingFace Inference Token (Optional)</p>
+                    <p className="text-sm text-slate-300">HuggingFace Inference Token (Optional)</p>
                   </div>
                   <div className="p-2 bg-purple-500/10 rounded-lg text-purple-400"><Server size={24} /></div>
                 </div>
@@ -404,7 +404,7 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-400 uppercase">Language</label>
+                    <label className="text-xs font-bold text-slate-300 uppercase">Language</label>
                     <select 
                       value={prefs.language} 
                       onChange={e => setPrefs({...prefs, language: e.target.value})}
@@ -420,7 +420,7 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-400 uppercase">Base Currency</label>
+                    <label className="text-xs font-bold text-slate-300 uppercase">Base Currency</label>
                     <select 
                       value={prefs.currency} 
                       onChange={e => setPrefs({...prefs, currency: e.target.value})}
@@ -435,7 +435,7 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-400 uppercase">Date Format</label>
+                    <label className="text-xs font-bold text-slate-300 uppercase">Date Format</label>
                     <select 
                       value={prefs.dateFormat} 
                       onChange={e => setPrefs({...prefs, dateFormat: e.target.value})}
@@ -448,7 +448,7 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-400 uppercase">Time Format</label>
+                    <label className="text-xs font-bold text-slate-300 uppercase">Time Format</label>
                     <select 
                       value={prefs.timeFormat} 
                       onChange={e => setPrefs({...prefs, timeFormat: e.target.value as any})}
@@ -460,7 +460,7 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-400 uppercase">Decimal Places</label>
+                    <label className="text-xs font-bold text-slate-300 uppercase">Decimal Places</label>
                     <select 
                       value={prefs.decimalPlaces} 
                       onChange={e => setPrefs({...prefs, decimalPlaces: parseInt(e.target.value)})}
@@ -482,7 +482,7 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-400 uppercase">Default Timeframe</label>
+                    <label className="text-xs font-bold text-slate-300 uppercase">Default Timeframe</label>
                     <select 
                       value={prefs.chartPreferences.defaultTimeframe} 
                       onChange={e => setPrefs({...prefs, chartPreferences: {...prefs.chartPreferences, defaultTimeframe: e.target.value}})}
@@ -499,7 +499,7 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-400 uppercase">Chart Type</label>
+                    <label className="text-xs font-bold text-slate-300 uppercase">Chart Type</label>
                     <select 
                       value={prefs.chartPreferences.chartType} 
                       onChange={e => setPrefs({...prefs, chartPreferences: {...prefs.chartPreferences, chartType: e.target.value as any}})}
@@ -512,7 +512,7 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-400 uppercase flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-300 uppercase flex items-center justify-between">
                       Show Volume Bars
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input 
@@ -553,14 +553,14 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                 {prefs.quietHours.enabled && (
                   <div className="grid grid-cols-2 gap-4 animate-fade-in">
                     <div>
-                      <label className="text-xs font-bold text-slate-400 uppercase block mb-1">Start Time</label>
+                      <label className="text-xs font-bold text-slate-300 uppercase block mb-1">Start Time</label>
                       <div className="relative">
                         <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
                         <input type="time" value={prefs.quietHours.start} onChange={e => setPrefs({...prefs, quietHours: {...prefs.quietHours, start: e.target.value}})} className="input-glass w-full pl-10" />
                       </div>
                     </div>
                     <div>
-                      <label className="text-xs font-bold text-slate-400 uppercase block mb-1">End Time</label>
+                      <label className="text-xs font-bold text-slate-300 uppercase block mb-1">End Time</label>
                       <div className="relative">
                         <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
                         <input type="time" value={prefs.quietHours.end} onChange={e => setPrefs({...prefs, quietHours: {...prefs.quietHours, end: e.target.value}})} className="input-glass w-full pl-10" />
@@ -584,7 +584,7 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                 
                 {prefs.soundEnabled && (
                   <div className="animate-fade-in">
-                    <label className="text-xs font-bold text-slate-400 uppercase block mb-2">Notification Sound</label>
+                    <label className="text-xs font-bold text-slate-300 uppercase block mb-2">Notification Sound</label>
                     <select 
                       value={prefs.notificationSound} 
                       onChange={e => setPrefs({...prefs, notificationSound: e.target.value})}
@@ -601,7 +601,7 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
               </div>
 
               <div className="space-y-4 pt-4">
-                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Event Notifications</h3>
+                <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Event Notifications</h3>
                 {Object.entries(prefs.notifications).map(([key, enabled]) => (
                   <div key={key} className="flex items-center justify-between py-2">
                     <span className="text-white capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
@@ -629,7 +629,7 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                     <h2 className="text-xl font-bold text-white flex items-center gap-2">
                       <Server size={20} className="text-purple-400" /> HuggingFace Space
                     </h2>
-                    <p className="text-sm text-slate-400 mt-1">Primary data source connection</p>
+                    <p className="text-sm text-slate-300 mt-1">Primary data source connection</p>
                   </div>
                   <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-500/10 border border-green-500/20 rounded-full text-green-400 text-xs font-bold">
                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
@@ -639,14 +639,14 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
 
                 <div className="space-y-4">
                   <div>
-                    <label className="text-xs font-bold text-slate-400 uppercase block mb-2">Base URL</label>
+                    <label className="text-xs font-bold text-slate-300 uppercase block mb-2">Base URL</label>
                     <div className="input-glass w-full bg-white/[0.02] text-slate-300 font-mono text-sm p-3 rounded-lg">
                       {prefs.dataSource.hfBaseUrl}
                     </div>
                   </div>
                   
                   <div>
-                    <label className="text-xs font-bold text-slate-400 uppercase block mb-2">API Token (Optional)</label>
+                    <label className="text-xs font-bold text-slate-300 uppercase block mb-2">API Token (Optional)</label>
                     <div className="text-xs text-slate-500 mb-2">Configure in API Keys tab</div>
                     <div className="input-glass w-full bg-white/[0.02] text-slate-500 font-mono text-sm p-3 rounded-lg">
                       {prefs.dataSource.hfToken ? '••••••••••••••••' : 'Not configured'}
@@ -667,7 +667,7 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                     { label: 'Sentiment', key: 'refreshRateSentiment', val: prefs.dataSource.refreshRateSentiment },
                   ].map((item) => (
                     <div key={item.key} className="bg-white/5 p-4 rounded-xl border border-white/5">
-                      <label className="text-xs font-bold text-slate-400 uppercase block mb-3">{item.label}</label>
+                      <label className="text-xs font-bold text-slate-300 uppercase block mb-3">{item.label}</label>
                       <select 
                         value={item.val} 
                         onChange={e => setPrefs({...prefs, dataSource: {...prefs.dataSource, [item.key]: parseInt(e.target.value)}})}
@@ -693,7 +693,7 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                   <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5">
                     <div>
                       <div className="font-bold text-white">Enable Response Caching</div>
-                      <div className="text-sm text-slate-400 mt-1">Cache API responses to reduce load times</div>
+                      <div className="text-sm text-slate-300 mt-1">Cache API responses to reduce load times</div>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input 
@@ -708,7 +708,7 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
 
                   {prefs.dataSource.cacheEnabled && (
                     <div className="animate-fade-in">
-                      <label className="text-xs font-bold text-slate-400 uppercase block mb-2">Cache TTL (Time To Live)</label>
+                      <label className="text-xs font-bold text-slate-300 uppercase block mb-2">Cache TTL (Time To Live)</label>
                       <select 
                         value={prefs.dataSource.cacheTTL} 
                         onChange={e => setPrefs({...prefs, dataSource: {...prefs.dataSource, cacheTTL: parseInt(e.target.value)}})}
@@ -737,21 +737,21 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                   <div className="bg-white/5 p-4 rounded-xl border border-white/5">
-                    <div className="text-slate-400 text-xs uppercase mb-1">Storage Size</div>
+                    <div className="text-slate-300 text-xs uppercase mb-1">Storage Size</div>
                     <div className="text-2xl font-mono text-white">{(dbStats.size / 1024).toFixed(2)} KB</div>
                   </div>
                   <div className="bg-white/5 p-4 rounded-xl border border-white/5">
-                    <div className="text-slate-400 text-xs uppercase mb-1">Total Tables</div>
+                    <div className="text-slate-300 text-xs uppercase mb-1">Total Tables</div>
                     <div className="text-2xl font-mono text-white">{dbStats.tables.length}</div>
                   </div>
                   <div className="bg-white/5 p-4 rounded-xl border border-white/5">
-                    <div className="text-slate-400 text-xs uppercase mb-1">Total Records</div>
+                    <div className="text-slate-300 text-xs uppercase mb-1">Total Records</div>
                     <div className="text-2xl font-mono text-white">
                       {dbStats.tables.reduce((sum, t) => sum + t.count, 0).toLocaleString()}
                     </div>
                   </div>
                   <div className="bg-white/5 p-4 rounded-xl border border-white/5">
-                    <div className="text-slate-400 text-xs uppercase mb-1">Last Saved</div>
+                    <div className="text-slate-300 text-xs uppercase mb-1">Last Saved</div>
                     <div className="text-sm font-mono text-white">
                       {dbStats.lastSaved ? new Date(dbStats.lastSaved).toLocaleTimeString() : 'N/A'}
                     </div>

@@ -34,7 +34,7 @@ const MiniChart = ({ data, color, label, unit }: { data: MetricData[], color: st
   return (
     <div className="flex flex-col">
       <div className="flex justify-between items-baseline mb-2">
-        <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">{label}</span>
+        <span className="text-xs font-medium text-slate-300 uppercase tracking-wider">{label}</span>
         <span className="text-lg font-bold font-mono" style={{ color }}>
           {latest.toFixed(1)}{unit}
         </span>
@@ -121,7 +121,7 @@ const GaugeChart = ({ value, max, label, color }: { value: number, max: number, 
           <span className="text-[10px] text-slate-500 uppercase">{label}</span>
         </div>
       </div>
-      <div className="text-xs text-slate-400 mt-2 font-mono">
+      <div className="text-xs text-slate-300 mt-2 font-mono">
         {value.toFixed(1)} / {max} {label === 'CPU' ? 'cores' : 'GB'}
       </div>
     </div>
@@ -282,25 +282,25 @@ export const PerformanceCharts = () => {
         <h4 className="font-bold text-white mb-4">Current Metrics</h4>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-white/5 rounded-lg p-4 border border-white/5">
-            <div className="text-xs text-slate-400 uppercase tracking-wider mb-1">Avg CPU (1m)</div>
+            <div className="text-xs text-slate-300 uppercase tracking-wider mb-1">Avg CPU (1m)</div>
             <div className="text-xl font-bold font-mono text-blue-400">
               {(cpuHistory.slice(-60).reduce((sum, d) => sum + d.value, 0) / Math.min(60, cpuHistory.length)).toFixed(1)}%
             </div>
           </div>
           <div className="bg-white/5 rounded-lg p-4 border border-white/5">
-            <div className="text-xs text-slate-400 uppercase tracking-wider mb-1">Avg Memory (1m)</div>
+            <div className="text-xs text-slate-300 uppercase tracking-wider mb-1">Avg Memory (1m)</div>
             <div className="text-xl font-bold font-mono text-purple-400">
               {(memoryHistory.slice(-60).reduce((sum, d) => sum + d.value, 0) / Math.min(60, memoryHistory.length)).toFixed(1)}%
             </div>
           </div>
           <div className="bg-white/5 rounded-lg p-4 border border-white/5">
-            <div className="text-xs text-slate-400 uppercase tracking-wider mb-1">Avg Latency (1m)</div>
+            <div className="text-xs text-slate-300 uppercase tracking-wider mb-1">Avg Latency (1m)</div>
             <div className="text-xl font-bold font-mono text-green-400">
               {(latencyHistory.slice(-60).reduce((sum, d) => sum + d.value, 0) / Math.min(60, latencyHistory.length)).toFixed(0)}ms
             </div>
           </div>
           <div className="bg-white/5 rounded-lg p-4 border border-white/5">
-            <div className="text-xs text-slate-400 uppercase tracking-wider mb-1">Total Requests (1m)</div>
+            <div className="text-xs text-slate-300 uppercase tracking-wider mb-1">Total Requests (1m)</div>
             <div className="text-xl font-bold font-mono text-cyan-400">
               {(requestHistory.slice(-60).reduce((sum, d) => sum + d.value, 0)).toFixed(0)}
             </div>

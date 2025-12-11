@@ -170,7 +170,7 @@ const StatCard = ({
         </div>
 
         <div className="space-y-1 z-10 relative">
-          <h3 className="text-slate-400 text-sm font-medium uppercase tracking-wider">{title}</h3>
+          <h3 className="text-slate-300 text-sm font-medium uppercase tracking-wider">{title}</h3>
           <div className="text-3xl font-bold text-white tracking-tight drop-shadow-md">
             {prefix}{displayValue}{suffix}
           </div>
@@ -200,7 +200,7 @@ export default function Dashboard() {
     <div className="space-y-8 animate-fade-in pb-20">
       <div className="flex flex-col gap-1">
         <h1 className="text-3xl font-bold text-white tracking-tight">Dashboard</h1>
-        <p className="text-slate-400 text-sm">Real-time market insights and portfolio tracking.</p>
+        <p className="text-slate-300 text-sm">Real-time market insights and portfolio tracking.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 grid-mobile stack-mobile">
@@ -271,7 +271,7 @@ export default function Dashboard() {
            <div className="p-1.5 rounded-lg bg-purple-500/10">
              <Activity className="w-4 h-4 text-purple-400" />
            </div>
-           <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Live Prices</span>
+           <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">Live Prices</span>
         </div>
         <div className="glass-panel border-y border-white/5 bg-black/20 backdrop-blur-sm py-4">
            <PriceTicker />

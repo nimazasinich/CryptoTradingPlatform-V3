@@ -39,7 +39,7 @@ export const RiskAssessment = () => {
           </svg>
           <div className="absolute top-full left-1/2 -translate-x-1/2 -translate-y-8 text-center">
             <div className="text-3xl font-bold text-white">{score}</div>
-            <div className="text-xs text-slate-400">
+            <div className="text-xs text-slate-300">
               {score < 30 ? 'Low Risk' : score < 60 ? 'Moderate Risk' : 'High Risk'}
             </div>
           </div>
