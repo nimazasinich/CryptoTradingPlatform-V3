@@ -111,8 +111,7 @@ class AutoTradeExecutionEngine {
         // Get AI signals
         const signals = await aiService.getSignals(symbol);
         const validSignals = signals.filter(s => 
-          s.confidence >= this.config.minConfidence &&
-          s.type !== 'HOLD'
+          s.confidence >= this.config.minConfidence
         );
 
         if (validSignals.length === 0) continue;
@@ -209,9 +208,9 @@ class AutoTradeExecutionEngine {
 
       // Get current price
       const rateData = await marketService.getRate(`${position.symbol}/USDT`);
-      const currentPrice = rateData?.price || position.current_price;
+      const currentPrice = rateData?.price || position.entryPrice;
 
-      const pnlPercent = ((currentPrice - position.entry_price) / position.entry_price) * 100;
+      const pnlPercent = ((currentPrice - position.entryPrice) / position.entryPrice) * 100;
       const adjustedPnl = position.side === 'long' ? pnlPercent : -pnlPercent;
 
       // Check stop loss
