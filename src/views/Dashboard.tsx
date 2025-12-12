@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   TrendingUp, 
@@ -11,6 +11,7 @@ import {
   Coins 
 } from 'lucide-react';
 import { useDashboardData } from '../hooks/useDashboardData';
+import { usePriceUpdates, useSentimentUpdates } from '../hooks/useWebSocket';
 import { PriceTicker } from '../components/Dashboard/PriceTicker';
 import { MarketOverview } from '../components/Dashboard/MarketOverview';
 import { SentimentGauge } from '../components/Dashboard/SentimentGauge';
@@ -170,8 +171,8 @@ const StatCard = ({
         </div>
 
         <div className="space-y-1 z-10 relative">
-          <h3 className="text-slate-300 text-sm font-medium uppercase tracking-wider">{title}</h3>
-          <div className="text-3xl font-bold text-white tracking-tight drop-shadow-md">
+          <h3 className="text-slate-300 text-sm font-medium uppercase tracking-wider truncate">{title}</h3>
+          <div className="text-3xl font-bold text-white tracking-tight drop-shadow-md break-words overflow-hidden">
             {prefix}{displayValue}{suffix}
           </div>
         </div>
@@ -192,15 +193,82 @@ const StatCard = ({
 
 export default function Dashboard() {
   const { marketOverview, topCoins, loading, error } = useDashboardData();
+  const [isLiveUpdating, setIsLiveUpdating] = useState(false);
+  const [liveEnabled, setLiveEnabled] = useState(() => {
+    // Load preference from localStorage
+    const saved = localStorage.getItem('dashboardLiveUpdates');
+    return saved !== 'false'; // Default to true
+  });
 
   const btcSparkline = topCoins.find(c => c.symbol.toLowerCase() === 'btc')?.sparkline_in_7d?.price || [];
   const ethSparkline = topCoins.find(c => c.symbol.toLowerCase() === 'eth')?.sparkline_in_7d?.price || [];
 
+  // Feature 1.1.1: Real-time price updates via WebSocket
+  usePriceUpdates((data) => {
+    try {
+      if (data && data.prices) {
+        setIsLiveUpdating(true);
+        // Briefly show live indicator
+        setTimeout(() => setIsLiveUpdating(false), 2000);
+        // Note: Price updates are handled by the PriceTicker component itself
+        // This just provides the visual feedback that updates are happening
+      }
+    } catch (error) {
+      console.error('Price update error:', error);
+    }
+  }, liveEnabled);
+
+  // Feature 1.1.1: Real-time sentiment updates via WebSocket
+  useSentimentUpdates((data) => {
+    try {
+      if (data) {
+        // The SentimentGauge component will handle its own updates
+        // This provides additional notification capability if needed
+        console.log('Sentiment updated:', data);
+      }
+    } catch (error) {
+      console.error('Sentiment update error:', error);
+    }
+  }, liveEnabled);
+
+  // Save live updates preference
+  useEffect(() => {
+    localStorage.setItem('dashboardLiveUpdates', String(liveEnabled));
+  }, [liveEnabled]);
+
   return (
     <div className="space-y-8 animate-fade-in pb-20">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold text-white tracking-tight">Dashboard</h1>
-        <p className="text-slate-300 text-sm">Real-time market insights and portfolio tracking.</p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-white tracking-tight">Dashboard</h1>
+            {liveEnabled && (
+              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20">
+                <div className={cn(
+                  "w-2 h-2 rounded-full bg-green-500 transition-all duration-500",
+                  isLiveUpdating && "animate-ping"
+                )} />
+                <span className="text-xs font-bold text-green-400 uppercase tracking-wider">Live</span>
+              </div>
+            )}
+          </div>
+          <p className="text-slate-300 text-sm">Real-time market insights and portfolio tracking.</p>
+        </div>
+        
+        {/* Live Updates Toggle */}
+        <button
+          onClick={() => setLiveEnabled(!liveEnabled)}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
+            liveEnabled
+              ? "bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30"
+              : "bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10"
+          )}
+          title={liveEnabled ? "Disable live updates" : "Enable live updates"}
+        >
+          <Activity size={16} className={liveEnabled ? "animate-pulse" : ""} />
+          {liveEnabled ? "Live Updates On" : "Live Updates Off"}
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 grid-mobile stack-mobile">

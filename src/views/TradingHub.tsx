@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Bot, Star, TrendingUp, TrendingDown, Activity } from 'lucide-react';
+import { ChevronDown, Bot, Star, TrendingUp, TrendingDown, Activity, Copy, Check } from 'lucide-react';
 import { PriceChart } from '../components/Trading/PriceChart';
 import { OrderBook } from '../components/Trading/OrderBook';
 import { OrderForm } from '../components/Trading/OrderForm';
@@ -11,6 +11,8 @@ import { CoinIcon } from '../components/Common/CoinIcon';
 import { tradingService, Position } from '../services/tradingService';
 import { marketService } from '../services/marketService';
 import { useApp } from '../context/AppContext';
+import { usePositionUpdates } from '../hooks/useWebSocket';
+import { copyToClipboard } from '../utils/exportTable';
 
 const AVAILABLE_PAIRS = ['BTC', 'ETH', 'SOL', 'BNB', 'ADA', 'XRP', 'DOGE', 'MATIC', 'LINK', 'DOT'];
 
@@ -67,6 +69,12 @@ export default function TradingHub() {
   const [positions, setPositions] = useState<Position[]>([]);
   const [isFavorite, setIsFavorite] = useState(false);
   const [activeTab, setActiveTab] = useState<'positions' | 'orders' | 'history'>('positions');
+  const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(() => {
+    const saved = localStorage.getItem('tradingHubAutoRefresh');
+    return saved !== 'false'; // Default to true
+  });
+  const [lastRefresh, setLastRefresh] = useState(Date.now());
+  const [copiedPositions, setCopiedPositions] = useState(false);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -141,12 +149,81 @@ export default function TradingHub() {
       });
       
       setPositions(updated);
+      setLastRefresh(Date.now());
     };
     
     loadPositions();
     const interval = setInterval(loadPositions, 2000);
     return () => clearInterval(interval);
   }, [currentPrice]);
+
+  // Feature 1.1.2: Auto-refresh positions when WebSocket signals updates
+  usePositionUpdates(() => {
+    try {
+      // Reload positions when update signal received
+      const loadPositions = async () => {
+        const pos = await tradingService.getPositions();
+        const updated = pos.map(p => {
+          const unrealizedPnL = (currentPrice - p.entryPrice) * p.amount * (p.side === 'long' ? 1 : -1);
+          return {
+            ...p,
+            unrealizedPnL
+          };
+        });
+        setPositions(updated);
+        setLastRefresh(Date.now());
+      };
+      loadPositions();
+    } catch (error) {
+      console.error('Position update error:', error);
+    }
+  }, autoRefreshEnabled);
+
+  // Save auto-refresh preference
+  useEffect(() => {
+    localStorage.setItem('tradingHubAutoRefresh', String(autoRefreshEnabled));
+  }, [autoRefreshEnabled]);
+
+  // Feature 1.4.1: Copy positions table
+  const handleCopyPositions = () => {
+    try {
+      const headers = ['Symbol', 'Side', 'Amount', 'Entry Price', 'Current Price', 'P&L', 'P&L %'];
+      const rows = positions.map(p => [
+        p.symbol,
+        p.side.toUpperCase(),
+        p.amount.toFixed(6),
+        `$${p.entryPrice.toLocaleString()}`,
+        `$${currentPrice.toLocaleString()}`,
+        `$${(p.unrealizedPnL || 0).toFixed(2)}`,
+        `${(((currentPrice - p.entryPrice) / p.entryPrice) * 100).toFixed(2)}%`
+      ]);
+      
+      const tsvData = [
+        headers.join('\t'),
+        ...rows.map(row => row.join('\t'))
+      ].join('\n');
+      
+      copyToClipboard(tsvData);
+      setCopiedPositions(true);
+      setTimeout(() => setCopiedPositions(false), 2000);
+      addToast('Positions copied to clipboard!', 'success', 2000);
+    } catch (error) {
+      addToast('Failed to copy positions', 'error', 2000);
+    }
+  };
+
+  // Feature 1.4.2: Copy individual position
+  const handleCopyPosition = (position: Position) => {
+    try {
+      const pnl = (currentPrice - position.entryPrice) * position.amount * (position.side === 'long' ? 1 : -1);
+      const pnlPercent = ((currentPrice - position.entryPrice) / position.entryPrice) * 100;
+      const rowText = `${position.symbol}\t${position.side.toUpperCase()}\t${position.amount.toFixed(6)}\t$${position.entryPrice.toLocaleString()}\t$${currentPrice.toLocaleString()}\t$${pnl.toFixed(2)}\t${pnlPercent.toFixed(2)}%`;
+      copyToClipboard(rowText);
+      addToast(`${position.symbol} position copied!`, 'success', 1500);
+    } catch (error) {
+      addToast('Failed to copy position', 'error', 1500);
+    }
+  };
 
   const formatVolume = (vol: number): string => {
     if (vol >= 1e9) return `${(vol / 1e9).toFixed(2)}B`;
@@ -285,19 +362,20 @@ export default function TradingHub() {
             {/* Positions & Orders Panel */}
             <div className="h-56 glass-card flex flex-col shrink-0">
                {/* Tabs */}
-               <div className="px-4 py-2 border-b border-white/5 flex gap-6 text-sm font-bold bg-slate-900/30">
-                  <button 
-                    onClick={() => setActiveTab('positions')}
-                    className={`pb-2 transition-colors relative ${activeTab === 'positions' ? 'text-white' : 'text-slate-300 hover:text-white'}`}
-                  >
-                    Positions ({positions.length})
-                    {activeTab === 'positions' && (
-                      <motion.div 
-                        layoutId="activeTab"
-                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-500"
-                      />
-                    )}
-                  </button>
+               <div className="px-4 py-2 border-b border-white/5 flex justify-between items-center bg-slate-900/30">
+                  <div className="flex gap-6 text-sm font-bold">
+                    <button 
+                      onClick={() => setActiveTab('positions')}
+                      className={`pb-2 transition-colors relative ${activeTab === 'positions' ? 'text-white' : 'text-slate-300 hover:text-white'}`}
+                    >
+                      Positions ({positions.length})
+                      {activeTab === 'positions' && (
+                        <motion.div 
+                          layoutId="activeTab"
+                          className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-500"
+                        />
+                      )}
+                    </button>
                   <button 
                     onClick={() => setActiveTab('orders')}
                     className={`pb-2 transition-colors relative ${activeTab === 'orders' ? 'text-white' : 'text-slate-300 hover:text-white'}`}
@@ -322,6 +400,26 @@ export default function TradingHub() {
                       />
                     )}
                   </button>
+                  </div>
+                  
+                  {/* Auto-Refresh Toggle & Last Update */}
+                  <div className="flex items-center gap-3 text-xs">
+                    <span className="text-slate-500">
+                      Updated: {Math.floor((Date.now() - lastRefresh) / 1000)}s ago
+                    </span>
+                    <button
+                      onClick={() => setAutoRefreshEnabled(!autoRefreshEnabled)}
+                      className={`flex items-center gap-1.5 px-2 py-1 rounded transition-all ${
+                        autoRefreshEnabled
+                          ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                          : 'bg-white/5 text-slate-400 border border-white/10'
+                      }`}
+                      title={autoRefreshEnabled ? "Disable auto-refresh" : "Enable auto-refresh"}
+                    >
+                      <Activity size={12} className={autoRefreshEnabled ? 'animate-pulse' : ''} />
+                      Auto
+                    </button>
+                  </div>
                </div>
                
                {/* Content */}

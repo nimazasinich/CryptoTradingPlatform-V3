@@ -97,36 +97,36 @@ const NewsItem = ({ article, index }: { article: NewsArticle; index: number }) =
 
       <div className="flex-1 flex flex-col justify-between py-0.5">
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-                <div className={cn("flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider", theme.bg, theme.text)}>
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div className="flex items-center gap-2 flex-shrink-0">
+                <div className={cn("flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider whitespace-nowrap", theme.bg, theme.text)}>
                   <SentimentIcon size={12} />
                   {sentiment}
                 </div>
                 {relatedCoin && (
-                    <div className="flex items-center gap-1 px-2 py-0.5 rounded bg-white/5 border border-white/5 text-[10px] text-slate-300 font-bold hover:bg-white/10 transition-colors">
+                    <div className="flex items-center gap-1 px-2 py-0.5 rounded bg-white/5 border border-white/5 text-[10px] text-slate-300 font-bold hover:bg-white/10 transition-colors whitespace-nowrap">
                         <CoinIcon symbol={relatedCoin.symbol} size="xs" />
                         {relatedCoin.symbol}
                     </div>
                 )}
             </div>
-            <div className="flex items-center gap-1 text-[10px] text-slate-500 font-mono">
+            <div className="flex items-center gap-1 text-[10px] text-slate-500 font-mono flex-shrink-0">
               <Clock size={10} />
               {new Date(article.published_at || Date.now()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
             </div>
           </div>
           
-          <h4 className="text-sm font-semibold text-slate-100 leading-snug line-clamp-2 group-hover:text-purple-200 transition-colors duration-300">
+          <h4 className="text-sm font-semibold text-slate-100 leading-snug line-clamp-2 break-words overflow-hidden group-hover:text-purple-200 transition-colors duration-300">
             {article.title}
           </h4>
         </div>
 
         <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/5 group-hover:border-white/10 transition-colors">
-          <span className="text-[11px] font-medium text-slate-300 group-hover:text-slate-200 transition-colors flex items-center gap-1">
-             <Newspaper size={12} className="opacity-70 group-hover:opacity-100 transition-opacity" />
-             {article.source || 'CryptoWire'}
+          <span className="text-[11px] font-medium text-slate-300 group-hover:text-slate-200 transition-colors flex items-center gap-1 truncate max-w-[60%]">
+             <Newspaper size={12} className="opacity-70 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+             <span className="truncate">{article.source || 'CryptoWire'}</span>
           </span>
-          <span className="flex items-center gap-1 text-[10px] text-purple-400 font-bold opacity-0 group-hover:opacity-100 transition-all transform -translate-x-2 group-hover:translate-x-0 duration-300">
+          <span className="flex items-center gap-1 text-[10px] text-purple-400 font-bold opacity-0 group-hover:opacity-100 transition-all transform -translate-x-2 group-hover:translate-x-0 duration-300 whitespace-nowrap flex-shrink-0">
             Read <ExternalLink size={10} className="animate-pulse" />
           </span>
         </div>

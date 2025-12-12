@@ -1,13 +1,16 @@
 
 import React, { useEffect, useState } from 'react';
-import { Download } from 'lucide-react';
+import { Download, Copy, Check } from 'lucide-react';
 import { CoinIcon } from '../Common/CoinIcon';
 import { formatPrice } from '../../utils/format';
 import { riskService, Holding } from '../../services/riskService';
-import { exportTable } from '../../utils/exportTable';
+import { exportTable, copyToClipboard } from '../../utils/exportTable';
+import { useApp } from '../../context/AppContext';
 
 export const HoldingsTable = () => {
+  const { addToast } = useApp();
   const [holdings, setHoldings] = useState<Holding[]>([]);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -31,19 +34,70 @@ export const HoldingsTable = () => {
     exportTable(exportData, { filename: `holdings_${new Date().toISOString().split('T')[0]}` });
   };
 
+  // Feature 1.4.1: Copy table to clipboard
+  const handleCopyTable = () => {
+    try {
+      const headers = ['Asset', 'Symbol', 'Balance', 'Price', 'Value', 'Allocation'];
+      const rows = holdings.map(h => [
+        h.name,
+        h.symbol,
+        h.amount.toLocaleString(),
+        formatPrice(h.price),
+        formatPrice(h.value),
+        `${h.allocation.toFixed(2)}%`
+      ]);
+      
+      const tsvData = [
+        headers.join('\t'),
+        ...rows.map(row => row.join('\t'))
+      ].join('\n');
+      
+      copyToClipboard(tsvData);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      addToast('Holdings table copied to clipboard!', 'success', 2000);
+    } catch (error) {
+      addToast('Failed to copy table', 'error', 2000);
+    }
+  };
+
+  // Feature 1.4.2: Copy individual row
+  const handleCopyRow = (holding: Holding, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const rowText = `${holding.name}\t${holding.symbol}\t${holding.amount.toLocaleString()}\t${formatPrice(holding.price)}\t${formatPrice(holding.value)}\t${holding.allocation.toFixed(2)}%`;
+      copyToClipboard(rowText);
+      addToast(`${holding.symbol} row copied!`, 'success', 1500);
+    } catch (error) {
+      addToast('Failed to copy row', 'error', 1500);
+    }
+  };
+
   return (
     <div className="glass-card flex flex-col">
       <div className="p-6 border-b border-white/5 flex items-center justify-between">
         <h3 className="font-bold text-white text-lg">Current Holdings</h3>
-        <button
-          onClick={handleExport}
-          disabled={holdings.length === 0}
-          className="flex items-center gap-2 px-3 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm font-medium text-white transition-colors"
-          title="Export to CSV"
-        >
-          <Download size={16} />
-          Export
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Feature 1.4.1: Copy button */}
+          <button
+            onClick={handleCopyTable}
+            disabled={holdings.length === 0}
+            className="flex items-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm font-medium text-slate-300 hover:text-white transition-colors"
+            title="Copy to clipboard"
+          >
+            {copied ? <Check size={16} className="text-green-400" /> : <Copy size={16} />}
+            <span className="hidden sm:inline">{copied ? 'Copied!' : 'Copy'}</span>
+          </button>
+          <button
+            onClick={handleExport}
+            disabled={holdings.length === 0}
+            className="flex items-center gap-2 px-3 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm font-medium text-white transition-colors"
+            title="Export to CSV"
+          >
+            <Download size={16} />
+            <span className="hidden sm:inline">Export</span>
+          </button>
+        </div>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full">
@@ -54,14 +108,15 @@ export const HoldingsTable = () => {
               <th className="px-6 py-4 text-right text-xs font-semibold text-slate-300 uppercase">Current Price</th>
               <th className="px-6 py-4 text-right text-xs font-semibold text-slate-300 uppercase">Value</th>
               <th className="px-6 py-4 text-right text-xs font-semibold text-slate-300 uppercase">Allocation</th>
+              <th className="px-6 py-4 text-right text-xs font-semibold text-slate-300 uppercase"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
             {holdings.length === 0 ? (
-              <tr><td colSpan={5} className="py-8 text-center text-slate-500">No holdings found</td></tr>
+              <tr><td colSpan={6} className="py-8 text-center text-slate-500">No holdings found</td></tr>
             ) : (
               holdings.map(asset => (
-                <tr key={asset.id} className="hover:bg-white/5 transition-colors">
+                <tr key={asset.id} className="hover:bg-white/5 transition-colors group">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       <CoinIcon symbol={asset.symbol} size="sm" />
@@ -87,6 +142,16 @@ export const HoldingsTable = () => {
                         <div className="h-full bg-purple-500 rounded-full" style={{ width: `${asset.allocation}%` }} />
                       </div>
                     </div>
+                  </td>
+                  {/* Feature 1.4.2: Copy row button */}
+                  <td className="px-6 py-4 text-right">
+                    <button
+                      onClick={(e) => handleCopyRow(asset, e)}
+                      className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                      title="Copy row"
+                    >
+                      <Copy size={14} />
+                    </button>
                   </td>
                 </tr>
               ))
