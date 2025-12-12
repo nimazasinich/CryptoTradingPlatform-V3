@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Square, Activity, Settings, TrendingUp, AlertCircle, BarChart2, Target, Shield } from 'lucide-react';
+import { Play, Square, Activity, Settings, TrendingUp, AlertCircle, BarChart2, Target, Shield, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { strategyService, StrategyConfig, TradeSignal } from '../../services/strategyService';
 import { tradingService, Position } from '../../services/tradingService';
 import { marketService } from '../../services/marketService';
 import { useApp } from '../../context/AppContext';
+import { autoTradeEngine } from '../../services/autoTradeExecutionEngine';
 
 interface BotMetrics {
   trades: number;
@@ -36,10 +37,108 @@ export const AutoTradingPanel = ({ symbol }: { symbol: string }) => {
   const [openPosition, setOpenPosition] = useState<Position | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const positionCheckRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  
+  // Feature 2.1.1: Engine mode toggle
+  const [engineMode, setEngineMode] = useState<'dreammaker' | 'simple'>(() => {
+    const saved = localStorage.getItem('autoTradeEngineMode');
+    return (saved as 'dreammaker' | 'simple') || 'dreammaker';
+  });
+  
+  // Feature 2.1.2: Simple engine configuration
+  const [simpleEngineConfig, setSimpleEngineConfig] = useState(() => {
+    const saved = localStorage.getItem('simpleEngineConfig');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {}
+    }
+    return {
+      minConfidence: 70,
+      maxPositions: 3,
+      riskPerTrade: 2,
+      stopLoss: 3,
+      takeProfit: 6,
+      cooldownMinutes: 30,
+      symbols: ['BTC', 'ETH', 'SOL']
+    };
+  });
+  
+  const [showSimpleConfig, setShowSimpleConfig] = useState(false);
+  const [simpleEngineStatus, setSimpleEngineStatus] = useState<any>(null);
+  
+  // Feature 2.3.1: Trailing stop configuration
+  const [trailingStopEnabled, setTrailingStopEnabled] = useState(() => {
+    const saved = localStorage.getItem('trailingStopEnabled');
+    return saved === 'true';
+  });
+  const [trailingStopPercent, setTrailingStopPercent] = useState(() => {
+    const saved = localStorage.getItem('trailingStopPercent');
+    return saved ? parseFloat(saved) : 2;
+  });
 
   useEffect(() => {
     setStrategies(strategyService.getStrategies());
   }, []);
+
+  // Save engine mode preference
+  useEffect(() => {
+    localStorage.setItem('autoTradeEngineMode', engineMode);
+  }, [engineMode]);
+
+  // Save simple engine config
+  useEffect(() => {
+    localStorage.setItem('simpleEngineConfig', JSON.stringify(simpleEngineConfig));
+  }, [simpleEngineConfig]);
+
+  // Save trailing stop settings
+  useEffect(() => {
+    localStorage.setItem('trailingStopEnabled', String(trailingStopEnabled));
+    localStorage.setItem('trailingStopPercent', String(trailingStopPercent));
+  }, [trailingStopEnabled, trailingStopPercent]);
+
+  // Feature 2.1.4: Subscribe to simple engine events
+  useEffect(() => {
+    if (engineMode === 'simple' && isRunning) {
+      const unsubscribe = autoTradeEngine.subscribe((status, data) => {
+        switch(status) {
+          case 'trade_opened':
+            addLog(`✅ Position opened: ${data.symbol} @ $${data.entryPrice}`);
+            addToast(`Position opened: ${data.symbol}`, 'success', 3000);
+            setMetrics(m => ({
+              ...m,
+              trades: m.trades + 1
+            }));
+            break;
+            
+          case 'trade_closed':
+            const isProfit = data.pnl > 0;
+            addLog(`${isProfit ? '💰' : '📉'} Position closed: ${data.symbol} - ${data.reason} - P&L: $${data.pnl.toFixed(2)}`);
+            addToast(
+              `Position closed: ${data.symbol} - P&L: $${data.pnl.toFixed(2)}`,
+              isProfit ? 'success' : 'error',
+              5000
+            );
+            setMetrics(m => ({
+              ...m,
+              pnl: m.pnl + data.pnl,
+              wins: isProfit ? m.wins + 1 : m.wins,
+              losses: !isProfit ? m.losses + 1 : m.losses
+            }));
+            break;
+            
+          case 'error':
+            addLog(`❌ Error: ${data.message}`);
+            addToast(`Trading error: ${data.message}`, 'error', 5000);
+            break;
+        }
+        
+        // Update status
+        setSimpleEngineStatus(autoTradeEngine.getStatus());
+      });
+      
+      return unsubscribe;
+    }
+  }, [engineMode, isRunning]);
 
   // Monitor current price
   useEffect(() => {
@@ -74,15 +173,53 @@ export const AutoTradingPanel = ({ symbol }: { symbol: string }) => {
 
   const activeStrategy = strategies.find(s => s.id === activeStrategyId);
 
-  const toggleBot = () => {
+  const toggleBot = async () => {
     if (isRunning) {
-      stopBot();
-    } else {
-      if (!activeStrategyId) {
-        addToast("Please select a strategy first", "warning");
-        return;
+      if (engineMode === 'simple') {
+        await stopSimpleEngine();
+      } else {
+        stopBot();
       }
-      startBot();
+    } else {
+      if (engineMode === 'simple') {
+        await startSimpleEngine();
+      } else {
+        if (!activeStrategyId) {
+          addToast("Please select a strategy first", "warning");
+          return;
+        }
+        startBot();
+      }
+    }
+  };
+
+  // Feature 2.1.3: Simple engine start/stop
+  const startSimpleEngine = async () => {
+    try {
+      await autoTradeEngine.start(simpleEngineConfig);
+      setIsRunning(true);
+      addToast('Simple Auto-Trade Engine started!', 'success');
+      addLog('🚀 Simple engine started with config:');
+      addLog(`   Min Confidence: ${simpleEngineConfig.minConfidence}%`);
+      addLog(`   Max Positions: ${simpleEngineConfig.maxPositions}`);
+      addLog(`   Risk/Trade: ${simpleEngineConfig.riskPerTrade}%`);
+      setSimpleEngineStatus(autoTradeEngine.getStatus());
+    } catch (error: any) {
+      addToast(`Failed to start: ${error.message}`, 'error');
+      addLog(`❌ Start failed: ${error.message}`);
+    }
+  };
+
+  const stopSimpleEngine = async () => {
+    try {
+      await autoTradeEngine.stop();
+      setIsRunning(false);
+      addToast('Simple Auto-Trade Engine stopped', 'info');
+      addLog('⏹️ Simple engine stopped');
+      setSimpleEngineStatus(autoTradeEngine.getStatus());
+    } catch (error: any) {
+      console.error('Stop error:', error);
+      setIsRunning(false);
     }
   };
 
@@ -237,8 +374,19 @@ export const AutoTradingPanel = ({ symbol }: { symbol: string }) => {
           addLog(`❌ Failed to close position: ${e.message}`);
         }
       } else {
-        // Manage trailing stop
-        await strategyService.manageRisk(position, currentPrice, activeStrategy);
+        // Feature 2.3.2: Manage trailing stop if enabled
+        if (trailingStopEnabled && engineMode === 'dreammaker') {
+          try {
+            await strategyService.manageRisk(position, currentPrice, activeStrategy);
+            // Log if stop was adjusted
+            const pnlPercent = ((currentPrice - position.entryPrice) / position.entryPrice) * 100;
+            if (pnlPercent > trailingStopPercent) {
+              addLog(`🛡️ Trailing stop active: protecting ${pnlPercent.toFixed(2)}% profit`);
+            }
+          } catch (e: any) {
+            console.error('Trailing stop error:', e);
+          }
+        }
       }
 
     } catch (e: any) {
@@ -287,57 +435,256 @@ export const AutoTradingPanel = ({ symbol }: { symbol: string }) => {
 
   return (
     <div className="glass-card flex flex-col h-full border-t-4 border-t-cyan-500 overflow-hidden">
-      {/* Header */}
-      <div className="p-4 border-b border-white/5 bg-gradient-to-r from-cyan-900/20 to-blue-900/20 flex justify-between items-center shrink-0">
-        <h3 className="font-bold text-white flex items-center gap-2">
-          <Activity className="text-cyan-400" size={20} />
-          Auto-Trading Bot
-        </h3>
-        <motion.div
-          animate={{ scale: isRunning ? [1, 1.1, 1] : 1 }}
-          transition={{ repeat: isRunning ? Infinity : 0, duration: 2 }}
-          className={`px-3 py-1 rounded-lg text-xs font-bold uppercase flex items-center gap-1.5 ${
-            isRunning ? 'bg-green-500/20 text-green-400' : 'bg-slate-500/20 text-slate-300'
-          }`}
-        >
-          <div className={`w-2 h-2 rounded-full ${isRunning ? 'bg-green-400 animate-pulse' : 'bg-slate-400'}`} />
-          {isRunning ? 'Active' : 'Inactive'}
-        </motion.div>
+      {/* Header with Engine Mode Toggle */}
+      <div className="p-4 border-b border-white/5 bg-gradient-to-r from-cyan-900/20 to-blue-900/20 shrink-0">
+        <div className="flex justify-between items-start mb-3">
+          <h3 className="font-bold text-white flex items-center gap-2">
+            <Activity className="text-cyan-400" size={20} />
+            Auto-Trading Bot
+          </h3>
+          <motion.div
+            animate={{ scale: isRunning ? [1, 1.1, 1] : 1 }}
+            transition={{ repeat: isRunning ? Infinity : 0, duration: 2 }}
+            className={`px-3 py-1 rounded-lg text-xs font-bold uppercase flex items-center gap-1.5 ${
+              isRunning ? 'bg-green-500/20 text-green-400' : 'bg-slate-500/20 text-slate-300'
+            }`}
+          >
+            <div className={`w-2 h-2 rounded-full ${isRunning ? 'bg-green-400 animate-pulse' : 'bg-slate-400'}`} />
+            {isRunning ? 'Active' : 'Inactive'}
+          </motion.div>
+        </div>
+        
+        {/* Feature 2.1.1: Engine Mode Toggle */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-slate-400">Engine:</span>
+          <div className="flex bg-white/5 p-0.5 rounded">
+            <button
+              onClick={() => {
+                if (isRunning) {
+                  addToast('Stop bot before switching engines', 'warning');
+                  return;
+                }
+                setEngineMode('dreammaker');
+              }}
+              disabled={isRunning}
+              className={`px-2 py-1 rounded text-xs font-bold transition-all ${
+                engineMode === 'dreammaker'
+                  ? 'bg-purple-600 text-white'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              DreamMaker
+            </button>
+            <button
+              onClick={() => {
+                if (isRunning) {
+                  addToast('Stop bot before switching engines', 'warning');
+                  return;
+                }
+                setEngineMode('simple');
+              }}
+              disabled={isRunning}
+              className={`px-2 py-1 rounded text-xs font-bold transition-all ${
+                engineMode === 'simple'
+                  ? 'bg-cyan-600 text-white'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Zap size={10} className="inline mr-0.5" />
+              Simple
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="p-4 space-y-4 flex-1 overflow-y-auto custom-scrollbar">
-        {/* Strategy Selector */}
-        <div className="space-y-2">
-          <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">Strategy</label>
-          <div className="relative">
-            <select 
-              value={activeStrategyId}
-              onChange={(e) => setActiveStrategyId(e.target.value)}
-              disabled={isRunning}
-              className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm appearance-none outline-none focus:border-cyan-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <option value="">Select Strategy...</option>
-              {strategies.map(s => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
-            </select>
-            <Settings className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={16} />
-          </div>
-          
-          {activeStrategy && (
-            <div className="bg-slate-900/30 rounded-lg p-3 text-xs space-y-1">
-              <p className="text-slate-300">{activeStrategy.description}</p>
-              <div className="flex flex-wrap gap-2 pt-2">
-                <span className="bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded text-[10px]">
-                  Risk: {activeStrategy.params.stopLossPercent}%
-                </span>
-                <span className="bg-green-500/20 text-green-300 px-2 py-0.5 rounded text-[10px]">
-                  Target: {activeStrategy.params.takeProfitPercent}%
-                </span>
-              </div>
+        {/* Engine-specific Configuration */}
+        {engineMode === 'dreammaker' ? (
+          /* DreamMaker Strategy Selector */
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">Strategy</label>
+            <div className="relative">
+              <select 
+                value={activeStrategyId}
+                onChange={(e) => setActiveStrategyId(e.target.value)}
+                disabled={isRunning}
+                className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm appearance-none outline-none focus:border-cyan-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <option value="">Select Strategy...</option>
+                {strategies.map(s => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+              <Settings className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={16} />
             </div>
-          )}
-        </div>
+            
+            {activeStrategy && (
+              <div className="bg-slate-900/30 rounded-lg p-3 text-xs space-y-1">
+                <p className="text-slate-300">{activeStrategy.description}</p>
+                <div className="flex flex-wrap gap-2 pt-2">
+                  <span className="bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded text-[10px]">
+                    Risk: {activeStrategy.params.stopLossPercent}%
+                  </span>
+                  <span className="bg-green-500/20 text-green-300 px-2 py-0.5 rounded text-[10px]">
+                    Target: {activeStrategy.params.takeProfitPercent}%
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Feature 2.1.2: Simple Engine Configuration */
+          <div className="space-y-3 bg-cyan-500/5 border border-cyan-500/20 rounded-xl p-4">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-cyan-300 uppercase tracking-wider">Simple Mode Settings</label>
+              <button
+                onClick={() => setShowSimpleConfig(!showSimpleConfig)}
+                className="text-xs text-slate-400 hover:text-white transition-colors"
+              >
+                {showSimpleConfig ? 'Collapse' : 'Expand'}
+              </button>
+            </div>
+            
+            {!showSimpleConfig ? (
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="bg-white/5 px-2 py-1.5 rounded"><span className="text-slate-400">Confidence:</span> <span className="text-white font-mono ml-1">{simpleEngineConfig.minConfidence}%</span></div>
+                <div className="bg-white/5 px-2 py-1.5 rounded"><span className="text-slate-400">Max Pos:</span> <span className="text-white font-mono ml-1">{simpleEngineConfig.maxPositions}</span></div>
+                <div className="bg-white/5 px-2 py-1.5 rounded"><span className="text-slate-400">Risk:</span> <span className="text-white font-mono ml-1">{simpleEngineConfig.riskPerTrade}%</span></div>
+                <div className="bg-white/5 px-2 py-1.5 rounded"><span className="text-slate-400">SL/TP:</span> <span className="text-white font-mono ml-1">{simpleEngineConfig.stopLoss}/{simpleEngineConfig.takeProfit}%</span></div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs text-slate-400 block mb-1.5">Min Confidence (%)</label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={simpleEngineConfig.minConfidence}
+                    onChange={(e) => setSimpleEngineConfig({...simpleEngineConfig, minConfidence: parseInt(e.target.value)})}
+                    disabled={isRunning}
+                    className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                  />
+                  <div className="text-xs text-white font-mono mt-1 text-right">{simpleEngineConfig.minConfidence}%</div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-xs text-slate-400 block mb-1">Max Positions</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="10"
+                      value={simpleEngineConfig.maxPositions}
+                      onChange={(e) => setSimpleEngineConfig({...simpleEngineConfig, maxPositions: parseInt(e.target.value)})}
+                      disabled={isRunning}
+                      className="w-full bg-white/5 border border-white/10 rounded px-2 py-1.5 text-white text-xs disabled:opacity-50"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-slate-400 block mb-1">Risk/Trade (%)</label>
+                    <input
+                      type="number"
+                      min="0.5"
+                      max="5"
+                      step="0.5"
+                      value={simpleEngineConfig.riskPerTrade}
+                      onChange={(e) => setSimpleEngineConfig({...simpleEngineConfig, riskPerTrade: parseFloat(e.target.value)})}
+                      disabled={isRunning}
+                      className="w-full bg-white/5 border border-white/10 rounded px-2 py-1.5 text-white text-xs disabled:opacity-50"
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-xs text-slate-400 block mb-1">Stop Loss (%)</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="10"
+                      value={simpleEngineConfig.stopLoss}
+                      onChange={(e) => setSimpleEngineConfig({...simpleEngineConfig, stopLoss: parseFloat(e.target.value)})}
+                      disabled={isRunning}
+                      className="w-full bg-white/5 border border-white/10 rounded px-2 py-1.5 text-white text-xs disabled:opacity-50"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-slate-400 block mb-1">Take Profit (%)</label>
+                    <input
+                      type="number"
+                      min="2"
+                      max="20"
+                      value={simpleEngineConfig.takeProfit}
+                      onChange={(e) => setSimpleEngineConfig({...simpleEngineConfig, takeProfit: parseFloat(e.target.value)})}
+                      disabled={isRunning}
+                      className="w-full bg-white/5 border border-white/10 rounded px-2 py-1.5 text-white text-xs disabled:opacity-50"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Feature 2.3.1 & 2.3.3: Trailing Stop Configuration */}
+        {engineMode === 'dreammaker' && (
+          <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Shield className="text-yellow-400" size={16} />
+                <label className="text-xs font-bold text-yellow-300 uppercase tracking-wider">Trailing Stop</label>
+              </div>
+              <button
+                onClick={() => setTrailingStopEnabled(!trailingStopEnabled)}
+                disabled={isRunning}
+                className={`relative w-12 h-6 rounded-full transition-all ${
+                  trailingStopEnabled 
+                    ? 'bg-yellow-500' 
+                    : 'bg-white/10'
+                }`}
+              >
+                <div
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
+                    trailingStopEnabled ? 'translate-x-6' : ''
+                  }`}
+                />
+              </button>
+            </div>
+            
+            {trailingStopEnabled && (
+              <div>
+                <label className="text-xs text-slate-400 block mb-1.5">Trail Distance (%)</label>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  step="0.5"
+                  value={trailingStopPercent}
+                  onChange={(e) => setTrailingStopPercent(parseFloat(e.target.value))}
+                  disabled={isRunning}
+                  className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-yellow-500"
+                />
+                <div className="flex justify-between items-center mt-1">
+                  <span className="text-xs text-white font-mono">{trailingStopPercent}%</span>
+                  <span className="text-[10px] text-slate-500">Protects profit automatically</span>
+                </div>
+              </div>
+            )}
+            
+            {openPosition && trailingStopEnabled && isRunning && (
+              <div className="bg-yellow-500/10 rounded-lg p-2 text-xs">
+                <div className="flex items-center gap-1 text-yellow-400 mb-1">
+                  <Shield size={12} />
+                  <span className="font-bold">Active Protection</span>
+                </div>
+                <div className="text-slate-300">
+                  Trailing {trailingStopPercent}% behind peak price
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Performance Metrics */}
         <div className="space-y-2">

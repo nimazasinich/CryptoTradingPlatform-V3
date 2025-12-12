@@ -1,11 +1,12 @@
 
 import React, { useState, Suspense, lazy, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar/Sidebar';
-import { Menu, Zap } from 'lucide-react';
+import { Menu, Zap, Bell } from 'lucide-react';
 import { AppProvider } from './context/AppContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { databaseService } from './services/database';
 import { backgroundTasks } from './services/backgroundTasks';
+import { riskService } from './services/riskService';
 
 // Lazy Load Views
 const Dashboard = lazy(() => import('./views/Dashboard'));
@@ -40,6 +41,7 @@ const PagePlaceholder = ({ title }: { title: string }) => (
 function AppContent() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState('/');
+  const [activeAlerts, setActiveAlerts] = useState(0);
 
   // Initialize DB and Background Tasks
   useEffect(() => {
@@ -52,6 +54,19 @@ function AppContent() {
     return () => {
       backgroundTasks.stop();
     };
+  }, []);
+
+  // Feature 1.2.2: Count active alerts for indicator
+  useEffect(() => {
+    const updateAlertCount = () => {
+      const alerts = riskService.getAlerts().filter(a => a.active);
+      setActiveAlerts(alerts.length);
+    };
+    
+    updateAlertCount();
+    const interval = setInterval(updateAlertCount, 5000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   const renderContent = () => {
@@ -112,12 +127,25 @@ function AppContent() {
       <div className="flex-1 flex flex-col min-h-screen relative overflow-hidden transition-all duration-300">
         <div className="md:hidden flex items-center justify-between p-4 border-b border-white/5 bg-slate-950/80 backdrop-blur-md sticky top-0 z-30">
           <div className="font-bold text-lg text-gradient">CryptoOne</div>
-          <button 
-            onClick={() => setIsMobileOpen(true)}
-            className="p-2 rounded-lg bg-white/5 text-slate-300"
-          >
-            <Menu size={24} />
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Feature 1.2.2: Alert Status Indicator */}
+            {activeAlerts > 0 && (
+              <button
+                onClick={() => setCurrentPath('/risk')}
+                className="relative flex items-center gap-1.5 px-2 py-1 rounded-lg bg-yellow-500/10 border border-yellow-500/20"
+                title={`${activeAlerts} active price alert${activeAlerts > 1 ? 's' : ''}`}
+              >
+                <Bell size={14} className="text-yellow-400 animate-pulse" />
+                <span className="text-xs font-bold text-yellow-400">{activeAlerts}</span>
+              </button>
+            )}
+            <button 
+              onClick={() => setIsMobileOpen(true)}
+              className="p-2 rounded-lg bg-white/5 text-slate-300"
+            >
+              <Menu size={24} />
+            </button>
+          </div>
         </div>
 
         <main className="flex-1 overflow-y-auto p-4 md:p-8 relative custom-scrollbar">

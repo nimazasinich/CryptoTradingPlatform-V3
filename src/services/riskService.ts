@@ -141,17 +141,46 @@ class RiskService {
   async checkAlerts() {
     const alerts = this.getAlerts().filter(a => a.active);
     for (const alert of alerts) {
+      // Check if this alert was already triggered recently (last hour)
+      const lastTriggered = (alert as any).lastTriggered || 0;
+      if (Date.now() - lastTriggered < 3600000) {
+        continue; // Skip to avoid spam
+      }
+      
       const rate = await marketService.getRate(`${alert.symbol}/USDT`);
       if (!rate) continue;
       
       const current = rate.price;
+      let triggered = false;
+      let message = '';
+      
       if (alert.condition === 'above' && current >= alert.price) {
-        // Trigger
-        console.log(`ALERT: ${alert.symbol} is above ${alert.price}`);
-        // In a real app, send push notification
+        triggered = true;
+        message = `${alert.symbol} is above $${alert.price.toLocaleString()} (Current: $${current.toLocaleString()})`;
       } else if (alert.condition === 'below' && current <= alert.price) {
-        // Trigger
-        console.log(`ALERT: ${alert.symbol} is below ${alert.price}`);
+        triggered = true;
+        message = `${alert.symbol} is below $${alert.price.toLocaleString()} (Current: $${current.toLocaleString()})`;
+      }
+      
+      if (triggered) {
+        // Emit custom event for app to handle
+        if (typeof window !== 'undefined' && window.dispatchEvent) {
+          window.dispatchEvent(new CustomEvent('priceAlert', {
+            detail: {
+              symbol: alert.symbol,
+              price: current,
+              condition: alert.condition,
+              targetPrice: alert.price,
+              message,
+              alertId: alert.id
+            }
+          }));
+        }
+        
+        // Update last triggered time
+        (alert as any).lastTriggered = Date.now();
+        
+        console.log(`🔔 ALERT TRIGGERED: ${message}`);
       }
     }
   }

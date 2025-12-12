@@ -1,12 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
-import { Bot, LineChart, Search, BrainCircuit, RefreshCw, Filter, TrendingUp } from 'lucide-react';
+import { Bot, LineChart, Search, BrainCircuit, RefreshCw, Filter, TrendingUp, Bell, BellOff } from 'lucide-react';
 import { SignalCard } from '../components/AI/SignalCard';
 import { MarketScanner } from '../components/AI/MarketScanner';
 import { BacktestPanel } from '../components/AI/BacktestPanel';
 import { StrategyBuilder } from '../components/AI/StrategyBuilder';
 import { aiService } from '../services/aiService';
 import { AISignal } from '../types';
+import { useSignalUpdates } from '../hooks/useWebSocket';
+import { useApp } from '../context/AppContext';
 
 const TABS = [
   { id: 'signals', label: 'AI Signals', icon: Bot },
@@ -22,6 +24,7 @@ interface AILabProps {
 }
 
 export default function AILab({ defaultTab = 'signals' }: AILabProps) {
+  const { addToast } = useApp();
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [signals, setSignals] = useState<AISignal[]>([]);
   const [loading, setLoading] = useState(false);
@@ -29,6 +32,12 @@ export default function AILab({ defaultTab = 'signals' }: AILabProps) {
   const [minConfidence, setMinConfidence] = useState(0);
   const [signalTypeFilter, setSignalTypeFilter] = useState<'ALL' | 'BUY' | 'SELL'>('ALL');
   const [showFilters, setShowFilters] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(() => {
+    const saved = localStorage.getItem('aiLabNotifications');
+    return saved !== 'false'; // Default to true
+  });
+  const [newSignalIds, setNewSignalIds] = useState<Set<string>>(new Set());
+  const [lastNotificationTime, setLastNotificationTime] = useState(0);
 
   useEffect(() => {
     if (activeTab === 'signals') {
@@ -129,6 +138,65 @@ export default function AILab({ defaultTab = 'signals' }: AILabProps) {
     return true;
   });
 
+  // Feature 1.1.3: Real-time signal notifications via WebSocket
+  useSignalUpdates((data) => {
+    try {
+      if (data && data.signal) {
+        const signal = data.signal;
+        
+        // Rate limiting: Max 1 notification per minute
+        const now = Date.now();
+        if (now - lastNotificationTime < 60000) {
+          console.log('Notification rate limited');
+          return;
+        }
+        
+        if (data.action === 'new') {
+          // Add new signal to the list
+          setSignals(prev => {
+            // Avoid duplicates
+            if (prev.some(s => s.id === signal.id)) return prev;
+            return [signal, ...prev];
+          });
+          
+          // Mark as new for visual feedback
+          setNewSignalIds(prev => new Set([...prev, signal.id]));
+          setTimeout(() => {
+            setNewSignalIds(prev => {
+              const updated = new Set(prev);
+              updated.delete(signal.id);
+              return updated;
+            });
+          }, 10000); // Remove "new" badge after 10 seconds
+          
+          // Show toast notification
+          if (notificationsEnabled && activeTab === 'signals') {
+            addToast(
+              `New ${signal.type} signal for ${signal.symbol}! Confidence: ${signal.confidence}%`,
+              'info',
+              5000
+            );
+            setLastNotificationTime(now);
+          }
+        }
+        
+        if (data.action === 'update') {
+          // Update existing signal
+          setSignals(prev => prev.map(s => 
+            s.id === signal.id ? signal : s
+          ));
+        }
+      }
+    } catch (error) {
+      console.error('Signal update error:', error);
+    }
+  }, notificationsEnabled && activeTab === 'signals');
+
+  // Save notification preference
+  useEffect(() => {
+    localStorage.setItem('aiLabNotifications', String(notificationsEnabled));
+  }, [notificationsEnabled]);
+
   return (
     <div className="space-y-6 pb-20 animate-fade-in">
       <div className="flex flex-col gap-2">
@@ -184,6 +252,20 @@ export default function AILab({ defaultTab = 'signals' }: AILabProps) {
                 >
                   <Filter size={16} />
                   Filters
+                </button>
+                
+                {/* Notifications Toggle */}
+                <button
+                  onClick={() => setNotificationsEnabled(!notificationsEnabled)}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                    notificationsEnabled 
+                      ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' 
+                      : 'bg-white/5 text-slate-400 border border-white/10 hover:text-white hover:bg-white/10'
+                  }`}
+                  title={notificationsEnabled ? "Disable signal notifications" : "Enable signal notifications"}
+                >
+                  {notificationsEnabled ? <Bell size={16} /> : <BellOff size={16} />}
+                  <span className="hidden sm:inline">Alerts</span>
                 </button>
               </div>
 
@@ -253,7 +335,16 @@ export default function AILab({ defaultTab = 'signals' }: AILabProps) {
                 </div>
               ) : (
                 filteredSignals.map((signal, index) => (
-                  <div key={signal.id} style={{ animationDelay: `${index * 50}ms` }} className="animate-fade-in">
+                  <div 
+                    key={signal.id} 
+                    style={{ animationDelay: `${index * 50}ms` }} 
+                    className={`animate-fade-in relative ${newSignalIds.has(signal.id) ? 'ring-2 ring-cyan-400/50 rounded-xl' : ''}`}
+                  >
+                    {newSignalIds.has(signal.id) && (
+                      <div className="absolute -top-2 -right-2 z-10 bg-cyan-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-pulse">
+                        NEW
+                      </div>
+                    )}
                     <SignalCard signal={signal} />
                   </div>
                 ))

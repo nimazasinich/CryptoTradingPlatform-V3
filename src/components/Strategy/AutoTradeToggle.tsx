@@ -2,19 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { Power, Activity, AlertCircle } from 'lucide-react';
 import { autoTradeService } from '../../services/autoTradeService';
 
-export function AutoTradeToggle() {
+interface AutoTradeToggleProps {
+  onStatusChange?: (enabled: boolean) => void;
+}
+
+export function AutoTradeToggle({ onStatusChange }: AutoTradeToggleProps = {}) {
   const [enabled, setEnabled] = useState(false);
   const [status, setStatus] = useState<'idle' | 'active' | 'error'>('idle');
   
   useEffect(() => {
     const interval = setInterval(() => {
       const state = autoTradeService.getState();
-      setEnabled(state.enabled);
-      setStatus(state.enabled ? 'active' : 'idle');
+      const isEnabled = state.enabled;
+      setEnabled(isEnabled);
+      setStatus(isEnabled ? 'active' : 'idle');
+      onStatusChange?.(isEnabled);
     }, 1000);
     
     return () => clearInterval(interval);
-  }, []);
+  }, [onStatusChange]);
   
   const handleToggle = async () => {
     try {
