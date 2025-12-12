@@ -190,7 +190,7 @@ export default function MarketAnalysis() {
             </div>
 
             {loading || !taData ? (
-               <div className="glass-card p-12 text-center animate-pulse">
+               <div className="glass-card p-12 text-center motion-safe:animate-pulse">
                  Calculating Technical Indicators...
                </div>
             ) : (

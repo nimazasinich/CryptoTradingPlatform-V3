@@ -296,11 +296,11 @@ export const AutoTradingPanel = ({ symbol }: { symbol: string }) => {
         <motion.div
           animate={{ scale: isRunning ? [1, 1.1, 1] : 1 }}
           transition={{ repeat: isRunning ? Infinity : 0, duration: 2 }}
-          className={`px-3 py-1 rounded-lg text-xs font-bold uppercase flex items-center gap-1.5 ${
+          className={`px-3 py-1 rounded-lg text-xs font-bold uppercase flex items-center gap-1.5 motion-reduce:transition-none ${
             isRunning ? 'bg-green-500/20 text-green-400' : 'bg-slate-500/20 text-slate-300'
           }`}
         >
-          <div className={`w-2 h-2 rounded-full ${isRunning ? 'bg-green-400 animate-pulse' : 'bg-slate-400'}`} />
+          <div className={`w-2 h-2 rounded-full ${isRunning ? 'bg-green-400 motion-safe:animate-pulse' : 'bg-slate-300'}`} />
           {isRunning ? 'Active' : 'Inactive'}
         </motion.div>
       </div>
@@ -341,11 +341,11 @@ export const AutoTradingPanel = ({ symbol }: { symbol: string }) => {
 
         {/* Performance Metrics */}
         <div className="space-y-2">
-          <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center">
             <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">Performance</label>
             <button
               onClick={resetMetrics}
-              className="text-[10px] text-slate-500 hover:text-white transition-colors"
+              className="text-[10px] text-slate-300 hover:text-white transition-colors rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-950"
             >
               Reset
             </button>
@@ -482,7 +482,7 @@ export const AutoTradingPanel = ({ symbol }: { symbol: string }) => {
           <button
             onClick={toggleBot}
             disabled={!activeStrategyId}
-            className={`w-full py-4 rounded-xl font-bold text-white shadow-lg flex items-center justify-center gap-2 transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
+            className={`w-full py-4 rounded-xl font-bold text-white shadow-lg flex items-center justify-center gap-2 transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-950 ${
               isRunning 
                 ? 'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 shadow-red-900/30' 
                 : 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 shadow-cyan-900/30'
@@ -501,7 +501,7 @@ export const AutoTradingPanel = ({ symbol }: { symbol: string }) => {
             )}
           </button>
 
-          <p className="text-[10px] text-center text-slate-500 italic">
+          <p className="text-[10px] text-center text-slate-300 italic">
             {isRunning ? '⚠️ Bot is monitoring and will execute trades automatically' : 'Select a strategy and click Run to start'}
           </p>
         </div>

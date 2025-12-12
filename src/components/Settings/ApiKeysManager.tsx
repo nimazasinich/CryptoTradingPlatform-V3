@@ -79,7 +79,7 @@ export const ApiKeysManager = ({ apiKeys, onUpdate }: Props) => {
         </div>
         <button 
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors text-sm font-semibold"
+          className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-950"
         >
           <Plus size={16} /> {showForm ? 'Cancel' : 'Create New Key'}
         </button>
@@ -123,7 +123,7 @@ export const ApiKeysManager = ({ apiKeys, onUpdate }: Props) => {
             />
           </div>
           <div className="flex justify-end gap-3 mt-6">
-            <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 border border-white/10 rounded-lg text-slate-300 hover:bg-white/5 transition-colors">
+            <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 border border-white/10 rounded-lg text-slate-300 hover:bg-white/5 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-950">
               Cancel
             </button>
             <button type="submit" disabled={isSaving} className="btn-primary">

@@ -153,7 +153,8 @@ export function Sidebar({ isMobileOpen, setIsMobileOpen, currentPath, onNavigate
         className={cn(
           "fixed md:static inset-y-0 left-0 z-50 flex flex-col h-screen",
           "bg-slate-950 border-r border-white/5",
-          "text-slate-300 shadow-2xl shadow-black/50"
+          "text-slate-300 shadow-2xl shadow-black/50",
+          "motion-reduce:transition-none"
         )}
       >
         {/* Header */}
@@ -183,7 +184,7 @@ export function Sidebar({ isMobileOpen, setIsMobileOpen, currentPath, onNavigate
           
           <button 
             onClick={() => setIsMobileOpen(false)}
-            className="md:hidden p-1.5 rounded-lg hover:bg-white/10 text-slate-300"
+            className="md:hidden p-1.5 rounded-lg hover:bg-white/10 text-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-950"
           >
             <X size={20} />
           </button>
@@ -202,6 +203,7 @@ export function Sidebar({ isMobileOpen, setIsMobileOpen, currentPath, onNavigate
                   onClick={() => item.subItems ? toggleSubmenu(item.id) : handleNavigate(item.path!)}
                   className={cn(
                     "w-full flex items-center gap-4 px-3 py-3 rounded-xl transition-all duration-200 relative",
+                    "focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-950",
                     isActive ? "bg-white/5 text-white" : "text-slate-300 hover:text-white hover:bg-white/5",
                     isCollapsed ? "justify-center" : "justify-between"
                   )}
@@ -249,7 +251,8 @@ export function Sidebar({ isMobileOpen, setIsMobileOpen, currentPath, onNavigate
                               onClick={() => handleNavigate(sub.path)}
                               className={cn(
                                 "w-full text-left px-3 py-2 text-sm rounded-lg transition-colors block border-l border-white/5",
-                                isSubActive ? "border-purple-500 text-purple-200 bg-purple-500/10" : "text-slate-500 hover:text-slate-300 hover:bg-white/5 hover:border-white/20"
+                                "focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-950",
+                                isSubActive ? "border-purple-500 text-purple-200 bg-purple-500/10" : "text-slate-300 hover:text-white hover:bg-white/5 hover:border-white/20"
                               )}
                             >
                               {sub.label}
@@ -272,6 +275,7 @@ export function Sidebar({ isMobileOpen, setIsMobileOpen, currentPath, onNavigate
                onClick={() => setIsWalletConnected(!isWalletConnected)}
                className={cn(
                  "w-full py-2.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg",
+                 "focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-950",
                  isWalletConnected 
                    ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-green-900/20" 
                    : "bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:shadow-purple-900/40"
@@ -281,7 +285,10 @@ export function Sidebar({ isMobileOpen, setIsMobileOpen, currentPath, onNavigate
                {isWalletConnected ? '0x84...9A2' : 'Connect Wallet'}
              </button>
            ) : (
-             <button className="w-full flex justify-center p-2 rounded-xl bg-purple-600/20 text-purple-400 hover:bg-purple-600 hover:text-white transition-all">
+             <button 
+               onClick={() => setIsWalletConnected(!isWalletConnected)}
+               className="w-full flex justify-center p-2 rounded-xl bg-purple-600/20 text-purple-400 hover:bg-purple-600 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-950"
+             >
                 <Wallet size={20} />
              </button>
            )}
@@ -294,7 +301,7 @@ export function Sidebar({ isMobileOpen, setIsMobileOpen, currentPath, onNavigate
                <div className="flex items-center gap-3">
                  <div className="relative flex h-2.5 w-2.5">
                    {showPing && (
-                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                     <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                    )}
                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
                  </div>

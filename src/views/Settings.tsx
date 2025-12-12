@@ -198,7 +198,7 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
     }
   };
 
-  if (isLoading || !profile) return <div className="flex h-screen items-center justify-center"><div className="animate-spin w-8 h-8 border-4 border-purple-500 rounded-full border-t-transparent" /></div>;
+  if (isLoading || !profile) return <div className="flex h-screen items-center justify-center"><div className="motion-safe:animate-spin w-8 h-8 border-4 border-purple-500 rounded-full border-t-transparent" /></div>;
 
   return (
     <div className="max-w-7xl mx-auto pb-20 animate-fade-in">
@@ -632,7 +632,7 @@ export default function Settings({ defaultTab }: { defaultTab?: string }) {
                     <p className="text-sm text-slate-300 mt-1">Primary data source connection</p>
                   </div>
                   <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-500/10 border border-green-500/20 rounded-full text-green-400 text-xs font-bold">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                    <div className="w-2 h-2 bg-green-500 rounded-full motion-safe:animate-pulse" />
                     Connected
                   </div>
                 </div>

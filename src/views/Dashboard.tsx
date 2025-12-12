@@ -64,14 +64,14 @@ const Sparkline = ({ data, color, isPositive }: { data: number[], color: string,
 const SkeletonCard = () => (
   <div className="glass-card p-6 h-[180px] flex flex-col justify-between relative overflow-hidden bg-white/5 border border-white/5">
     <div className="flex justify-between items-start">
-      <div className="w-12 h-12 rounded-2xl bg-white/5 animate-pulse" />
-      <div className="w-20 h-6 rounded-full bg-white/5 animate-pulse" />
+      <div className="w-12 h-12 rounded-2xl bg-white/5 motion-safe:animate-pulse" />
+      <div className="w-20 h-6 rounded-full bg-white/5 motion-safe:animate-pulse" />
     </div>
     <div className="space-y-3 mt-4">
-      <div className="w-24 h-4 rounded bg-white/5 animate-pulse" />
-      <div className="w-32 h-10 rounded bg-white/5 animate-pulse" />
+      <div className="w-24 h-4 rounded bg-white/5 motion-safe:animate-pulse" />
+      <div className="w-32 h-10 rounded bg-white/5 motion-safe:animate-pulse" />
     </div>
-    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-12 animate-shimmer" />
+    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-12 motion-safe:animate-shimmer" />
   </div>
 );
 

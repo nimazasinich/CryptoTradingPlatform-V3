@@ -157,7 +157,7 @@ export const PriceTicker = () => {
   }, []);
 
   if (loading || coins.length === 0) return (
-    <div className="w-full py-4 text-center text-slate-500 text-xs font-mono animate-pulse">
+    <div className="w-full py-4 text-center text-slate-300 text-xs font-mono motion-safe:animate-pulse">
       Loading Market Data...
     </div>
   );
@@ -167,7 +167,7 @@ export const PriceTicker = () => {
       <div className="absolute top-0 left-0 w-32 h-full bg-gradient-to-r from-slate-950 to-transparent z-10 pointer-events-none" />
       <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-slate-950 to-transparent z-10 pointer-events-none" />
 
-      <div className="flex animate-marquee hover:[animation-play-state:paused] w-max py-2">
+      <div className="flex motion-safe:animate-marquee hover:[animation-play-state:paused] w-max py-2">
         {coins.map((coin: CryptoPrice) => (
           // @ts-ignore - React key prop is handled internally
           <TickerItem key={`original-${coin.id || coin.symbol}`} coin={coin} />

@@ -192,7 +192,7 @@ export default function AILab({ defaultTab = 'signals' }: AILabProps) {
                 disabled={loading}
                 className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-lg font-medium text-sm transition-all hover:shadow-lg hover:shadow-purple-900/30"
               >
-                <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+                <RefreshCw size={16} className={loading ? 'motion-safe:animate-spin' : ''} />
                 Refresh
               </button>
             </div>

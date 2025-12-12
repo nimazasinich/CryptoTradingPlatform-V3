@@ -135,7 +135,7 @@ export const OrderBook = ({ symbol, currentPrice }: { symbol: string, currentPri
               Live
             </span>
           ) : useWebSocket ? (
-            <span className="text-[9px] text-yellow-400 bg-yellow-500/10 px-1.5 py-0.5 rounded border border-yellow-500/20 font-bold uppercase flex items-center gap-1 animate-pulse" title="Connecting...">
+            <span className="text-[9px] text-yellow-400 bg-yellow-500/10 px-1.5 py-0.5 rounded border border-yellow-500/20 font-bold uppercase flex items-center gap-1 motion-safe:animate-pulse" title="Connecting...">
               <WifiOff size={10} />
               Connecting
             </span>

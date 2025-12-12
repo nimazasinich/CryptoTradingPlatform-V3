@@ -213,21 +213,33 @@ export const OrderForm = ({ symbol, currentPrice }: { symbol: string, currentPri
         <div className="flex gap-6 text-sm font-medium text-slate-300 mb-5 px-1 shrink-0">
           <button 
             onClick={() => setOrderType('limit')}
-            className={cn("hover:text-white transition-colors relative", orderType === 'limit' && "text-purple-400")}
+            className={cn(
+              "hover:text-white transition-colors relative rounded px-2 py-1",
+              "focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-950",
+              orderType === 'limit' && "text-purple-400"
+            )}
           >
             Limit
             {orderType === 'limit' && <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-purple-500 rounded-full" />}
           </button>
           <button 
             onClick={() => { setOrderType('market'); setPrice('Market'); }}
-            className={cn("hover:text-white transition-colors relative", orderType === 'market' && "text-purple-400")}
+            className={cn(
+              "hover:text-white transition-colors relative rounded px-2 py-1",
+              "focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-950",
+              orderType === 'market' && "text-purple-400"
+            )}
           >
             Market
             {orderType === 'market' && <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-purple-500 rounded-full" />}
           </button>
           <button 
             onClick={() => setOrderType('stop-limit')}
-            className={cn("hover:text-white transition-colors relative", orderType === 'stop-limit' && "text-purple-400")}
+            className={cn(
+              "hover:text-white transition-colors relative rounded px-2 py-1",
+              "focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-950",
+              orderType === 'stop-limit' && "text-purple-400"
+            )}
           >
             Stop-Limit
             {orderType === 'stop-limit' && <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-purple-500 rounded-full" />}
@@ -300,8 +312,9 @@ export const OrderForm = ({ symbol, currentPrice }: { symbol: string, currentPri
                 onClick={() => handlePercentageClick(pct)}
                 className={cn(
                   "py-2 rounded-lg text-xs font-bold transition-all border",
+                  "focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-950",
                   selectedPercent === pct
-                    ? "bg-purple-500/30 border-purple-500 text-purple-200"
+                    ? "bg-purple-500/30 border-purple-500 text-purple-200 shadow-lg shadow-purple-500/20"
                     : "bg-white/5 border-white/5 hover:bg-purple-500/20 hover:border-purple-500/50 text-slate-300"
                 )}
               >
@@ -353,6 +366,7 @@ export const OrderForm = ({ symbol, currentPrice }: { symbol: string, currentPri
             disabled={!amount || isSubmitting}
             className={cn(
               "w-full py-3.5 rounded-xl font-bold text-white shadow-lg transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed",
+              "focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-950",
               side === 'buy' 
                 ? "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 shadow-green-900/20" 
                 : "bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 shadow-red-900/20"
@@ -360,7 +374,7 @@ export const OrderForm = ({ symbol, currentPrice }: { symbol: string, currentPri
           >
             {isSubmitting ? (
               <span className="flex items-center justify-center gap-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full motion-safe:animate-spin" />
                 Processing...
               </span>
             ) : (
