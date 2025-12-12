@@ -84,21 +84,21 @@ const TickerItem = ({ coin }: { coin: CryptoPrice }) => {
         flash === 'red' && "bg-red-500/10 opacity-100"
       )} />
 
-      <div className="flex flex-col justify-center relative z-10">
+      <div className="flex flex-col justify-center relative z-10 min-w-0">
         <div className="flex items-center gap-2.5 mb-1.5">
           <CoinIcon symbol={coin.symbol} size="sm" />
-          <span className="font-bold text-sm text-white uppercase tracking-tight">{coin.symbol}</span>
+          <span className="font-bold text-sm text-white uppercase tracking-tight truncate">{coin.symbol}</span>
         </div>
         <div className="flex items-baseline gap-2">
           <span className={cn(
-            "font-mono text-base font-bold transition-colors duration-300",
+            "font-mono text-base font-bold transition-colors duration-300 truncate",
              flash === 'green' ? "text-green-400" : flash === 'red' ? "text-red-400" : "text-white"
           )}>
             {formatPrice(coin.current_price)}
           </span>
         </div>
-        <div className={cn("flex items-center text-[10px] font-bold mt-0.5", isPositive ? "text-green-400" : "text-red-400")}>
-          {isPositive ? <TrendingUp size={10} className="mr-1" /> : <TrendingDown size={10} className="mr-1" />}
+        <div className={cn("flex items-center text-[10px] font-bold mt-0.5 whitespace-nowrap", isPositive ? "text-green-400" : "text-red-400")}>
+          {isPositive ? <TrendingUp size={10} className="mr-1 flex-shrink-0" /> : <TrendingDown size={10} className="mr-1 flex-shrink-0" />}
           {Math.abs(priceChange).toFixed(2)}%
         </div>
       </div>

@@ -56,12 +56,12 @@ export const SentimentGauge = () => {
     <div className="glass-card p-5 h-full flex flex-col relative overflow-hidden group">
       {/* Header */}
       <div className="flex justify-between items-start z-10">
-        <div>
-          <h3 className="font-bold text-white flex items-center gap-2">
-            <Zap className="w-4 h-4 text-purple-400" fill="currentColor" />
-            Market Sentiment
+        <div className="min-w-0 flex-1">
+          <h3 className="font-bold text-white flex items-center gap-2 truncate">
+            <Zap className="w-4 h-4 text-purple-400 flex-shrink-0" fill="currentColor" />
+            <span className="truncate">Market Sentiment</span>
           </h3>
-          <p className="text-xs text-slate-300 mt-1">Fear & Greed Index</p>
+          <p className="text-xs text-slate-300 mt-1 truncate">Fear & Greed Index</p>
         </div>
         <div className="flex gap-1">
            <button className="p-1.5 hover:bg-white/10 rounded-lg transition-colors text-slate-300 hover:text-white">
@@ -156,11 +156,11 @@ export const SentimentGauge = () => {
         </div>
 
         {/* Status Text - Better positioning and sizing */}
-        <div className="text-center mt-8 space-y-1.5">
-          <div className={cn("text-xl font-black uppercase tracking-[0.2em] drop-shadow-md", colorClass)}>
+        <div className="text-center mt-8 space-y-1.5 px-2">
+          <div className={cn("text-xl font-black uppercase tracking-[0.2em] drop-shadow-md break-words", colorClass)}>
             {status}
           </div>
-          <div className="text-[11px] text-slate-500 font-medium">
+          <div className="text-[11px] text-slate-500 font-medium whitespace-nowrap">
             Updated: <span className="text-slate-300">Just now</span>
           </div>
         </div>

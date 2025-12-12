@@ -170,8 +170,8 @@ const StatCard = ({
         </div>
 
         <div className="space-y-1 z-10 relative">
-          <h3 className="text-slate-300 text-sm font-medium uppercase tracking-wider">{title}</h3>
-          <div className="text-3xl font-bold text-white tracking-tight drop-shadow-md">
+          <h3 className="text-slate-300 text-sm font-medium uppercase tracking-wider truncate">{title}</h3>
+          <div className="text-3xl font-bold text-white tracking-tight drop-shadow-md break-words overflow-hidden">
             {prefix}{displayValue}{suffix}
           </div>
         </div>

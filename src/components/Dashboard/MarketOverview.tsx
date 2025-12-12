@@ -61,12 +61,12 @@ const CoinRow = ({ coin, rank, type }: { coin: CryptoPrice; rank: number; type: 
         isGainer ? "bg-green-500/10" : "bg-red-500/10"
       )} />
       
-      <div className="flex items-center gap-3 relative z-10">
-        <span className="text-slate-500 text-sm font-mono w-4">{rank}</span>
+      <div className="flex items-center gap-3 relative z-10 min-w-0 flex-1">
+        <span className="text-slate-500 text-sm font-mono w-4 flex-shrink-0">{rank}</span>
         <CoinIcon symbol={coin.symbol} size="md" />
-        <div>
-          <div className="font-bold text-sm text-white group-hover:text-purple-400 transition-colors">{coin.symbol.toUpperCase()}</div>
-          <div className="text-xs text-slate-500 group-hover:text-slate-300 transition-colors">{coin.name}</div>
+        <div className="min-w-0 flex-1">
+          <div className="font-bold text-sm text-white group-hover:text-purple-400 transition-colors truncate">{coin.symbol.toUpperCase()}</div>
+          <div className="text-xs text-slate-500 group-hover:text-slate-300 transition-colors truncate">{coin.name}</div>
         </div>
       </div>
       <div className="text-right relative z-10">
@@ -97,13 +97,13 @@ const VolumeRow = ({ coin, rank, maxVolume }: { coin: CryptoPrice; rank: number;
       {/* Hover Glow Background */}
       <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-cyan-500/5 blur-sm" />
       
-      <div className="flex items-center justify-between mb-3 relative z-10">
-        <div className="flex items-center gap-3">
-          <span className="text-slate-500 text-sm font-mono w-4 group-hover:text-slate-300 transition-colors">{rank}</span>
+      <div className="flex items-center justify-between mb-3 relative z-10 gap-2">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <span className="text-slate-500 text-sm font-mono w-4 group-hover:text-slate-300 transition-colors flex-shrink-0">{rank}</span>
           <CoinIcon symbol={coin.symbol} size="md" />
-          <span className="font-bold text-base text-white group-hover:text-cyan-300 transition-colors">{coin.symbol.toUpperCase()}</span>
+          <span className="font-bold text-base text-white group-hover:text-cyan-300 transition-colors truncate">{coin.symbol.toUpperCase()}</span>
         </div>
-        <span className="font-mono text-sm text-cyan-400 font-bold group-hover:text-cyan-300 transition-colors">
+        <span className="font-mono text-sm text-cyan-400 font-bold group-hover:text-cyan-300 transition-colors flex-shrink-0 whitespace-nowrap">
           ${formatCompactNumber(coin.total_volume)}
         </span>
       </div>
