@@ -194,19 +194,33 @@ export const formatDataForExport = (data: any[]): any[] => {
 /**
  * Copy table data to clipboard
  */
-export const copyToClipboard = async (data: any[]): Promise<void> => {
-  if (data.length === 0) return;
+export const copyToClipboard = async (data: any[] | string): Promise<void> => {
+  let textToCopy: string;
 
-  const headers = Object.keys(data[0]);
-  const tsv = [
-    headers.join('\t'),
-    ...data.map(row => 
-      headers.map(h => row[h]).join('\t')
-    )
-  ].join('\n');
+  // If data is already a string, use it directly
+  if (typeof data === 'string') {
+    textToCopy = data;
+  } 
+  // If data is an array, convert to TSV format
+  else if (Array.isArray(data)) {
+    if (data.length === 0) return;
+
+    const headers = Object.keys(data[0]);
+    textToCopy = [
+      headers.join('\t'),
+      ...data.map(row => 
+        headers.map(h => row[h]).join('\t')
+      )
+    ].join('\n');
+  } 
+  // Invalid input
+  else {
+    console.error('Invalid data type for copyToClipboard');
+    return;
+  }
 
   try {
-    await navigator.clipboard.writeText(tsv);
+    await navigator.clipboard.writeText(textToCopy);
     console.log('Table data copied to clipboard');
   } catch (error) {
     console.error('Failed to copy to clipboard:', error);
