@@ -604,5 +604,194 @@ function VendorLockSection() {
         <h3 className="font-bold text-red-400 mb-2">Code Coupling Analysis</h3>
         <p className="text-slate-300 mb-3">Direct API calls found in:</p>
         <div className="space-y-2 text-sm font-mono">
-          <div className="bg-slate-900 p-2 rounded">src/services/marketService.ts:42 - Direct fetch()</div>
-          <div className="bg-slate-900 p-2 rounded">src/services/aiService.ts:18 - Direct fetch
+          <div className="bg-slate-900 p-2 rounded">src/services/marketService.ts:17 - HttpClient.get()</div>
+          <div className="bg-slate-900 p-2 rounded">src/services/aiService.ts:18 - HttpClient.get()</div>
+          <div className="bg-slate-900 p-2 rounded">src/services/newsService.ts - HttpClient.get()</div>
+          <div className="bg-slate-900 p-2 rounded">src/services/sentimentService.ts - HttpClient.get()</div>
+        </div>
+        <p className="text-slate-400 mt-3 text-sm">
+          All services use centralized HttpClient, but all point to single HuggingFace endpoint.
+          Refactoring to add fallback APIs would require updating each service individually.
+        </p>
+      </div>
+
+      <div className="bg-blue-900/20 border border-blue-500 rounded-lg p-4 mt-4">
+        <h3 className="font-bold text-blue-400 mb-2">Migration Effort</h3>
+        <div className="grid md:grid-cols-2 gap-3">
+          <div>
+            <h4 className="font-semibold text-sm mb-2">Easy Wins (1-2 hours)</h4>
+            <ul className="text-sm text-slate-300 space-y-1">
+              <li>• Add fallback API in httpClient.ts</li>
+              <li>• Implement retry with alternative endpoints</li>
+              <li>• Add API health monitoring</li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-semibold text-sm mb-2">Major Effort (8-16 hours)</h4>
+            <ul className="text-sm text-slate-300 space-y-1">
+              <li>• Migrate to CoinGecko/CoinMarketCap</li>
+              <li>• Update all data normalization code</li>
+              <li>• Self-host data aggregation service</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MockDataSection() {
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-purple-400">Mock Data Implementation Status</h2>
+      
+      <div className="bg-green-900/20 border border-green-500 rounded-lg p-4">
+        <h3 className="font-bold text-green-400 mb-2">✓ GOOD NEWS: App Already Has Mock Capabilities</h3>
+        <p className="text-slate-300">
+          The application architecture uses a service layer pattern with database caching. 
+          Most services gracefully fallback to cached data when APIs fail.
+        </p>
+      </div>
+
+      <div className="space-y-3">
+        <div className="bg-slate-900/50 border border-slate-600 rounded-lg p-4">
+          <h4 className="font-bold text-purple-300 mb-2">Market Data (marketService.ts)</h4>
+          <div className="text-sm space-y-2">
+            <div className="flex justify-between">
+              <span className="text-slate-400">Cache Implementation:</span>
+              <span className="text-green-400">✓ Excellent</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-400">Fallback Strategy:</span>
+              <span className="text-green-400">✓ Returns cached data</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-400">Mock Needed:</span>
+              <span className="text-yellow-400">Optional (has cache)</span>
+            </div>
+            <pre className="bg-slate-950 p-2 rounded text-xs overflow-x-auto mt-2">
+{`// Lines 11-14
+const cached = databaseService.getCachedResponse<MarketOverview>(cacheKey);
+if (cached) {
+  console.log('📦 Market overview from cache');
+  return cached;
+}`}
+            </pre>
+          </div>
+        </div>
+
+        <div className="bg-slate-900/50 border border-slate-600 rounded-lg p-4">
+          <h4 className="font-bold text-purple-300 mb-2">AI Signals (aiService.ts)</h4>
+          <div className="text-sm space-y-2">
+            <div className="flex justify-between">
+              <span className="text-slate-400">Cache Implementation:</span>
+              <span className="text-green-400">✓ Excellent</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-400">Fallback Strategy:</span>
+              <span className="text-green-400">✓ Database signals + Empty array</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-400">Mock Needed:</span>
+              <span className="text-green-400">No</span>
+            </div>
+            <pre className="bg-slate-950 p-2 rounded text-xs overflow-x-auto mt-2">
+{`// Lines 71-91
+catch (error) {
+  console.warn('AI Signals API unavailable, using cached signals', error);
+  const cached = databaseService.getSignals();
+  if (cached.length > 0) {
+    return cached.map(...);
+  }
+  return [];
+}`}
+            </pre>
+          </div>
+        </div>
+
+        <div className="bg-slate-900/50 border border-slate-600 rounded-lg p-4">
+          <h4 className="font-bold text-purple-300 mb-2">Trading & Portfolio</h4>
+          <div className="text-sm space-y-2">
+            <div className="flex justify-between">
+              <span className="text-slate-400">Implementation:</span>
+              <span className="text-green-400">✓ Fully Local</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-400">Database Storage:</span>
+              <span className="text-green-400">✓ SQLite (sql.js)</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-400">API Dependency:</span>
+              <span className="text-green-400">None</span>
+            </div>
+            <p className="text-slate-400 mt-2">
+              Positions, trades, and portfolio management work entirely offline using browser-based SQLite.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-yellow-900/20 border border-yellow-500 rounded-lg p-4">
+        <h3 className="font-bold text-yellow-400 mb-2">Recommendations</h3>
+        <ol className="list-decimal list-inside space-y-2 text-slate-300">
+          <li>
+            <strong>Pre-populate Cache:</strong> On first load, fetch data and cache aggressively (1-hour TTL)
+          </li>
+          <li>
+            <strong>Seed Database:</strong> Ship with pre-seeded market data for top 50 coins
+          </li>
+          <li>
+            <strong>Offline Mode Toggle:</strong> Let users manually enable "offline mode" to use cached-only data
+          </li>
+          <li>
+            <strong>Mock Data Generator:</strong> Add development utility to generate realistic mock data
+          </li>
+        </ol>
+      </div>
+
+      <div className="bg-blue-900/20 border border-blue-500 rounded-lg p-4">
+        <h3 className="font-bold text-blue-400 mb-3">Quick Mock Data Script</h3>
+        <pre className="bg-slate-950 p-3 rounded text-xs overflow-x-auto">
+{`// mockDataGenerator.ts
+export function generateMockMarketData() {
+  const coins = ['BTC', 'ETH', 'BNB', 'SOL', 'ADA'];
+  return coins.map((symbol, i) => ({
+    id: symbol.toLowerCase(),
+    symbol,
+    name: symbol,
+    current_price: Math.random() * 50000,
+    price_change_percentage_24h: (Math.random() - 0.5) * 10,
+    market_cap: Math.random() * 1e12,
+    total_volume: Math.random() * 1e10,
+    // ... other fields
+  }));
+}
+
+// Usage: databaseService.cacheApiResponse('/api/coins/top', generateMockMarketData(), 3600);`}
+        </pre>
+      </div>
+    </div>
+  );
+}
+
+function StatusCard({ title, status, value, description }: {
+  title: string;
+  status: 'success' | 'warning' | 'critical' | 'optional';
+  value: string;
+  description: string;
+}) {
+  const colors = {
+    success: 'border-green-500 bg-green-900/20',
+    warning: 'border-yellow-500 bg-yellow-900/20',
+    critical: 'border-red-500 bg-red-900/20',
+    optional: 'border-blue-500 bg-blue-900/20'
+  };
+
+  return (
+    <div className={`border rounded-lg p-4 ${colors[status]}`}>
+      <h3 className="font-semibold mb-1">{title}</h3>
+      <div className="text-3xl font-bold mb-2">{value}</div>
+      <p className="text-sm text-slate-400">{description}</p>
+    </div>
+  );
+}
