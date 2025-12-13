@@ -772,9 +772,22 @@ export class HTSService {
 
 /*
 // مثال استفاده در کامپوننت React:
+// این بخش به عنوان مرجع نگهداری می‌شود
+// تمام کدها در فایل‌های اصلی پروژه پیاده‌سازی شده‌اند
 
 import { HTSService } from '@/services/hts/HTSService';
 import { HTSResult } from '@/types/hts';
 
 export function HTSSignalsPanel() {
-  const [signals, setSign
+  // Example implementation - see src/components/Strategy/HTSAnalysisPanel.tsx for actual code
+  const [signals, setSignals] = useState<HTSResult[]>([]);
+  // ... rest of implementation
+}
+*/
+
+// ============================================================================
+// INTEGRATION COMPLETE
+// ============================================================================
+// All code has been integrated into the CryptoOne project.
+// This file is kept for reference only.
+// See HTS_INTEGRATION_COMPLETE.md for full details.

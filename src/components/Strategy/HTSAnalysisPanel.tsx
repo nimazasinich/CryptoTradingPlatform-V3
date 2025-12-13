@@ -180,8 +180,8 @@ export function HTSAnalysisPanel({
       {/* Signals Grid */}
       {!loading && signals.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {signals.map((signal) => (
-            <HTSSignalCard key={signal.symbol} signal={signal} />
+          {signals.map((signal, index) => (
+            <HTSSignalCard key={`${signal.symbol}-${index}`} signal={signal} />
           ))}
         </div>
       )}
