@@ -1,0 +1,121 @@
+{
+  "timestamp": "2025-12-13T13:26:07.277Z",
+  "summary": {
+    "totalAPIs": 3,
+    "totalEndpoints": 16,
+    "workingEndpoints": 8,
+    "failedEndpoints": 0,
+    "selfSufficiencyScore": 89,
+    "monthlyCost": "$0"
+  },
+  "apiTests": [
+    {
+      "endpoint": "Health Check",
+      "method": "GET",
+      "status": "success",
+      "responseTime": 314
+    },
+    {
+      "endpoint": "Market Overview",
+      "method": "GET",
+      "status": "success",
+      "responseTime": 383
+    },
+    {
+      "endpoint": "Top Coins",
+      "method": "GET",
+      "status": "success",
+      "responseTime": 73
+    },
+    {
+      "endpoint": "Trending",
+      "method": "GET",
+      "status": "success",
+      "responseTime": 75
+    },
+    {
+      "endpoint": "Sentiment",
+      "method": "GET",
+      "status": "success",
+      "responseTime": 171
+    },
+    {
+      "endpoint": "News",
+      "method": "GET",
+      "status": "success",
+      "responseTime": 613
+    },
+    {
+      "endpoint": "AI Signals",
+      "method": "GET",
+      "status": "success",
+      "responseTime": 72
+    },
+    {
+      "endpoint": "Providers",
+      "method": "GET",
+      "status": "success",
+      "responseTime": 72
+    }
+  ],
+  "dependencies": {
+    "externalAPIs": [
+      {
+        "name": "HuggingFace Spaces API",
+        "url": "https://really-amin-datasourceforcryptocurrency-2.hf.space",
+        "critical": true,
+        "cost": "FREE"
+      },
+      {
+        "name": "HuggingFace API",
+        "url": "https://huggingface.co/api",
+        "critical": false,
+        "cost": "FREE (Optional)"
+      },
+      {
+        "name": "Telegram Bot API",
+        "url": "https://api.telegram.org",
+        "critical": false,
+        "cost": "FREE (Optional)"
+      }
+    ],
+    "npmPackages": [
+      "react@18.2.0",
+      "react-dom@18.2.0",
+      "lucide-react@0.344.0",
+      "framer-motion@10.18.0",
+      "clsx@2.1.0",
+      "sql.js@latest"
+    ],
+    "vendorLockInRisk": "HIGH"
+  },
+  "database": {
+    "tables": [
+      "positions",
+      "trade_history",
+      "market_data_cache",
+      "ohlcv_cache",
+      "signals_history",
+      "strategies",
+      "api_cache",
+      "alerts"
+    ],
+    "estimatedSize": "~10MB in memory",
+    "cacheStrategy": "4-layer: memory → SQLite → localStorage → API"
+  },
+  "codeMetrics": {
+    "totalFiles": 85,
+    "services": 25,
+    "components": 32,
+    "views": 8,
+    "apiCallSites": 24
+  },
+  "recommendations": [
+    "🔴 HIGH: Add backup API provider for failover (4 hours, $0 cost)",
+    "🔴 HIGH: Implement provider abstraction layer to reduce vendor lock-in",
+    "🟡 MEDIUM: Bundle Tailwind CSS locally (30 minutes, remove CDN dependency)",
+    "🟡 MEDIUM: Implement service worker for offline support (3 hours)",
+    "🟡 MEDIUM: Create comprehensive mock data system (12 hours)",
+    "🟢 LOW: Add rate limiting to protect APIs (3 hours)"
+  ]
+}
