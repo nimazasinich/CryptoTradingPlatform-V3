@@ -1,8 +1,24 @@
 // ============================================================================
 // HTS (Hybrid Trading System) - Complete Integration for CryptoOne
 // ============================================================================
-// این فایل شامل تمام کدهای اصلی HTS است که به CryptoOne اضافه می‌شود
-// استفاده: این کدها را در پروژه موجود خود قرار دهید
+// ✅ INTEGRATION COMPLETE - این فایل به عنوان مرجع نگهداری می‌شود
+// ✅ تمام کدها به پروژه CryptoOne اضافه شده‌اند
+// ✅ استفاده: این فایل دیگر نیازی به استفاده ندارد - فقط برای مرجع
+// ============================================================================
+// 
+// STATUS: ✅ COMPLETED
+// Date: December 13, 2025
+// 
+// All HTS components have been successfully integrated into the CryptoOne platform:
+// - Types: src/types/hts.ts
+// - Indicators: src/services/hts/indicators/
+// - Scoring: src/services/hts/scoring/
+// - Service: src/services/hts/HTSService.ts
+// - Components: src/components/Strategy/HTS*.tsx
+// - Hook: src/hooks/useHTSAnalysis.ts
+// - Integration: src/views/StrategyManager.tsx
+//
+// See HTS_INTEGRATION_COMPLETE.md for full details.
 // ============================================================================
 
 // ============================================================================

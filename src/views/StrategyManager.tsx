@@ -3,6 +3,7 @@ import { StrategySelector } from '../components/Strategy/StrategySelector';
 import { AutoTradeToggle } from '../components/Strategy/AutoTradeToggle';
 import { SignalDisplay } from '../components/Strategy/SignalDisplay';
 import { PerformanceMetrics } from '../components/Strategy/PerformanceMetrics';
+import { HTSAnalysisPanel } from '../components/Strategy/HTSAnalysisPanel';
 import { Settings, Info, Target, Zap, Activity, BarChart3, TrendingUp, X } from 'lucide-react';
 import { useScoringUpdates } from '../hooks/useWebSocket';
 import { strategyService } from '../services/strategyService';
@@ -23,6 +24,9 @@ export default function StrategyManager() {
   const [backtestPeriod, setBacktestPeriod] = useState(90); // days
   const [backtestBalance, setBacktestBalance] = useState(10000);
   const [showBacktestConfig, setShowBacktestConfig] = useState(false);
+  
+  // HTS Analysis state
+  const [showHTSAnalysis, setShowHTSAnalysis] = useState(false);
 
   // Feature 1.1.4: Real-time scoring updates via WebSocket
   useScoringUpdates((data) => {
@@ -117,6 +121,67 @@ export default function StrategyManager() {
           </div>
         </div>
       </div>
+
+      {/* HTS Strategy Toggle */}
+      <div className="glass-card p-6 border-l-4 border-l-purple-500">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-white font-bold flex items-center gap-2 mb-1">
+              <span className="text-2xl">🎯</span>
+              HTS (Hybrid Trading System)
+            </h3>
+            <p className="text-slate-400 text-sm">
+              Advanced multi-layer analysis combining technical indicators, Smart Money Concepts, and more
+            </p>
+          </div>
+          <button
+            onClick={() => setShowHTSAnalysis(!showHTSAnalysis)}
+            className={`px-6 py-3 rounded-lg font-bold transition-all ${
+              showHTSAnalysis
+                ? 'bg-purple-600 text-white hover:bg-purple-700'
+                : 'bg-white/5 text-slate-400 hover:bg-white/10'
+            }`}
+          >
+            {showHTSAnalysis ? 'Hide HTS Analysis' : 'Show HTS Analysis'}
+          </button>
+        </div>
+
+        {/* HTS Quick Stats */}
+        {!showHTSAnalysis && (
+          <div className="grid grid-cols-3 gap-3 mt-4">
+            <div className="bg-white/5 rounded-lg p-3">
+              <div className="text-slate-400 text-xs mb-1">Analysis Layers</div>
+              <div className="text-white font-bold">5</div>
+              <div className="text-xs text-slate-500">Core, SMC, Patterns, Sentiment, ML</div>
+            </div>
+            <div className="bg-white/5 rounded-lg p-3">
+              <div className="text-slate-400 text-xs mb-1">Supported Symbols</div>
+              <div className="text-white font-bold">8+</div>
+              <div className="text-xs text-slate-500">BTC, ETH, SOL, BNB, and more</div>
+            </div>
+            <div className="bg-white/5 rounded-lg p-3">
+              <div className="text-slate-400 text-xs mb-1">Auto-Refresh</div>
+              <div className="text-green-400 font-bold">30s</div>
+              <div className="text-xs text-slate-500">Real-time signal updates</div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* HTS Analysis Panel */}
+      {showHTSAnalysis && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+        >
+          <HTSAnalysisPanel 
+            symbols={['BTC', 'ETH', 'SOL', 'BNB']} 
+            autoRefresh={true}
+          />
+        </motion.div>
+      )}
 
       {/* Strategy Selection */}
       <div>
