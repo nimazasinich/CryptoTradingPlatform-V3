@@ -214,7 +214,11 @@ async function fetchWithFallback(endpoint) {
   throw new Error('All APIs failed');
 }`}
         </pre>
+          </div>
+        </div>
       </div>
+        </>
+      )}
     </div>
   );
 }
