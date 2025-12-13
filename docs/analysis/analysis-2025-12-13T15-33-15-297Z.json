@@ -1,0 +1,232 @@
+{
+  "timestamp": "2025-12-13T15:33:15.293Z",
+  "summary": {
+    "totalFiles": 85,
+    "totalLines": 19542,
+    "totalSize": 698174,
+    "filesByType": {
+      ".tsx": 42,
+      ".ts": 43
+    },
+    "componentCount": 32,
+    "serviceCount": 25,
+    "hookCount": 5
+  },
+  "dependencies": {
+    "production": {
+      "clsx": "2.1.0",
+      "framer-motion": "10.18.0",
+      "lucide-react": "0.344.0",
+      "react": "^18.2.0",
+      "react-dom": "^18.2.0",
+      "react-focus-lock": "^2.13.7",
+      "sql.js": "latest",
+      "tailwind-merge": "2.2.1"
+    },
+    "dev": {
+      "@types/node": "^22.14.0",
+      "@vitejs/plugin-react": "^5.0.0",
+      "ts-node": "^10.9.2",
+      "tsx": "^4.21.0",
+      "typescript": "~5.8.2",
+      "vite": "^6.2.0"
+    },
+    "external": [
+      "react",
+      "lucide-react",
+      "framer-motion",
+      "clsx",
+      "tailwind-merge",
+      "react-focus-lock"
+    ]
+  },
+  "apiDependencies": {
+    "endpoints": [
+      "/api/health",
+      "/api/status",
+      "/api/market",
+      "/api/trending",
+      "/api/coins/top",
+      "/api/service/rate",
+      "/api/service/rate/batch",
+      "/api/service/history",
+      "/api/resources/summary",
+      "/api/providers",
+      "/api/sentiment/global",
+      "/api/service/sentiment",
+      "/api/news",
+      "/api/ai/signals",
+      "/api/ai/decision"
+    ],
+    "baseUrl": "https://really-amin-datasourceforcryptocurrency-2.hf.space",
+    "criticalEndpoints": [
+      "/api/market",
+      "/api/coins/top",
+      "/api/ai/signals",
+      "/api/sentiment/global"
+    ],
+    "servicesUsingAPI": [
+      "/src/services/httpClient.ts",
+      "/src/services/settingsService.ts"
+    ]
+  },
+  "architecture": {
+    "layers": [
+      "Views (React)",
+      "Components",
+      "Hooks",
+      "Services",
+      "Database (SQLite)"
+    ],
+    "patterns": [
+      "Service Layer",
+      "Custom Hooks",
+      "Context API",
+      "Lazy Loading"
+    ],
+    "stateManagement": "React Context API + Local State",
+    "dataFlow": "API → Service → Cache → Hook → Component"
+  },
+  "risks": {
+    "level": "CRITICAL",
+    "issues": [
+      {
+        "severity": "CRITICAL",
+        "category": "API Dependency",
+        "description": "Heavy reliance on single external API (HuggingFace Spaces)",
+        "files": [
+          "/src/config/api.ts",
+          "/src/services/httpClient.ts",
+          "/src/services/settingsService.ts"
+        ],
+        "recommendation": "Implement fallback APIs (CoinGecko, CoinMarketCap) and enhance caching"
+      },
+      {
+        "severity": "LOW",
+        "category": "Type Safety",
+        "description": "Excessive use of 'any' type (7 occurrences)",
+        "files": [
+          "/src/components/Trading/AutoTradingPanel.tsx"
+        ],
+        "recommendation": "Replace any types with proper TypeScript interfaces"
+      },
+      {
+        "severity": "LOW",
+        "category": "Type Safety",
+        "description": "Excessive use of 'any' type (7 occurrences)",
+        "files": [
+          "/src/hooks/useWebSocket.ts"
+        ],
+        "recommendation": "Replace any types with proper TypeScript interfaces"
+      },
+      {
+        "severity": "LOW",
+        "category": "Type Safety",
+        "description": "Excessive use of 'any' type (7 occurrences)",
+        "files": [
+          "/src/services/aiService.ts"
+        ],
+        "recommendation": "Replace any types with proper TypeScript interfaces"
+      },
+      {
+        "severity": "LOW",
+        "category": "Type Safety",
+        "description": "Excessive use of 'any' type (17 occurrences)",
+        "files": [
+          "/src/services/database.ts"
+        ],
+        "recommendation": "Replace any types with proper TypeScript interfaces"
+      },
+      {
+        "severity": "LOW",
+        "category": "Type Safety",
+        "description": "Excessive use of 'any' type (6 occurrences)",
+        "files": [
+          "/src/services/strategyService.ts"
+        ],
+        "recommendation": "Replace any types with proper TypeScript interfaces"
+      },
+      {
+        "severity": "LOW",
+        "category": "Type Safety",
+        "description": "Excessive use of 'any' type (9 occurrences)",
+        "files": [
+          "/src/utils/exportTable.ts"
+        ],
+        "recommendation": "Replace any types with proper TypeScript interfaces"
+      },
+      {
+        "severity": "LOW",
+        "category": "Type Safety",
+        "description": "Excessive use of 'any' type (6 occurrences)",
+        "files": [
+          "/src/views/Settings.tsx"
+        ],
+        "recommendation": "Replace any types with proper TypeScript interfaces"
+      }
+    ]
+  },
+  "caching": {
+    "implementation": "SQLite (sql.js)",
+    "cacheLayers": [
+      "api_cache",
+      "market_data_cache",
+      "ohlcv_cache",
+      "signals_history",
+      "positions",
+      "trade_history"
+    ],
+    "ttl": {},
+    "offlineCapability": 48
+  },
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "category": "Reliability",
+      "title": "Implement API Fallback Strategy",
+      "description": "Add CoinGecko and CoinMarketCap as backup APIs to reduce dependency on HuggingFace",
+      "effort": "4-8 hours",
+      "impact": "Eliminates single point of failure, increases uptime to 99.9%"
+    },
+    {
+      "priority": "HIGH",
+      "category": "Performance",
+      "title": "Enhance Cache TTL Strategy",
+      "description": "Implement adaptive TTL based on data volatility and user preferences",
+      "effort": "2-4 hours",
+      "impact": "Reduces API calls by 50%, improves offline experience"
+    },
+    {
+      "priority": "MEDIUM",
+      "category": "UX",
+      "title": "Add Offline Mode Indicator",
+      "description": "Show users when they are running on cached data vs live data",
+      "effort": "1-2 hours",
+      "impact": "Improved transparency and user confidence"
+    },
+    {
+      "priority": "MEDIUM",
+      "category": "Data",
+      "title": "Pre-seed Database with Market Data",
+      "description": "Ship application with recent market data for top 50 coins",
+      "effort": "2-3 hours",
+      "impact": "Instant first-load experience, works offline from start"
+    },
+    {
+      "priority": "LOW",
+      "category": "Testing",
+      "title": "Add Mock Data Generator",
+      "description": "Create utility to generate realistic mock data for development and testing",
+      "effort": "2-4 hours",
+      "impact": "Faster development, easier testing, demo mode for presentations"
+    },
+    {
+      "priority": "LOW",
+      "category": "Monitoring",
+      "title": "Implement API Health Dashboard",
+      "description": "Add admin panel showing real-time API status and fallback usage",
+      "effort": "3-5 hours",
+      "impact": "Proactive monitoring, faster issue detection"
+    }
+  ]
+}
